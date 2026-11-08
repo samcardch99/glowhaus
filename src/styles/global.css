@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+@import '@fontsource/aboreto/400.css';
+@import '@fontsource-variable/montserrat/wght.css';
+
+/* Tokens de marca, tomados del diseño v3 de Claude Design */
+@theme {
+  --color-cream: #faf8f5;
+  --color-cream-2: #f2ece3;
+  --color-sand: #eae0d1;
+  --color-sand-2: #e7dccb;
+  --color-beige: #dcceb9;
+  --color-tan: #cbb595;
+  --color-gold: #a8844f;
+  --color-gold-dark: #765c37;
+  --color-brown: #3b2f26;
+  --color-brown-2: #29211b;
+  --color-ink: #18120e;
+  --color-taupe: #625951;
+  --color-silver: #d1d0cf;
+
+  --font-display: 'Aboreto', serif;
+  --font-sans: 'Montserrat Variable', 'Montserrat', sans-serif;
+
+  --shadow-stack: 0 -16px 40px rgb(24 18 14 / 0.16);
+  --ease-glow: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
