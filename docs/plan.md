@@ -39,3 +39,30 @@ Web estática con Astro 7, Tailwind 4 y GSAP (ScrollTrigger y SplitText) para Ho
 ```bash
 pnpm build && pnpm check && pnpm format:check
 ```
+
+## Estado (08-11-2026)
+
+Las fases 1 a 8 están hechas y la web está publicada en el sitio temporal:
+<https://darkgray-mandrill-714142.hostingersite.com>. El sitio temporal no se indexa (`noindex`).
+
+Pendiente de la clínica:
+
+- **Claves de EmailJS:** ver `docs/emailjs.md`. Hasta que estén, el formulario envía la consulta por WhatsApp.
+- **Enlace de solicitud de Cherry:** va en `site.cherry`, en `src/data/site.ts`.
+- **Enlaces reales de Facebook y TikTok:** también en `site.ts`.
+- **Tercera persona del equipo:** se añade en `src/data/home.ts`.
+- **Foto horizontal de la sala:** la actual (768×1024, vertical) se ve blanda en el banner de Primera visita.
+- **Revisión de los textos de Privacidad y Términos.**
+- **Conectar `glowhausaesthetics.net`:** transferir desde Namecheap o apuntar los DNS. Después, construir sin `SITE_URL` y volver a desplegar.
+
+## Desplegar
+
+1. Construye y comprime la web:
+
+   ```bash
+   SITE_URL=https://darkgray-mandrill-714142.hostingersite.com pnpm build   # en el dominio final, sin SITE_URL
+   rm -f site.zip && (cd dist && zip -qr ../site.zip .)
+   ```
+
+2. Sube `site.zip` a `public_html` con la API de archivos de Hostinger (TUS).
+3. Ejecuta `hosting_websites_deploy-static-site-archive` con `archive_path: site.zip`, que reemplaza todo el contenido del sitio.
