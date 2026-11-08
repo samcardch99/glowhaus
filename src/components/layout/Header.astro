@@ -38,13 +38,8 @@ const items = menuItems.map((m, i) => ({
 <header
   id="gh-header"
   data-theme={theme}
-  class="group/h fixed inset-x-0 top-0 z-30 transition-[background,transform] duration-500 ease-(--ease-glow)"
+  class="group/h fixed inset-x-0 top-0 z-30"
 >
-  <!-- Desenfoque que aparece al bajar, con degradado hacia abajo -->
-  <div
-    aria-hidden="true"
-    class="hdr-blur pointer-events-none absolute inset-x-0 top-0 -bottom-7 -z-10 opacity-0 backdrop-blur-[14px] transition-opacity duration-400"
-  ></div>
   <div class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[clamp(20px,2.4vw,36px)] px-gutter pt-[clamp(18px,calc(120px-14vw),56px)] pb-[18px]">
     <a href={homeHref} class="flex justify-self-start" aria-label="GlowHaus, inicio">
       <Image
@@ -207,7 +202,9 @@ const items = menuItems.map((m, i) => ({
 </dialog>
 
 <style is:global>
-  /* Colores de la cabecera según lo que hay debajo (lo cambia src/scripts/header.ts) */
+  /* Cabecera: degradado del color de la sección que tiene debajo (lo calcula
+     src/scripts/site.ts), transparente sobre el vídeo de portada, y se esconde
+     al bajar y vuelve al subir, como en el diseño. */
   #gh-header {
     --hdr-fg: var(--color-ink);
     color: var(--hdr-fg);
@@ -217,6 +214,10 @@ const items = menuItems.map((m, i) => ({
       rgb(var(--hdr-bg, 250 248 245) / 0.92) 70%,
       rgb(var(--hdr-bg, 250 248 245) / 0) 100%
     );
+    transition:
+      background 0.5s,
+      color 0.5s,
+      transform 0.45s var(--ease-glow);
   }
   #gh-header .hdr-logo {
     filter: brightness(0) opacity(0.88);
@@ -229,6 +230,8 @@ const items = menuItems.map((m, i) => ({
   #gh-header[data-theme='overlay'],
   #gh-header[data-theme='dark'] {
     --hdr-fg: var(--color-cream);
+  }
+  #gh-header[data-theme='overlay']:not([data-scrolled]) {
     background: transparent;
   }
   #gh-header[data-theme='overlay'] .hdr-logo,
@@ -241,14 +244,15 @@ const items = menuItems.map((m, i) => ({
     border-color: rgb(250 248 245 / 0.55);
     color: var(--color-cream);
   }
-  #gh-header[data-scrolled]:not([data-theme='overlay']) .hdr-blur {
-    opacity: 1;
-  }
-  #gh-header .hdr-blur {
-    mask-image: linear-gradient(180deg, #000 55%, transparent);
-  }
   #gh-header[data-hidden] {
-    transform: translateY(-100%);
+    transform: translateY(-101%);
+  }
+  /* Durante la entrada de marca la cabecera espera fuera */
+  .gh-intro-on #gh-header {
+    opacity: 0;
+  }
+  #gh-header {
+    transition-property: background, color, transform, opacity;
   }
   dialog#gh-menu[open] {
     display: block;

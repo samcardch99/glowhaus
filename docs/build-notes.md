@@ -53,24 +53,44 @@ Convenciones del código de la web. Léelas antes de tocar una página.
   - `no-scrollbar`.
 - **Contraste:** el dorado `gold` sobre crema solo se usa en texto grande (24 px o más). En texto pequeño sobre fondo claro, usa `gold-dark`.
 
-## Comportamientos globales (`site.ts`), por atributo
+## Sistema de movimiento (`src/scripts/site.ts` y `src/scripts/gsap.ts`)
 
-| Atributo                                                                                     | Qué hace                                                                                         |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `data-theme="dark\|light\|overlay"`                                                          | En cada sección: la cabecera cambia de color cuando la tiene debajo. **Pónselo a toda sección.** |
-| `data-reveal` (con `data-delay="200"` opcional, en ms)                                       | Aparece con un fundido, desplazamiento y desenfoque al entrar en pantalla                        |
-| `data-stack-wrap` con hijos `data-stack`                                                     | Tarjetas sticky que se apilan; la de debajo se reduce y se oscurece                              |
-| `data-cover`                                                                                 | Una sección sticky que se oscurece cuando la tapa la siguiente                                   |
-| `data-count="650"`                                                                           | Contador desde 0, conservando el prefijo y el sufijo del texto                                   |
-| `data-type`                                                                                  | Texto que se escribe solo                                                                        |
-| `<video data-autoplay data-src="/media/x.mp4" muted loop playsinline poster="/media/x.jpg">` | Se carga cerca de la pantalla y se pausa fuera de ella                                           |
-| `data-video-toggle` + `aria-controls="<id del vídeo>"`                                       | Botón de pausa del vídeo; obligatorio en cada vídeo en bucle visible                             |
+Replica la lógica de animación del diseño v3, que se puede leer extraída en
+`/private/tmp/claude-501/-Users-sam-Documents-laira/fa562ac9-3ef6-40d0-a75c-4018ce24d885/scratchpad/design-logic.js`.
+**No reimplementes en un componente lo que ya hace un atributo global.**
 
-Las animaciones propias de una sección van en un `<script>` dentro de su componente:
+| Atributo | Qué hace (parámetros del diseño) |
+| --- | --- |
+| `data-theme="dark\|light\|overlay"` | En cada sección. La cabecera toma el color de fondo opaco de lo que tiene debajo y cambia su texto a claro u oscuro. Se esconde al bajar y vuelve al subir |
+| `data-reveal` | Aparece en **grupo con sus hermanos** (mismo padre): sube 56 px, escala .96 → 1, 0,8 s, curva `glow` (.2,.7,.2,1), 220 ms entre hermanos. Se dispara cuando el primero del grupo llega al 82 % de la pantalla |
+| `data-reveal="solo"` | Igual que `data-reveal`, pero aparece por su cuenta |
+| `data-delay="ms"` | Retraso extra para `data-reveal` |
+| `data-mark` | Destello dorado en el borde superior tras aparecer (tarjetas) |
+| `data-words` (con `data-wstep="ms"` y `data-wdelay="ms"`) | Titular que aparece letra a letra. Úsalo en los h1/h2 grandes, nunca junto con `data-reveal` en el mismo elemento |
+| `data-stack-wrap` > `data-stack` | Tarjetas sticky a pantalla completa. La de abajo tapa a la de arriba, que pasa a escala 1−.06p, desenfoque 4p, brillo 1−.35p y radio 18p; la que entra lleva sombra. En escritorio, cada golpe de rueda salta a la tarjeta siguiente (560–620 ms, easeInOutCubic) |
+| `data-cover` (opcional: `data-cover-target`) | Una sección sticky que reacciona igual cuando la tapa su hermana siguiente |
+| `data-count="650"` | Cuenta desde 0 en 1,3 s, conservando el prefijo y el sufijo |
+| `data-wipe` | El texto se descubre de izquierda a derecha con desenfoque (1,4 s) |
+| `data-glow` | Destello dorado del texto una vez, tras 0,9 s |
+| Contenedor con `data-typerow` (cada fila con `data-dot` + `data-type`) | Se escribe fila a fila: el punto aparece con un rebote y luego el texto, a 22 ms por letra. Un `data-type` suelto también funciona |
+| `video[data-autoplay][data-src]` | Carga diferida, play y pause según la visibilidad |
+| `data-video-toggle` + `aria-controls` | Botón de pausa de un vídeo |
 
-- importan desde `src/scripts/gsap.ts` (`gsap`, `ScrollTrigger`, `SplitText`, `prefersReducedMotion`);
-- respetan `prefersReducedMotion()` y usan `gsap.matchMedia()` para separar móvil y escritorio;
-- dejan el contenido visible y usable sin JavaScript.
+Más piezas:
+
+- **Anclas** de la misma página: desplazamiento suave de 900 ms.
+- **Transición entre páginas:** View Transitions en CSS (`global.css`).
+- **Helpers de `src/scripts/gsap.ts`:**
+  - curvas `glow`, `swift` y `wipe`;
+  - `prefersReducedMotion()` e `isDesktopPointer()` (≥1100 px con ratón);
+  - `easeInOutCubic` y `scrollToY(y, ms)`.
+- **Entrada de marca:** `src/scripts/intro-state.ts` exporta `introDone`, una promesa que se resuelve cuando termina la entrada. Mientras corre, `<html>` tiene la clase `gh-intro-on`. Las animaciones de la primera pantalla esperan a `introDone`.
+
+Reglas:
+
+- **Hover** solo en escritorio (en Tailwind 4, `hover:` ya va dentro de `@media (hover:hover)`).
+- **Rotación automática** (carruseles, metas, equipo, pagos): se pausa al interactuar 6–7 s, con la pestaña oculta o fuera de pantalla, y no corre con movimiento reducido.
+- Todo debe verse completo **sin JS** y con **movimiento reducido**.
 
 ## Medios
 

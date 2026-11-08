@@ -1,30 +1,55 @@
-import { gsap, ScrollTrigger, prefersReducedMotion } from './gsap'
+import {
+  gsap,
+  ScrollTrigger,
+  SplitText,
+  prefersReducedMotion,
+  isDesktopPointer,
+  scrollToY,
+} from './gsap'
+import { introDone } from './intro-state'
 
-// Comportamiento común a todas las páginas: cabecera, menú, apariciones al hacer
-// scroll, secciones apiladas, contadores, texto que se escribe y vídeos diferidos.
+// Sistema de movimiento común, fiel al diseño v3 (Claude Design):
+// cabecera que se esconde al bajar y toma el color de la sección de debajo,
+// apariciones por grupos, titulares letra a letra, tarjetas apiladas con
+// «snap», contadores, barrido, destello dorado, texto que se escribe y vídeos
+// diferidos. Todo respeta «reducir movimiento» y funciona sin JS.
 
 const reduce = prefersReducedMotion()
+const root = document.documentElement
 
-// ---------- Cabecera: colores según la sección que tiene debajo ----------
+// ---------- Cabecera ----------
 const header = document.getElementById('gh-header')
+const menu = document.getElementById('gh-menu') as HTMLDialogElement | null
+let lastY = window.scrollY
+
+/** Color opaco real de un elemento (sube por los padres si es transparente) */
+function opaqueBg(el: Element | null): string | null {
+  for (let n = el; n && n !== root; n = n.parentElement) {
+    const m = getComputedStyle(n).backgroundColor.match(/[\d.]+/g)
+    if (m && (m.length < 4 || Number(m[3]) > 0.5)) return `${m[0]} ${m[1]} ${m[2]}`
+  }
+  return null
+}
 
 function updateHeader() {
   if (!header) return
-  header.toggleAttribute('data-scrolled', window.scrollY > 8)
-  const y = Math.min(header.offsetHeight * 0.55, 60)
-  const stack = document.elementsFromPoint(window.innerWidth / 2, y)
-  const host = stack
-    .find((el) => !header.contains(el) && el.closest('[data-theme]'))
-    ?.closest<HTMLElement>('[data-theme]')
-  if (!host || host === header) return
+  const y = window.scrollY
+  const dy = y - lastY
+  lastY = y
+  header.toggleAttribute('data-scrolled', y > 40)
+  // Se esconde al bajar y vuelve al subir (como en el diseño)
+  if (!menu?.open) {
+    if (y <= 20 || dy < -4) header.removeAttribute('data-hidden')
+    else if (dy > 4) header.setAttribute('data-hidden', '')
+  }
+  const probeY = Math.min(header.offsetHeight * 0.55, 60)
+  const below = document.elementsFromPoint(window.innerWidth / 2, probeY).filter((el) => !header.contains(el))
+  const host = below.find((el) => el.closest('[data-theme]'))?.closest<HTMLElement>('[data-theme]')
+  if (!host) return
   const theme = host.dataset.theme ?? 'light'
   if (header.dataset.theme !== theme) header.dataset.theme = theme
-  if (theme === 'light') {
-    const bg = getComputedStyle(host).backgroundColor.match(/\d+(\.\d+)?/g)
-    if (bg && (bg.length < 4 || Number(bg[3]) > 0.5)) {
-      header.style.setProperty('--hdr-bg', `${bg[0]} ${bg[1]} ${bg[2]}`)
-    }
-  }
+  const bg = opaqueBg(below[0] ?? host)
+  if (bg) header.style.setProperty('--hdr-bg', bg)
 }
 
 let headerRaf = 0
@@ -38,113 +63,280 @@ const queueHeader = () => {
 window.addEventListener('scroll', queueHeader, { passive: true })
 window.addEventListener('resize', queueHeader)
 updateHeader()
+// Algunas secciones cambian debajo sin scroll: repaso periódico barato
+window.setInterval(() => {
+  if (!document.hidden) updateHeader()
+}, 700)
 
 // ---------- Menú ----------
-const menu = document.getElementById('gh-menu') as HTMLDialogElement | null
 const openers = document.querySelectorAll<HTMLButtonElement>('[data-menu-open]')
 let menuTl: gsap.core.Timeline | null = null
 
 function openMenu() {
   if (!menu || menu.open) return
   menu.showModal()
+  header?.removeAttribute('data-hidden')
   openers.forEach((b) => b.setAttribute('aria-expanded', 'true'))
-  document.documentElement.style.overflow = 'hidden'
+  root.style.overflow = 'hidden'
   menuTl?.kill()
   menuTl = gsap
     .timeline()
-    .to(menu, { opacity: 1, duration: reduce ? 0 : 0.45, ease: 'power2.out' })
+    .fromTo(
+      menu,
+      { opacity: 0, clipPath: reduce ? 'inset(0 0 0% 0)' : 'inset(0 0 100% 0)' },
+      { opacity: 1, clipPath: 'inset(0 0 0% 0)', duration: reduce ? 0 : 0.7, ease: 'swift' },
+    )
     .from(
       menu.querySelectorAll('[data-menu-item]'),
-      { y: reduce ? 0 : 24, opacity: 0, duration: 0.6, stagger: 0.05, ease: 'power3.out' },
-      0.05,
+      { y: reduce ? 0 : 40, opacity: 0, duration: 0.8, stagger: 0.06, ease: 'glow' },
+      0.25,
     )
 }
 
-function closeMenu() {
-  if (!menu?.open) return
-  menuTl?.kill()
-  gsap.to(menu, {
-    opacity: 0,
-    duration: reduce ? 0 : 0.35,
-    ease: 'power2.in',
-    onComplete: () => {
-      menu.close()
-      document.documentElement.style.overflow = ''
-      openers.forEach((b) => b.setAttribute('aria-expanded', 'false'))
-    },
+function closeMenu(): Promise<void> {
+  return new Promise((resolve) => {
+    if (!menu?.open) return resolve()
+    menuTl?.kill()
+    gsap.to(menu, {
+      opacity: 0,
+      duration: reduce ? 0 : 0.4,
+      ease: 'power2.in',
+      onComplete: () => {
+        menu.close()
+        root.style.overflow = ''
+        openers.forEach((b) => b.setAttribute('aria-expanded', 'false'))
+        resolve()
+      },
+    })
   })
 }
 
 openers.forEach((b) => b.addEventListener('click', openMenu))
-menu?.querySelectorAll('[data-menu-close]').forEach((b) => b.addEventListener('click', closeMenu))
+menu
+  ?.querySelectorAll('[data-menu-close]')
+  .forEach((b) => b.addEventListener('click', () => void closeMenu()))
 menu?.addEventListener('cancel', (e) => {
   e.preventDefault()
-  closeMenu()
+  void closeMenu()
 })
 menu?.addEventListener('click', (e) => {
   const target = e.target as HTMLElement
-  // Clic en el fondo, o en un enlace a una sección de esta misma página
-  if (!target.closest('a,button,input,select,textarea,label,img')) closeMenu()
-  const link = target.closest('a')
-  if (link && link.pathname === location.pathname && link.hash) closeMenu()
+  if (!target.closest('a,button,input,select,textarea,label,img')) void closeMenu()
 })
 
-// ---------- Apariciones al entrar en pantalla ----------
-const reveals = gsap.utils.toArray<HTMLElement>('[data-reveal]')
-if (reduce) {
-  gsap.set(reveals, { opacity: 1 })
-} else {
-  reveals.forEach((el) => {
-    const delay = Number(el.dataset.delay ?? 0) / 1000
+// ---------- Anclas de esta misma página: desplazamiento suave ----------
+document.addEventListener('click', (e) => {
+  const a = (e.target as HTMLElement).closest('a')
+  if (!a || a.target || e.metaKey || e.ctrlKey || e.shiftKey || e.defaultPrevented) return
+  const url = new URL(a.href, location.href)
+  if (url.pathname !== location.pathname || !url.hash) return
+  const dest = document.getElementById(decodeURIComponent(url.hash.slice(1)))
+  if (!dest) return
+  e.preventDefault()
+  void closeMenu().then(() => {
+    const y = dest.getBoundingClientRect().top + window.scrollY
+    void scrollToY(y, 900).then(() => {
+      history.replaceState(null, '', url.hash)
+      if (!dest.hasAttribute('tabindex')) dest.setAttribute('tabindex', '-1')
+      dest.focus({ preventScroll: true })
+    })
+  })
+})
+
+// ---------- Apariciones por grupos ----------
+// [data-reveal] sube 56px con una leve escala al entrar, en grupo con sus
+// hermanos (220ms entre uno y otro). data-delay suma ms; data-reveal="solo"
+// aparece por su cuenta; data-mark añade un destello dorado arriba.
+const revealEls = gsap.utils.toArray<HTMLElement>('[data-reveal]')
+
+function playReveal(group: HTMLElement[]) {
+  group.forEach((el, k) => {
+    const delay = k * 0.22 + Number(el.dataset.delay ?? 0) / 1000
     gsap.fromTo(
       el,
-      { opacity: 0, y: 36, filter: 'blur(6px)' },
-      {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 0.9,
-        delay,
-        ease: 'power3.out',
-        clearProps: 'filter,transform',
-        scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-      },
+      { opacity: 0, y: 56, scale: 0.96 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.8, delay, ease: 'glow', clearProps: 'transform' },
     )
+    if (el.dataset.mark !== undefined)
+      gsap.to(el, {
+        keyframes: [
+          { boxShadow: 'inset 0 3px 0 rgba(168,132,79,1)', duration: 0.7 },
+          { boxShadow: 'inset 0 2px 0 rgba(168,132,79,0)', duration: 0.7 },
+        ],
+        delay: 0.5 + k * 0.45,
+        ease: 'sine.inOut',
+      })
   })
 }
 
-// ---------- Secciones apiladas: la de abajo tapa a la de arriba ----------
-// [data-stack-wrap] contiene tarjetas sticky [data-stack]; cada una se reduce y
-// oscurece mientras la siguiente sube por encima.
+if (reduce) {
+  gsap.set(revealEls, { opacity: 1 })
+} else {
+  const groups = new Map<Element, HTMLElement[]>()
+  revealEls.forEach((el) => {
+    const key: Element = el.dataset.reveal === 'solo' ? el : (el.parentElement ?? el)
+    const g = groups.get(key) ?? []
+    g.push(el)
+    groups.set(key, g)
+  })
+  void introDone.then(() => {
+    groups.forEach((group) => {
+      ScrollTrigger.create({
+        trigger: group[0],
+        start: 'top 82%',
+        once: true,
+        onEnter: () => playReveal(group),
+      })
+    })
+  })
+}
+
+// ---------- Titulares letra a letra ----------
+// [data-words]: las letras aparecen en cascada (data-wstep ms entre letras,
+// data-wdelay ms de espera). Los lectores de pantalla leen el texto entero.
+async function splitWords() {
+  const els = gsap.utils.toArray<HTMLElement>('[data-words]')
+  if (!els.length || reduce) return
+  await document.fonts.ready
+  await introDone
+  els.forEach((el) => {
+    const split = SplitText.create(el, { type: 'words,chars', aria: 'auto' })
+    const step = Number(el.dataset.wstep ?? 32) / 1000
+    gsap.set(split.chars, { opacity: 0, yPercent: 40 })
+    el.style.opacity = '1'
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 85%',
+      once: true,
+      onEnter: () =>
+        gsap.to(split.chars, {
+          opacity: 1,
+          yPercent: 0,
+          duration: 0.55,
+          ease: 'glow',
+          stagger: step,
+          delay: Number(el.dataset.wdelay ?? 0) / 1000,
+        }),
+    })
+  })
+}
+void splitWords()
+
+// ---------- Tarjetas apiladas ----------
+// [data-stack-wrap] > [data-stack] (sticky, a pantalla completa): la de abajo
+// tapa a la de arriba, que se reduce, se desenfoca, se oscurece y redondea sus
+// esquinas. [data-cover] hace lo mismo con una sola sección sticky y la
+// siguiente. En escritorio, la rueda salta de una tarjeta a la siguiente.
+function stackPair(card: HTMLElement, next: HTMLElement, target: Element = card) {
+  ScrollTrigger.create({
+    trigger: next,
+    start: 'top bottom',
+    end: 'top top',
+    onUpdate: ({ progress: p }) => {
+      gsap.set(target, {
+        scale: 1 - 0.06 * p,
+        filter: p > 0.001 ? `blur(${(p * 4).toFixed(2)}px) brightness(${1 - 0.35 * p})` : 'none',
+        borderRadius: Math.round(p * 18),
+      })
+      next.style.boxShadow = p > 0.03 && p < 0.99 ? '0 -24px 48px rgba(0,0,0,.45)' : ''
+    },
+    onLeaveBack: () => gsap.set(target, { clearProps: 'transform,filter,borderRadius' }),
+  })
+}
+
 if (!reduce) {
   gsap.utils.toArray<HTMLElement>('[data-stack-wrap]').forEach((wrap) => {
     const cards = gsap.utils.toArray<HTMLElement>(wrap.querySelectorAll(':scope > [data-stack]'))
     cards.forEach((card, i) => {
       const next = cards[i + 1]
-      if (!next) return
-      gsap.to(card, {
-        scale: 0.9,
-        filter: 'brightness(0.45) blur(2px)',
-        ease: 'none',
-        scrollTrigger: { trigger: next, start: 'top bottom', end: 'top top', scrub: true },
-      })
+      if (next) stackPair(card, next)
     })
   })
-
-  // Una sección sticky [data-cover] se oscurece cuando la tapa la siguiente
   gsap.utils.toArray<HTMLElement>('[data-cover]').forEach((el) => {
     const next = el.nextElementSibling
-    if (!next) return
-    gsap.to(el.querySelector('[data-cover-target]') ?? el, {
-      scale: 0.94,
-      filter: 'brightness(0.55)',
-      ease: 'none',
-      scrollTrigger: { trigger: next, start: 'top bottom', end: 'top top', scrub: true },
-    })
+    if (next instanceof HTMLElement)
+      stackPair(el, next, el.querySelector('[data-cover-target]') ?? el)
   })
 }
 
-// ---------- Contadores: $650 → cuenta desde 0 ----------
+// «Snap» con la rueda entre tarjetas apiladas (solo escritorio con ratón)
+function stackSnaps(): number[][] {
+  const out: number[][] = []
+  const vh = window.innerHeight
+  document.querySelectorAll<HTMLElement>('[data-stack-wrap]').forEach((wrap) => {
+    const isCard = (c: Element): c is HTMLElement =>
+      c instanceof HTMLElement && c.hasAttribute('data-stack') && c.offsetHeight >= vh * 0.95
+    if ([...wrap.children].filter(isCard).length < 2) return
+    let acc = wrap.getBoundingClientRect().top + window.scrollY
+    const snaps: number[] = []
+    for (const c of wrap.children) {
+      const cs = getComputedStyle(c)
+      acc += parseFloat(cs.marginTop) || 0
+      if (isCard(c)) snaps.push(Math.round(acc))
+      acc += (c as HTMLElement).offsetHeight + (parseFloat(cs.marginBottom) || 0)
+    }
+    out.push(snaps)
+  })
+  return out
+}
+
+if (!reduce) {
+  let cache: number[][] | null = null
+  let cacheT = 0
+  let animating = false
+  let used = false
+  let acc = 0
+  let lastWheel = 0
+  window.addEventListener('resize', () => (cache = null))
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      if (!isDesktopPointer() || e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return
+      if (menu?.open || root.classList.contains('gh-intro-on')) return
+      const now = Date.now()
+      if (!cache || now - cacheT > 1500) {
+        cache = stackSnaps()
+        cacheT = now
+      }
+      const y = window.scrollY
+      const dir = Math.sign(e.deltaY)
+      const stack = cache.find((s) => {
+        const first = s[0]!
+        const last = s[s.length - 1]!
+        if (y < first - 4 || y > last + 4) return false
+        if (!animating && dir < 0 && y <= first + 4) return false
+        if (!animating && dir > 0 && y >= last - 4) return false
+        return true
+      })
+      if (!stack) {
+        acc = 0
+        return
+      }
+      e.preventDefault()
+      if (now - lastWheel > 260) {
+        used = false
+        acc = 0
+      }
+      lastWheel = now
+      if (animating || used || !dir) return
+      acc += e.deltaY
+      if (Math.abs(acc) < 24) return
+      acc = 0
+      used = true
+      const target =
+        dir > 0 ? stack.find((v) => v > y + 4) : [...stack].reverse().find((v) => v < y - 4)
+      if (target === undefined) return
+      animating = true
+      void scrollToY(target, 620).then(() => (animating = false))
+    },
+    { passive: false },
+  )
+}
+
+// ---------- Contadores, barrido y destello ----------
+// data-count="650": cuenta desde 0 conservando prefijo y sufijo ($, +, /mes).
+// data-wipe: el texto se descubre de izquierda a derecha.
+// data-glow: un destello dorado recorre el texto una vez.
 gsap.utils.toArray<HTMLElement>('[data-count]').forEach((el) => {
   const target = Number(el.dataset.count)
   const text = el.textContent ?? ''
@@ -152,35 +344,125 @@ gsap.utils.toArray<HTMLElement>('[data-count]').forEach((el) => {
   const suffix = text.match(/[^\d,]*$/)?.[0] ?? ''
   if (!Number.isFinite(target) || reduce) return
   const obj = { v: 0 }
-  gsap.to(obj, {
-    v: target,
-    duration: 1.4,
-    ease: 'power2.out',
-    scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-    onUpdate: () => {
-      el.textContent = prefix + Math.round(obj.v).toLocaleString('en-US') + suffix
-    },
+  el.textContent = prefix + '0' + suffix
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 80%',
+    once: true,
+    onEnter: () =>
+      gsap.to(obj, {
+        v: target,
+        duration: 1.3,
+        ease: 'power3.out',
+        onUpdate: () => {
+          el.textContent = prefix + Math.round(obj.v).toLocaleString('en-US') + suffix
+        },
+      }),
   })
 })
 
-// ---------- Texto que se escribe solo ----------
-gsap.utils.toArray<HTMLElement>('[data-type]').forEach((el, i) => {
-  if (reduce) return
-  const full = el.textContent ?? ''
-  el.setAttribute('aria-label', full)
+if (!reduce) {
+  gsap.utils.toArray<HTMLElement>('[data-wipe]').forEach((el) => {
+    gsap.fromTo(
+      el,
+      { clipPath: 'inset(0 100% 0 0)', opacity: 0.2, filter: 'blur(4px)' },
+      {
+        clipPath: 'inset(0 0% 0 0)',
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: 1.4,
+        ease: 'wipe',
+        clearProps: 'clipPath,filter',
+        scrollTrigger: { trigger: el, start: 'top 80%', once: true },
+      },
+    )
+  })
+  gsap.utils.toArray<HTMLElement>('[data-glow]').forEach((el) => {
+    gsap.to(el, {
+      keyframes: [
+        {
+          color: '#F6E2B8',
+          textShadow: '0 0 18px rgba(232,196,130,.95), 0 0 36px rgba(232,196,130,.55)',
+          duration: 0.8,
+        },
+        { textShadow: '0 0 0px rgba(232,196,130,0)', duration: 1 },
+      ],
+      delay: 0.9,
+      ease: 'sine.inOut',
+      clearProps: 'color,textShadow',
+      scrollTrigger: { trigger: el, start: 'top 80%', once: true },
+    })
+  })
+}
+
+// ---------- Texto que se escribe ----------
+// Un contenedor con filas [data-typerow] (cada una con [data-dot] y [data-type])
+// se escribe fila a fila: el punto aparece con un rebote y después el texto,
+// 22ms por letra. Un [data-type] suelto se escribe solo.
+function typeInto(el: HTMLElement, full: string, at: number) {
   const obj = { n: 0 }
-  el.textContent = ''
   gsap.to(obj, {
     n: full.length,
-    duration: Math.min(2.2, full.length * 0.028),
-    delay: (i % 4) * 0.25,
+    duration: full.length * 0.022,
+    delay: at,
     ease: 'none',
-    scrollTrigger: { trigger: el, start: 'top 88%', once: true },
     onUpdate: () => {
-      el.textContent = full.slice(0, Math.round(obj.n))
+      el.textContent = full.slice(0, Math.round(obj.n)) || ' '
     },
   })
-})
+}
+
+if (!reduce) {
+  const boxes = new Set<HTMLElement>()
+  document.querySelectorAll<HTMLElement>('[data-typerow]').forEach((r) => {
+    if (r.parentElement) boxes.add(r.parentElement)
+  })
+  boxes.forEach((box) => {
+    const items = [...box.querySelectorAll<HTMLElement>(':scope > [data-typerow]')].flatMap((row) => {
+      const tx = row.querySelector<HTMLElement>('[data-type]')
+      if (!tx) return []
+      const dot = row.querySelector<HTMLElement>('[data-dot]')
+      const full = tx.textContent?.trim() ?? ''
+      tx.setAttribute('aria-label', full)
+      tx.textContent = ' '
+      if (dot) gsap.set(dot, { opacity: 0, scale: 0 })
+      return [{ tx, dot, full }]
+    })
+    ScrollTrigger.create({
+      trigger: box,
+      start: 'top 75%',
+      once: true,
+      onEnter: () => {
+        let t = 0.15
+        items.forEach(({ tx, dot, full }) => {
+          if (dot)
+            gsap.to(dot, {
+              keyframes: [
+                { opacity: 1, scale: 1.35, duration: 0.25 },
+                { scale: 1, duration: 0.17 },
+              ],
+              delay: t,
+              ease: 'power2.out',
+            })
+          typeInto(tx, full, t + 0.2)
+          t += 0.2 + full.length * 0.022 + 0.18
+        })
+      },
+    })
+  })
+  gsap.utils.toArray<HTMLElement>('[data-type]').forEach((el) => {
+    if (el.closest('[data-typerow]')) return
+    const full = el.textContent?.trim() ?? ''
+    el.setAttribute('aria-label', full)
+    el.textContent = ' '
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => typeInto(el, full, 0),
+    })
+  })
+}
 
 // ---------- Vídeos: cargan cerca de la pantalla y se pausan fuera de ella ----------
 const videos = document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]')
@@ -205,10 +487,8 @@ videos.forEach((v) => {
 
 // Botones de pausa de los vídeos en bucle (WCAG 2.2.2)
 document.querySelectorAll<HTMLButtonElement>('[data-video-toggle]').forEach((btn) => {
-  const v = document.getElementById(
-    btn.getAttribute('aria-controls') ?? '',
-  ) as HTMLVideoElement | null
-  if (!v) return
+  const v = document.getElementById(btn.getAttribute('aria-controls') ?? '')
+  if (!(v instanceof HTMLVideoElement)) return
   const sync = () => btn.setAttribute('aria-pressed', String(v.paused))
   btn.addEventListener('click', () => {
     if (v.paused) {
@@ -226,4 +506,4 @@ document.querySelectorAll<HTMLButtonElement>('[data-video-toggle]').forEach((btn
 
 // Recalcular posiciones cuando terminan de cargar fuentes e imágenes
 window.addEventListener('load', () => ScrollTrigger.refresh())
-document.fonts?.ready.then(() => ScrollTrigger.refresh())
+void document.fonts.ready.then(() => ScrollTrigger.refresh())

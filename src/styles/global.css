@@ -181,13 +181,47 @@
 }
 
 /* Elementos que GSAP anima al entrar: visibles si no hay JS */
-.js [data-reveal] {
+.js [data-reveal],
+.js [data-words] {
   opacity: 0;
 }
 
+/* Transición entre páginas (navegadores con View Transitions entre documentos):
+   la cabecera se queda quieta y el contenido se funde y sube un poco. */
+@view-transition {
+  navigation: auto;
+}
+#gh-header {
+  view-transition-name: gh-header;
+}
+::view-transition-old(root) {
+  animation: gh-vt-out 0.35s var(--ease-swift) both;
+}
+::view-transition-new(root) {
+  animation: gh-vt-in 0.7s var(--ease-glow) both;
+}
+@keyframes gh-vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.985);
+    filter: blur(6px);
+  }
+}
+@keyframes gh-vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .js [data-reveal] {
+  .js [data-reveal],
+  .js [data-words] {
     opacity: 1 !important;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
   *,
   *::before,
