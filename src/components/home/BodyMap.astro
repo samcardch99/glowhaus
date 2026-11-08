@@ -1,0 +1,180 @@
+---
+import { Image } from 'astro:assets'
+import Button from '../ui/Button.astro'
+import bodyFull from '../../assets/body-full-t.png'
+import bodyFace from '../../assets/body-face-t.png'
+import { treatments } from '../../data/treatments'
+import { bodyMap } from '../../data/home'
+import { treatmentPath, useT, type Lang } from '../../i18n'
+
+// «Dónde actúa cada tratamiento»: once botones y un maniquí con puntos dorados.
+// Las categorías de rostro amplían la cara. Sin JS se ve la categoría inicial.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+const START = 1
+const startFace = bodyMap[START]!.face
+const items = treatments.map((c, i) => ({
+  href: treatmentPath(lang, c.slug[lang]),
+  name: t(c.name),
+  face: bodyMap[i]?.face ?? false,
+}))
+---
+
+<section
+  id="inicio-cuerpo"
+  data-theme="light"
+  data-body
+  data-items={JSON.stringify(items)}
+  class="bg-cream text-ink px-gutter relative z-[3] grid grid-cols-1 items-start gap-x-[clamp(32px,5vw,80px)] gap-y-10 pt-[clamp(110px,14vh,140px)] pb-[clamp(72px,10vh,120px)] lg:grid-cols-[minmax(0,660px)_1fr]"
+>
+  <h2
+    data-reveal
+    class="m-0 text-[clamp(18px,1.5vw,22px)] leading-normal font-normal lg:col-start-2 lg:row-start-1 lg:text-center"
+  >
+    {t('Dónde actúa cada tratamiento')}
+  </h2>
+
+  <div class="order-3 flex flex-col gap-5 lg:order-none lg:col-start-1 lg:row-span-2 lg:row-start-1">
+    <div
+      role="group"
+      aria-label={t('Categorías de tratamientos')}
+      class="grid grid-cols-2 gap-2.5 sm:gap-3"
+    >
+      {treatments.map((c, i) => (
+        <button
+          type="button"
+          data-body-btn={i}
+          aria-pressed={i === START ? 'true' : 'false'}
+          aria-controls="body-figure"
+          class="group aria-pressed:bg-gold-dark text-cream hover:bg-brown flex flex-col items-start gap-0 rounded-[10px] bg-[rgb(24_18_14/0.5)] px-4 py-3 sm:px-6 sm:py-4 text-left backdrop-blur-[16px] transition-colors duration-300"
+        >
+          <span class="text-[clamp(16px,1.6vw,23.5px)] leading-[1.2] font-semibold">
+            {t(c.name)}
+          </span>
+          <span class="grid grid-rows-[0fr] opacity-0 max-sm:hidden transition-[grid-template-rows,opacity] duration-500 ease-(--ease-glow) group-aria-pressed:grid-rows-[1fr] group-aria-pressed:opacity-100">
+            <span class="overflow-hidden">
+              <span class="text-cream-2 block pt-2 text-[17px] leading-[1.55] text-pretty">
+                {t(c.short)}
+              </span>
+            </span>
+          </span>
+        </button>
+      ))}
+    </div>
+    <div>
+      <Button
+        href={treatmentPath(lang, treatments[START]!.slug[lang])}
+        tone="dark"
+        data-body-link
+        class="!whitespace-normal text-left"
+      >
+        {t('Ver tratamiento')}: <span data-body-name>{t(treatments[START]!.name)}</span>
+      </Button>
+    </div>
+  </div>
+
+  <div
+    id="body-figure"
+    data-reveal
+    data-delay="200"
+    data-face={startFace ? '' : undefined}
+    class="body-fig relative order-2 aspect-[2/3] h-[min(52vh,520px)] w-auto max-w-full lg:order-none justify-self-center overflow-hidden lg:col-start-2 lg:h-[min(78vh,780px)] lg:w-auto lg:max-w-full"
+  >
+    <div class="body-stage absolute inset-0">
+      <Image
+        src={bodyFull}
+        alt={t('Silueta del cuerpo con las zonas de tratamiento')}
+        widths={[400, 700, 1024]}
+        sizes="(min-width: 1100px) 520px, 90vw"
+        class="body-full absolute inset-0 size-full object-contain"
+      />
+      <Image
+        src={bodyFace}
+        alt=""
+        widths={[400, 700, 1024]}
+        sizes="(min-width: 1100px) 520px, 90vw"
+        class="body-face absolute top-[4.053%] left-[40.094%] size-[19.608%] object-contain"
+      />
+    </div>
+    {bodyMap.map((m, i) => (
+      <div data-body-dots={i} hidden={i !== START} aria-hidden="true" class="absolute inset-0">
+        {m.dots.map(([x, y], k) => (
+          <span class="absolute size-3.5" style={`left:${x}%;top:${y}%`}>
+            <span class="bg-gold absolute top-1/2 left-1/2 size-3.5 animate-[gh-pulse_1.6s_ease-out_infinite] rounded-full" />
+            <span
+              class="body-dot bg-gold absolute top-1/2 left-1/2 size-3.5 rounded-full shadow-[0_0_0_3px_rgb(250_248_245/0.85),0_0_18px_rgb(168_132_79/0.9)]"
+              style={`animation-delay:${(m.face ? 0.9 : 0.15) + k * 0.04}s`}
+            />
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .body-stage {
+    transform-origin: 49.8% 10.7%;
+    transition: transform 1.1s cubic-bezier(0.65, 0, 0.25, 1);
+  }
+  .body-full {
+    transition: opacity 0.5s ease 0s;
+  }
+  .body-face {
+    opacity: 0;
+    transition: opacity 0.5s ease 0s;
+  }
+  [data-face] .body-stage {
+    transform: translate(-0.3%, 23.2%) scale(5.1);
+  }
+  [data-face] .body-full {
+    opacity: 0;
+    transition-delay: 0.6s;
+  }
+  [data-face] .body-face {
+    opacity: 1;
+    transition-delay: 0.45s;
+  }
+  .body-dot {
+    transform: translate(-50%, -50%);
+    animation: gh-dotin 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+  }
+  @keyframes gh-dotin {
+    from {
+      transform: translate(-50%, -50%) scale(0);
+    }
+    to {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-body]').forEach((root) => {
+    const fig = root.querySelector<HTMLElement>('.body-fig')
+    const btns = root.querySelectorAll<HTMLButtonElement>('[data-body-btn]')
+    const groups = root.querySelectorAll<HTMLElement>('[data-body-dots]')
+    const link = root.querySelector<HTMLAnchorElement>('[data-body-link]')
+    const name = root.querySelector<HTMLElement>('[data-body-name]')
+    // Rutas y nombres ya traducidos, en data-items
+    const data = JSON.parse(root.dataset.items ?? '[]') as {
+      href: string
+      name: string
+      face: boolean
+    }[]
+    btns.forEach((b, i) =>
+      b.addEventListener('click', () => {
+        btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)))
+        groups.forEach((g, k) => (g.hidden = k !== i))
+        const d = data[i]
+        if (!d) return
+        fig?.toggleAttribute('data-face', d.face)
+        if (link) link.href = d.href
+        if (name) name.textContent = d.name
+      }),
+    )
+  })
+</script>

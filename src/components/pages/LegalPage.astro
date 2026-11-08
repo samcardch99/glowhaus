@@ -1,0 +1,80 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { pathFor, type Lang, type PageKey } from '../../i18n'
+
+// Página legal (privacidad, términos): crema, texto legible a ~70 caracteres.
+// El contenido (h2, p, ul) va en el slot, ya escrito en el idioma de la página.
+interface Props {
+  lang: Lang
+  page: Extract<PageKey, 'privacy' | 'terms'>
+  title: string
+  description: string
+}
+const { lang, page, title, description } = Astro.props
+const updated =
+  lang === 'es' ? 'Última actualización: 8 de noviembre de 2026' : 'Last updated: November 8, 2026'
+---
+
+<Layout
+  lang={lang}
+  title={title}
+  description={description}
+  altPath={pathFor(lang === 'es' ? 'en' : 'es', page)}
+  headerTheme="light"
+  contact={false}
+>
+  <section
+    data-theme="light"
+    class="bg-cream text-ink px-gutter pt-[clamp(130px,18vh,180px)] pb-[clamp(72px,10vh,120px)]"
+  >
+    <article class="legal mx-auto max-w-[70ch]">
+      <h1 class="font-display m-0 text-[clamp(36px,4.6vw,60px)] leading-[1.05]">{title}</h1>
+      <p class="text-taupe mt-5 mb-0 text-[15px]">
+        <time datetime="2026-11-08">{updated}</time>
+      </p>
+      <div class="legal-body text-brown mt-10">
+        <slot />
+      </div>
+    </article>
+  </section>
+</Layout>
+
+<style>
+  .legal-body {
+    font-size: var(--text-body-sm);
+    line-height: 1.7;
+  }
+  .legal-body :global(h2) {
+    margin: 2.4em 0 0.6em;
+    color: var(--color-ink);
+    font-size: clamp(21px, 1.8vw, 24px);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .legal-body :global(p),
+  .legal-body :global(ul) {
+    margin: 0 0 1em;
+  }
+  .legal-body :global(ul) {
+    padding-left: 1.25em;
+    list-style: disc;
+  }
+  .legal-body :global(li) {
+    margin-bottom: 0.4em;
+  }
+  .legal-body :global(li::marker) {
+    color: var(--color-gold-dark);
+  }
+  .legal-body :global(a) {
+    color: var(--color-gold-dark);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .legal-body :global(a:hover) {
+    color: var(--color-ink);
+  }
+  .legal-body :global(strong) {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+</style>

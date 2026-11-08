@@ -1,0 +1,92 @@
+---
+import { testimonials } from '../../data/home'
+import { useT, type Lang } from '../../i18n'
+
+// «En sus palabras»: testimonios en vídeo con sonido. No se reproducen solos:
+// el botón grande los inicia con controles. Sin JS quedan los controles nativos.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+---
+
+<div class="mt-[clamp(40px,6vh,72px)] flex flex-wrap items-baseline justify-between gap-x-12 gap-y-3">
+  <h2 data-reveal class="font-display m-0 text-[clamp(28px,3.4vw,54px)] leading-[1.06]">
+    {t('En sus palabras')}
+  </h2>
+  <p
+    data-reveal
+    data-delay="220"
+    class="text-sand-2 m-0 text-[clamp(17px,1.4vw,21px)] leading-[1.45]"
+  >
+    {t('Pacientes de GlowHaus cuentan cómo vivieron su tratamiento.')}
+  </p>
+</div>
+
+<ul
+  role="list"
+  data-reveal
+  data-delay="300"
+  class="no-scrollbar m-0 -mx-(--g) flex list-none snap-x snap-mandatory scroll-px-(--g) gap-5 overflow-x-auto px-(--g) pt-3 pb-4 [--g:clamp(24px,1.8vw,28px)]"
+>
+  {testimonials.map((v, i) => (
+    <li class="w-[clamp(270px,24vw,360px)] flex-none snap-start" data-testi>
+      <div class="bg-brown relative aspect-[4/5.4] overflow-hidden rounded-[20px]">
+        <video
+          src={v.src}
+          poster={v.poster}
+          preload="none"
+          playsinline
+          controls
+          data-testi-video
+          aria-label={`${t('Testimonio')}: ${t(v.title)} (${t(v.tag)})`}
+          class="absolute inset-0 size-full object-cover"
+        />
+        <button
+          type="button"
+          data-testi-play
+          class="group text-cream absolute inset-0 hidden flex-col justify-between bg-[linear-gradient(180deg,rgb(24_18_14/0.25),transparent_30%,transparent_50%,rgb(24_18_14/0.55))] p-3 text-left [.js_&]:flex"
+        >
+          <span class="glass-chip flex max-w-full gap-2.5 self-start rounded-lg px-3 py-[7px] text-[15px] font-medium">
+            <span class="whitespace-nowrap">{t('Testimonio')}</span>
+            <span class="text-sand-2 whitespace-nowrap">{t(v.tag)}</span>
+          </span>
+          <span
+            aria-hidden="true"
+            class="glass-chip group-hover:bg-gold absolute top-1/2 left-1/2 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
+          >
+            <svg viewBox="0 0 20 20" width="22" height="22" fill="currentColor">
+              <path d="M6 3.5v13l11-6.5z" />
+            </svg>
+          </span>
+          <span class="glass-chip flex w-full flex-col gap-2 rounded-lg px-4 pt-3.5 pb-4">
+            <span class="text-[23.5px] leading-[1.15] font-semibold">{t(v.title)}</span>
+            <span class="sr-only">
+              {t('Reproducir testimonio')} {i + 1}
+            </span>
+          </span>
+        </button>
+      </div>
+    </li>
+  ))}
+</ul>
+
+<script>
+  const cards = document.querySelectorAll<HTMLElement>('[data-testi]')
+  const videos = [...cards].map((c) => c.querySelector<HTMLVideoElement>('[data-testi-video]'))
+  cards.forEach((card) => {
+    const video = card.querySelector<HTMLVideoElement>('[data-testi-video]')
+    const play = card.querySelector<HTMLButtonElement>('[data-testi-play]')
+    if (!video || !play) return
+    video.controls = false
+    play.addEventListener('click', () => {
+      play.remove()
+      video.controls = true
+      video.play().catch(() => {})
+      video.focus()
+    })
+    // Solo suena uno a la vez
+    video.addEventListener('play', () => videos.forEach((v) => v && v !== video && v.pause()))
+  })
+</script>

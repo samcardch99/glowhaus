@@ -1,0 +1,60 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Intro from './Intro.astro'
+import Hero from './Hero.astro'
+import AboutIntro from './AboutIntro.astro'
+import Experience from './Experience.astro'
+import TreatmentsCarousel from './TreatmentsCarousel.astro'
+import BodyMap from './BodyMap.astro'
+import FotonaFeature from './FotonaFeature.astro'
+import Goals from './Goals.astro'
+import Results from './Results.astro'
+import Team from './Team.astro'
+import Reviews from './Reviews.astro'
+import HomeFaq from './HomeFaq.astro'
+import { homeFaqs } from '../../data/home'
+import { otherLang, pathFor, tr, type Lang } from '../../i18n'
+
+// Página de inicio completa, en los dos idiomas. El contacto y el pie los pone el layout.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = (s: string) => tr(lang, s)
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: homeFaqs.map((f) => ({
+    '@type': 'Question',
+    name: t(f.q),
+    acceptedAnswer: { '@type': 'Answer', text: t(f.a) },
+  })),
+}
+---
+
+<Layout
+  lang={lang}
+  title={t('GlowHaus Aesthetics · Medicina estética en Miami')}
+  description={t(
+    'Láser Fotona, inyectables, rellenos, depilación láser y faciales médicos en Miami. Cada tratamiento empieza con una valoración y un plan pensado para tu piel.',
+  )}
+  altPath={pathFor(otherLang(lang), 'home')}
+  headerTheme="overlay"
+  jsonLd={faqLd}
+>
+  <Intro lang={lang} />
+  <div class="relative">
+    <Hero lang={lang} />
+    <AboutIntro lang={lang} />
+  </div>
+  <Experience lang={lang} />
+  <TreatmentsCarousel lang={lang} />
+  <BodyMap lang={lang} />
+  <FotonaFeature lang={lang} />
+  <Goals lang={lang} />
+  <Results lang={lang} />
+  <Team lang={lang} />
+  <Reviews lang={lang} />
+  <HomeFaq lang={lang} />
+</Layout>

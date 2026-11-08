@@ -1,0 +1,117 @@
+---
+import LegalPage from '../components/pages/LegalPage.astro'
+import { site } from '../data/site'
+import { pathFor } from '../i18n'
+---
+
+<LegalPage
+  lang="es"
+  page="privacy"
+  title="Política de privacidad"
+  description="Cómo GlowHaus Aesthetics trata los datos que nos envías desde este sitio web: formulario de contacto, WhatsApp y mapa."
+>
+  <!--
+  Plantilla general redactada para el sitio web. La clínica debe revisarla con su
+  asesor legal antes de publicarla como definitiva.
+  -->
+  <p>
+    En {site.name} («GlowHaus», «nosotros») respetamos tu privacidad. Esta política explica qué
+    datos recogemos a través de este sitio web, para qué los usamos y qué opciones tienes. Se aplica
+    solo al sitio web; la información clínica que nos das en la consulta se rige por nuestro aviso
+    de prácticas de privacidad (HIPAA), que te entregamos en la clínica.
+  </p>
+
+  <h2>Quién es responsable</h2>
+  <p>
+    {site.name}, {site.address.street}, {site.address.city}, {site.address.region}{' '}
+    {site.address.zip}, Estados Unidos. Correo: <a href={`mailto:${site.email}`}>{site.email}</a>.
+    Teléfono: <a href={site.phoneHref}>{site.phone}</a>.
+  </p>
+
+  <h2>Qué datos recogemos</h2>
+  <p>Cuando usas el formulario de contacto, nos envías:</p>
+  <ul>
+    <li>tu nombre;</li>
+    <li>tu teléfono y/o tu correo electrónico;</li>
+    <li>el motivo de contacto y, si lo eliges, el tratamiento que te interesa;</li>
+    <li>el mensaje que escribas.</li>
+  </ul>
+  <p>
+    No pedimos ni necesitamos otros datos para responderte. Como cualquier sitio web, nuestro
+    proveedor de alojamiento puede registrar datos técnicos básicos (dirección IP, navegador, fecha
+    y hora) en sus registros de seguridad.
+  </p>
+
+  <h2>No nos envíes información médica por el formulario</h2>
+  <p>
+    El formulario y el correo electrónico no son canales adecuados para datos de salud. Por favor,
+    no incluyas diagnósticos, medicamentos, fotos ni otra información médica. Hablaremos de todo
+    ello en persona durante tu valoración. Este sitio no guarda historias clínicas.
+  </p>
+
+  <h2>Para qué usamos tus datos</h2>
+  <ul>
+    <li>Responder a tu mensaje y agendar o confirmar tu cita.</li>
+    <li>Darte la información que nos pidas sobre tratamientos, precios y formas de pago.</li>
+  </ul>
+  <p>
+    No vendemos ni alquilamos tus datos y no los usamos para publicidad de terceros. Solo te
+    enviaremos promociones si nos lo pides expresamente.
+  </p>
+
+  <h2>Cómo se envía el formulario</h2>
+  <p>
+    El formulario se envía por correo electrónico a través de EmailJS, un servicio que entrega el
+    mensaje a la bandeja de entrada de la clínica. EmailJS trata los datos solo para hacer esa
+    entrega, según su propia política de privacidad. Conservamos los mensajes en nuestro correo el
+    tiempo necesario para atenderte y llevar nuestros registros.
+  </p>
+
+  <h2>WhatsApp, teléfono y redes sociales</h2>
+  <p>
+    Los botones de WhatsApp abren una conversación en la aplicación de WhatsApp (Meta). A partir de
+    ese momento se aplican sus condiciones y su política de privacidad. Lo mismo ocurre con los
+    enlaces a Instagram y otras redes sociales.
+  </p>
+
+  <h2>Mapa de Google</h2>
+  <p>
+    El mapa de Google Maps de la sección de contacto no se carga hasta que pulsas «Ver mapa». Al
+    hacerlo, Google puede recibir tu dirección IP y usar cookies según su política de privacidad. Si
+    no lo pulsas, no se conecta con Google.
+  </p>
+
+  <h2>Cookies</h2>
+  <p>
+    Actualmente este sitio no usa cookies de analítica ni de publicidad. Si en el futuro las
+    añadimos, actualizaremos esta política y, cuando corresponda, te pediremos tu consentimiento.
+  </p>
+
+  <h2>Seguridad</h2>
+  <p>
+    El sitio se sirve con conexión cifrada (HTTPS) y limitamos el acceso a los mensajes al personal
+    de la clínica que los necesita. Ningún sistema es completamente seguro, pero tomamos medidas
+    razonables para proteger tu información.
+  </p>
+
+  <h2>Tus derechos</h2>
+  <p>
+    Puedes pedirnos en cualquier momento que te digamos qué datos tenemos tuyos, que los corrijamos
+    o que los borremos, y dejar de recibir mensajes nuestros. Escríbenos a{' '}
+    <a href={`mailto:${site.email}`}>{site.email}</a> y te responderemos lo antes posible. Como
+    paciente, además, tienes los derechos que te reconoce la ley HIPAA sobre tu información de
+    salud, descritos en nuestro aviso de prácticas de privacidad.
+  </p>
+
+  <h2>Menores de edad</h2>
+  <p>
+    Este sitio está dirigido a personas mayores de 18 años. No recogemos a sabiendas datos de
+    menores a través del formulario.
+  </p>
+
+  <h2>Cambios en esta política</h2>
+  <p>
+    Podemos actualizar esta política. La fecha de arriba indica la última versión. Consulta también
+    nuestros <a href={pathFor('es', 'terms')}>términos de uso</a>.
+  </p>
+</LegalPage>

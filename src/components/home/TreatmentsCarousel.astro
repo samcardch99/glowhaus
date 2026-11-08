@@ -1,0 +1,131 @@
+---
+import { Image } from 'astro:assets'
+import Button from '../ui/Button.astro'
+import Arrow from '../ui/Arrow.astro'
+import { treatments, fromLabel, countLabel } from '../../data/treatments'
+import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
+
+// «Medicina estética avanzada»: carrusel horizontal de las 11 categorías.
+// Es una lista de enlaces que se recorre con Tab; con ratón se puede arrastrar.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+---
+
+<section
+  id="inicio-tratamientos"
+  data-theme="light"
+  class="bg-cream stack-shadow relative z-[3] -mt-7 flex min-h-[calc(100vh+56px)] flex-col justify-center gap-12 overflow-hidden pt-[clamp(110px,14vh,140px)] pb-[clamp(80px,11vh,130px)]"
+>
+  <div class="px-gutter flex flex-wrap items-baseline justify-between gap-x-12 gap-y-5">
+    <h2
+      data-reveal
+      class="font-display m-0 min-w-0 flex-[1_1_420px] text-[clamp(28px,3.4vw,54px)] leading-[1.06]"
+    >
+      {t('Medicina estética')}
+      <br />
+      {t('avanzada')}
+    </h2>
+    <div class="ml-auto flex max-w-full min-w-0 flex-col items-end gap-3.5">
+      <p
+        data-reveal
+        data-delay="220"
+        class="text-brown m-0 text-[clamp(17px,calc(1.3vw+2px),21.5px)] leading-[1.45] text-balance"
+      >
+        {t('Más de 80 tratamientos en once categorías.')}
+      </p>
+      <div data-reveal data-delay="440">
+        <Button href={pathFor(lang, 'treatments')} tone="dark" class="min-w-[min(100%,200px)]">
+          {t('Todos los tratamientos')}
+        </Button>
+      </div>
+    </div>
+  </div>
+
+  <ul
+    data-cat-track
+    role="list"
+    aria-label={t('Categorías de tratamientos')}
+    class="no-scrollbar px-gutter m-0 flex cursor-grab list-none snap-x snap-mandatory scroll-px-(--gutter) gap-5 overflow-x-auto pt-3 pb-4 [--gutter:clamp(24px,1.8vw,28px)] active:cursor-grabbing"
+  >
+    {treatments.map((c, i) => (
+      <li class="w-[clamp(270px,24vw,360px)] flex-none snap-start">
+        <a
+          href={treatmentPath(lang, c.slug[lang])}
+          draggable="false"
+          class="group text-cream relative block aspect-[4/5.4] overflow-hidden rounded-[20px] bg-brown"
+        >
+          <Image
+            src={c.img}
+            alt=""
+            draggable="false"
+            widths={[320, 480, 720]}
+            sizes="(min-width: 1100px) 360px, 280px"
+            style={`object-position:${c.imgPos ?? 'center'}`}
+            class="absolute inset-0 size-full object-cover transition-transform duration-800 ease-(--ease-glow) group-hover:scale-[1.06]"
+          />
+          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.25),transparent_30%,transparent_50%,rgb(24_18_14/0.55))]" />
+          <div class="glass-chip absolute top-3 left-3 flex max-w-[calc(100%-24px)] gap-2.5 rounded-lg px-3 py-[7px] text-[15px] font-medium">
+            <span class="whitespace-nowrap">
+              {t(`Categoría ${String(i + 1).padStart(2, '0')}`)}
+            </span>
+            <span class="text-sand-2 whitespace-nowrap">{t(countLabel(c))}</span>
+          </div>
+          <div class="glass-chip absolute right-3 bottom-3 left-3 flex flex-col gap-2 rounded-lg px-4 pt-3.5 pb-4">
+            <h3 class="m-0 text-[clamp(20px,1.7vw,23.5px)] leading-[1.15] font-semibold">
+              {t(c.name)}
+            </h3>
+            <span class="text-sand-2 text-base font-medium">{t(fromLabel(c))}</span>
+            <p class="m-0 line-clamp-2 text-[17px] leading-[1.5] text-pretty">{t(c.short)}</p>
+            <span class="group-hover:bg-gold group-hover:border-gold mt-1 inline-flex items-center gap-3 self-start rounded-[14px] border border-[rgb(250_248_245/0.55)] bg-[rgb(250_248_245/0.14)] px-[18px] py-2.5 text-base font-semibold tracking-[0.03em] backdrop-blur-[10px] transition-colors duration-300">
+              <Arrow />
+              {t('Ver tratamiento')}
+            </span>
+          </div>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<script>
+  // Arrastrar con el ratón (el táctil y el trackpad ya desplazan solos)
+  document.querySelectorAll<HTMLElement>('[data-cat-track]').forEach((track) => {
+    let startX = 0
+    let startScroll = 0
+    let dragging = false
+    let moved = false
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return
+      dragging = true
+      moved = false
+      startX = e.clientX
+      startScroll = track.scrollLeft
+      track.style.scrollSnapType = 'none'
+    })
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return
+      const dx = e.clientX - startX
+      if (Math.abs(dx) > 5) moved = true
+      track.scrollLeft = startScroll - dx
+    })
+    window.addEventListener('pointerup', () => {
+      if (!dragging) return
+      dragging = false
+      track.style.scrollSnapType = ''
+    })
+    // Un arrastre no debe abrir la tarjeta
+    track.addEventListener(
+      'click',
+      (e) => {
+        if (moved) {
+          e.preventDefault()
+          moved = false
+        }
+      },
+      true,
+    )
+  })
+</script>

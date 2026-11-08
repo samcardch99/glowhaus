@@ -1,0 +1,274 @@
+---
+import { Image } from 'astro:assets'
+import sala from '../../assets/clinica-sala.jpg'
+import BackButton from './BackButton.astro'
+import Arrow from '../ui/Arrow.astro'
+import { site, whatsappHref } from '../../data/site'
+import { useT, type Lang } from '../../i18n'
+
+// Página «Tu primera visita»: pasos, formas de pago y qué conviene saber.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+
+const steps = [
+  {
+    n: '01',
+    title: 'Llegada',
+    time: '10 MIN',
+    text: 'Te recibimos, completas una ficha breve con tus datos de salud y te ofrecemos algo de tomar.',
+  },
+  {
+    n: '02',
+    title: 'Valoración',
+    time: '30 MIN',
+    text: 'Alain Castellat, APRN, revisa tu piel, escucha lo que quieres mejorar y te explica las opciones con sus precios.',
+  },
+  {
+    n: '03',
+    title: 'Tu plan',
+    time: '10 MIN',
+    text: 'Te entregamos un plan con el tratamiento, el número de sesiones y el costo total, con opción de pagar en cuotas con Cherry.',
+  },
+  {
+    n: '04',
+    title: 'Tratamiento y seguimiento',
+    time: 'SEGÚN EL TRATAMIENTO',
+    text: 'Puedes empezar el mismo día o agendar para otra fecha. Después te escribimos para saber cómo sigues.',
+  },
+]
+
+// Cherry: el enlace real cuando la clínica lo pase; mientras, preguntar por WhatsApp
+const cherryHref = site.cherry || whatsappHref(lang, t('pago en cuotas con Cherry'))
+const cherryLabel = site.cherry ? t('Solicitar con Cherry') : t('Pregunta por Cherry')
+
+const payments = [
+  {
+    title: 'Por sesión',
+    text: 'Pagas cada cita al terminar, con tarjeta o efectivo.',
+    tags: ['Tarjeta', 'Efectivo'],
+  },
+  {
+    title: 'Por paquete',
+    text: 'Los paquetes de 4 u 8 sesiones salen más económicos que pagar una por una.',
+    tags: ['4 sesiones', '8 sesiones'],
+  },
+  {
+    title: 'En cuotas con Cherry',
+    text: 'Divide tu paquete en pagos mensuales. La solicitud se hace desde el celular.',
+    tags: ['Pagos mensuales', 'Desde el celular'],
+    link: { href: cherryHref, label: cherryLabel },
+  },
+]
+
+const tips = [
+  'Llega 10 minutos antes para completar tu ficha.',
+  'Trae la lista de medicamentos o tratamientos que uses.',
+  'Si vienes por láser, evita el sol directo la semana anterior.',
+  'Estacionamiento disponible frente a la clínica.',
+]
+---
+
+<section
+  data-theme="light"
+  class="bg-cream text-ink grid grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] items-end gap-[clamp(28px,4vw,64px)] px-gutter pt-[clamp(110px,14vh,140px)] pb-[clamp(40px,6vh,64px)]"
+>
+  <div class="flex flex-col items-start gap-[22px]">
+    <BackButton lang={lang} tone="dark" />
+    <h1 data-reveal class="font-display m-0 text-[clamp(40px,5.4vw,72px)] leading-[1.04]">
+      {t('Tu primera visita, paso a paso')}
+    </h1>
+  </div>
+  <p data-reveal data-delay="200" class="text-body text-brown m-0 max-w-[520px] justify-self-end">
+    {t(
+      'Tu primera cita empieza con una valoración. Te explicamos qué tratamiento te conviene, cuántas sesiones necesitas y cuánto cuesta antes de empezar.',
+    )}
+  </p>
+</section>
+
+<section data-theme="light" class="bg-cream px-gutter pb-24">
+  <div class="bg-sand aspect-[4/5] overflow-hidden rounded-[14px] sm:aspect-[16/9] lg:aspect-[21/9]">
+    <Image
+      src={sala}
+      alt={t('Sala de tratamiento de la clínica GlowHaus')}
+      widths={[480, 768]}
+      sizes="100vw"
+      class="size-full object-cover object-[50%_60%]"
+    />
+  </div>
+</section>
+
+<section id="visit-steps" data-theme="light" class="bg-cream text-ink px-gutter">
+  <div class="relative flex flex-col pb-24 pl-[clamp(40px,4vw,64px)]">
+    <h2 class="sr-only">{t('Paso a paso')}</h2>
+    <div
+      aria-hidden="true"
+      class="bg-beige pointer-events-none absolute top-0 bottom-24 left-[clamp(10px,1.2vw,18px)] w-0.5 rounded-sm"
+    >
+      <div data-vs-fill class="bg-gold absolute inset-0 origin-top rounded-sm"></div>
+    </div>
+    <ol class="m-0 list-none p-0">
+      {steps.map((s) => (
+        <li
+          data-vs-row
+          class="border-beige relative grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3 border-b py-9 md:grid-cols-[minmax(80px,120px)_minmax(0,1fr)_minmax(0,1.4fr)] md:gap-x-10"
+        >
+          <span
+            data-vs-dot
+            aria-hidden="true"
+            class="border-beige bg-gold absolute top-[58px] left-[calc(-1*clamp(40px,4vw,64px)+clamp(10px,1.2vw,18px)-6px)] size-3.5 rounded-full border-2 transition-[background,transform] duration-300"
+          />
+          <span class="text-gold-dark text-[48px] leading-none font-semibold">{s.n}</span>
+          <div class="flex flex-col gap-1.5">
+            <h3 class="m-0 text-[24px] leading-[1.15] font-semibold">{t(s.title)}</h3>
+            <span class="text-taupe text-[14.5px] font-semibold tracking-[0.12em]">
+              {t(s.time)}
+            </span>
+          </div>
+          <p class="text-body-sm text-brown col-span-full m-0 w-full max-w-[605px] md:col-span-1 md:justify-self-end">
+            {t(s.text)}
+          </p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<div
+  data-theme="light"
+  class="bg-sand text-ink flex min-h-screen flex-col justify-center gap-[clamp(56px,8vh,96px)] pt-[clamp(100px,12vh,120px)] pb-[clamp(56px,8vh,96px)]"
+>
+  <section data-theme="light" aria-labelledby="pay-title" class="px-gutter">
+    <h2
+      id="pay-title"
+      data-reveal
+      class="font-display m-0 mb-8 text-[clamp(30px,3.4vw,44px)] leading-[1.1]"
+    >
+      {t('Tres formas de pago')}
+    </h2>
+    <ul class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-[22px] p-0">
+      {payments.map((p, i) => (
+        <li
+          data-reveal
+          data-delay={String(120 + i * 140)}
+          class="pay-card group text-ink relative flex flex-col gap-5 overflow-hidden rounded-[14px] border border-[rgb(24_18_14/0.18)] bg-[rgb(250_248_245/0.55)] p-[clamp(22px,2.2vw,32px)] backdrop-blur-[14px] transition-[background,color,border-color,transform,box-shadow] duration-500 ease-(--ease-glow) hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(24_18_14/0.12)]"
+        >
+          <span
+            aria-hidden="true"
+            class="bg-gold absolute top-0 left-0 h-0.5 w-0 transition-[width] duration-[1.2s] ease-linear group-hover:w-full group-focus-within:w-full"
+          />
+          <h3 class="m-0 text-[clamp(22px,2vw,26px)] leading-[1.2] font-semibold">{t(p.title)}</h3>
+          <p class="text-taupe m-0 text-[17.5px] leading-[1.6] text-pretty">{t(p.text)}</p>
+          <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+            {p.tags.map((tag) => (
+              <li class="text-taupe rounded-lg border border-[rgb(24_18_14/0.18)] px-3 py-[7px] text-[14.5px] font-medium">
+                {t(tag)}
+              </li>
+            ))}
+          </ul>
+          {p.link && (
+            <a
+              href={p.link.href}
+              target="_blank"
+              rel="noopener"
+              class="text-gold-dark hover:text-ink mt-auto inline-flex items-center gap-2 self-start pt-1 text-[17px] font-semibold underline-offset-4 hover:underline"
+            >
+              <span>{p.link.label}</span>
+              <Arrow />
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section
+    data-theme="light"
+    class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-14 px-gutter"
+  >
+    <div class="flex flex-col gap-[18px]">
+      <span class="eyebrow text-gold-dark">{t('ANTES DE VENIR')}</span>
+      <h2
+        data-reveal
+        class="font-display m-0 max-w-[519px] text-[clamp(30px,3.4vw,44px)] leading-[1.1]"
+      >
+        {t('Lo que conviene saber')}
+      </h2>
+    </div>
+    <ul class="border-ink text-body-sm text-brown m-0 flex list-none flex-col border-t p-0">
+      {tips.map((tip) => (
+        <li class="border-beige flex items-baseline gap-3.5 border-b py-[18px]">
+          <span
+            aria-hidden="true"
+            class="border-gold size-[9px] flex-none rounded-full border-[1.5px] bg-[rgb(168_132_79/0.25)]"
+          />
+          <span data-type>{t(tip)}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+</div>
+
+<style>
+  /* Sin JS o con movimiento reducido, todos los pasos se ven encendidos */
+  :global(.js) [data-vs-row] {
+    opacity: 0.35;
+    transition: opacity 0.45s;
+  }
+  :global(.js) [data-vs-row][data-on] {
+    opacity: 1;
+  }
+  :global(.js) [data-vs-row]:not([data-on]) [data-vs-dot] {
+    background: var(--color-sand);
+  }
+  :global(.js) [data-vs-row][data-on] [data-vs-dot] {
+    transform: scale(1.15);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) [data-vs-row] {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, prefersReducedMotion } from '../../scripts/gsap'
+
+  // Línea dorada vertical que se llena con el scroll y enciende cada paso
+  const section = document.getElementById('visit-steps')
+  const fill = section?.querySelector<HTMLElement>('[data-vs-fill]')
+  const rows = section ? [...section.querySelectorAll<HTMLElement>('[data-vs-row]')] : []
+
+  if (section && fill) {
+    if (prefersReducedMotion()) {
+      rows.forEach((r) => r.setAttribute('data-on', ''))
+    } else {
+      const line = fill.parentElement ?? section
+      gsap.fromTo(
+        fill,
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: line,
+            start: 'top 60%',
+            end: 'bottom 60%',
+            scrub: true,
+            onUpdate: () => {
+              // Un paso se enciende cuando la punta de la línea llega a su punto
+              const tip = fill.getBoundingClientRect().bottom
+              rows.forEach((r) => {
+                const dot = r.querySelector('[data-vs-dot]')
+                const y = dot ? dot.getBoundingClientRect().top : r.getBoundingClientRect().top
+                r.toggleAttribute('data-on', tip >= y)
+              })
+            },
+          },
+        },
+      )
+    }
+  }
+</script>

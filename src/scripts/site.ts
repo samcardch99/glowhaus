@@ -205,7 +205,9 @@ videos.forEach((v) => {
 
 // Botones de pausa de los vídeos en bucle (WCAG 2.2.2)
 document.querySelectorAll<HTMLButtonElement>('[data-video-toggle]').forEach((btn) => {
-  const v = document.getElementById(btn.getAttribute('aria-controls') ?? '') as HTMLVideoElement | null
+  const v = document.getElementById(
+    btn.getAttribute('aria-controls') ?? '',
+  ) as HTMLVideoElement | null
   if (!v) return
   const sync = () => btn.setAttribute('aria-pressed', String(v.paused))
   btn.addEventListener('click', () => {

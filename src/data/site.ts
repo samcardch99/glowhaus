@@ -15,7 +15,8 @@ export const site = {
   tiktok: 'https://www.tiktok.com/',
   googleReviews: 'https://www.google.com/maps/search/GlowHaus+Aesthetics+11890+SW+8th+St+Miami',
   mapsLink: 'https://maps.google.com/?q=GlowHaus+Aesthetics+11890+SW+8th+St+Miami',
-  mapsEmbed: 'https://maps.google.com/maps?q=11890%20SW%208th%20St%2C%20Miami%2C%20FL&z=15&output=embed',
+  mapsEmbed:
+    'https://maps.google.com/maps?q=11890%20SW%208th%20St%2C%20Miami%2C%20FL&z=15&output=embed',
   address: {
     street: '11890 SW 8th St, Suite 211',
     city: 'Miami',
@@ -28,7 +29,7 @@ export const site = {
   },
   rating: { value: 5, count: 6 },
   // Enlace de solicitud de Cherry: pendiente de la clínica
-  cherry: '',
+  cherry: '' as string,
 } as const
 
 /** Enlace de WhatsApp con un mensaje inicial en el idioma de la página */

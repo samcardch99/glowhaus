@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import About from '../../components/pages/About.astro'
+import { alainJsonLd } from '../../components/pages/about-ld'
+import { pathFor } from '../../i18n'
+
+const ld = await alainJsonLd('en', Astro.site)
+---
+
+<Layout
+  lang="en"
+  title="About us"
+  description="GlowHaus is a boutique aesthetic medicine spa in Miami led by Alain Castellat, APRN, FNP-C. One client at a time, no rush, and real attention."
+  altPath={pathFor('es', 'about')}
+  headerTheme="dark"
+  jsonLd={ld}
+>
+  <About lang="en" />
+</Layout>

@@ -99,17 +99,35 @@ export const treatments: Treatment[] = [
     ],
     stepsTitle: 'Cuatro pasos, una sesión',
     steps: S([
-      ['SmoothLiftin', 'Desde el interior de la boca, estimula el colágeno y da soporte a las mejillas y los surcos.'],
+      [
+        'SmoothLiftin',
+        'Desde el interior de la boca, estimula el colágeno y da soporte a las mejillas y los surcos.',
+      ],
       ['FRAC3', 'Trabaja imperfecciones, manchas y textura en capas profundas de la piel.'],
       ['PIANO', 'Calor profundo y uniforme que tensa el óvalo del rostro y la piel del cuello.'],
       ['SupErficial', 'Un pulido suave de la superficie que deja la piel más lisa y luminosa.'],
     ]),
     faqs: F([
-      ['¿Duele?', 'La mayoría de los pacientes lo describe como calor intenso en la piel. Usamos enfriamiento durante la sesión para que sea cómodo.'],
-      ['¿Cuándo veo resultados?', 'Notarás la piel más luminosa en los primeros días. La firmeza mejora de forma gradual durante las semanas siguientes, a medida que la piel produce colágeno.'],
-      ['¿Puedo volver al trabajo el mismo día?', 'Sí. Puede quedar enrojecimiento leve por unas horas. Te damos indicaciones de cuidado al terminar.'],
-      ['¿Cuántas sesiones necesito?', 'Lo habitual son de 2 a 4 sesiones, separadas por unas 4 semanas. En tu valoración te decimos cuántas necesitas tú.'],
-      ['¿Se puede combinar con otros tratamientos?', 'Sí, por ejemplo con neurotoxina o rellenos. Lo planificamos contigo para espaciar las citas de forma segura.'],
+      [
+        '¿Duele?',
+        'La mayoría de los pacientes lo describe como calor intenso en la piel. Usamos enfriamiento durante la sesión para que sea cómodo.',
+      ],
+      [
+        '¿Cuándo veo resultados?',
+        'Notarás la piel más luminosa en los primeros días. La firmeza mejora de forma gradual durante las semanas siguientes, a medida que la piel produce colágeno.',
+      ],
+      [
+        '¿Puedo volver al trabajo el mismo día?',
+        'Sí. Puede quedar enrojecimiento leve por unas horas. Te damos indicaciones de cuidado al terminar.',
+      ],
+      [
+        '¿Cuántas sesiones necesito?',
+        'Lo habitual son de 2 a 4 sesiones, separadas por unas 4 semanas. En tu valoración te decimos cuántas necesitas tú.',
+      ],
+      [
+        '¿Se puede combinar con otros tratamientos?',
+        'Sí, por ejemplo con neurotoxina o rellenos. Lo planificamos contigo para espaciar las citas de forma segura.',
+      ],
     ]),
     showResults: true,
   },
@@ -143,18 +161,45 @@ export const treatments: Treatment[] = [
     duration: '30–60 min',
     recovery: '1 a 5 días',
     by: A,
-    forWho: ['Cicatrices de acné', 'Acné activo', 'Manchas y pigmentación', 'Poros y textura', 'Lesiones vasculares'],
+    forWho: [
+      'Cicatrices de acné',
+      'Acné activo',
+      'Manchas y pigmentación',
+      'Poros y textura',
+      'Lesiones vasculares',
+    ],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
-      ['Valoración de la piel', 'Revisamos la zona, el tipo de piel y las lesiones para elegir el protocolo y la intensidad.'],
-      ['Preparación', 'Limpiamos la piel y, si hace falta, aplicamos anestesia tópica para que estés cómoda.'],
-      ['Láser Fotona', 'Tratamos la zona por capas. En algunos protocolos sumamos PDGF para acelerar la regeneración.'],
-      ['Cuidados posteriores', 'Te llevas indicaciones de hidratación y protección solar para los días siguientes.'],
+      [
+        'Valoración de la piel',
+        'Revisamos la zona, el tipo de piel y las lesiones para elegir el protocolo y la intensidad.',
+      ],
+      [
+        'Preparación',
+        'Limpiamos la piel y, si hace falta, aplicamos anestesia tópica para que estés cómoda.',
+      ],
+      [
+        'Láser Fotona',
+        'Tratamos la zona por capas. En algunos protocolos sumamos PDGF para acelerar la regeneración.',
+      ],
+      [
+        'Cuidados posteriores',
+        'Te llevas indicaciones de hidratación y protección solar para los días siguientes.',
+      ],
     ]),
     faqs: F([
-      ['¿Cuánto tarda en recuperarse la piel?', 'Depende del protocolo. Un peeling suave deja la piel rosada unas horas; un resurfacing puede necesitar de 3 a 5 días.'],
-      ['¿Sirve para cicatrices antiguas?', 'Sí. Las cicatrices de acné mejoran de forma progresiva con varias sesiones.'],
-      ['¿Las lesiones tienen precio fijo?', 'Parten desde $250 y el precio final depende del tamaño y la cantidad. Lo confirmamos en tu valoración.'],
+      [
+        '¿Cuánto tarda en recuperarse la piel?',
+        'Depende del protocolo. Un peeling suave deja la piel rosada unas horas; un resurfacing puede necesitar de 3 a 5 días.',
+      ],
+      [
+        '¿Sirve para cicatrices antiguas?',
+        'Sí. Las cicatrices de acné mejoran de forma progresiva con varias sesiones.',
+      ],
+      [
+        '¿Las lesiones tienen precio fijo?',
+        'Parten desde $250 y el precio final depende del tamaño y la cantidad. Lo confirmamos en tu valoración.',
+      ],
     ]),
     showResults: true,
   },
@@ -183,17 +228,38 @@ export const treatments: Treatment[] = [
     duration: '30–60 min',
     recovery: 'Ninguna',
     by: A,
-    forWho: ['Piel flácida después de bajar de peso', 'Grasa localizada', 'Papada', 'Abdomen y flancos', 'Brazos y muslos'],
+    forWho: [
+      'Piel flácida después de bajar de peso',
+      'Grasa localizada',
+      'Papada',
+      'Abdomen y flancos',
+      'Brazos y muslos',
+    ],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
       ['Valoración', 'Medimos la zona y definimos si conviene tensado, TightSculpting o ambos.'],
-      ['Calor profundo', 'El láser calienta las capas profundas para estimular colágeno y tensar la piel.'],
-      ['TightSculpting', 'En zonas con grasa localizada, el láser trabaja el tejido graso de forma no invasiva.'],
-      ['Seguimiento', 'Repetimos cada pocas semanas hasta completar el paquete y medimos el avance.'],
+      [
+        'Calor profundo',
+        'El láser calienta las capas profundas para estimular colágeno y tensar la piel.',
+      ],
+      [
+        'TightSculpting',
+        'En zonas con grasa localizada, el láser trabaja el tejido graso de forma no invasiva.',
+      ],
+      [
+        'Seguimiento',
+        'Repetimos cada pocas semanas hasta completar el paquete y medimos el avance.',
+      ],
     ]),
     faqs: F([
-      ['¿Es doloroso?', 'Se siente como calor intenso y controlado. La mayoría lo tolera bien sin anestesia.'],
-      ['¿Cuándo se ven los cambios?', 'La piel se ve más firme desde las primeras semanas y el resultado se consolida al terminar el paquete.'],
+      [
+        '¿Es doloroso?',
+        'Se siente como calor intenso y controlado. La mayoría lo tolera bien sin anestesia.',
+      ],
+      [
+        '¿Cuándo se ven los cambios?',
+        'La piel se ve más firme desde las primeras semanas y el resultado se consolida al terminar el paquete.',
+      ],
       ['¿Puedo hacer ejercicio después?', 'Sí, puedes seguir con tu rutina el mismo día.'],
     ]),
     showResults: true,
@@ -228,15 +294,24 @@ export const treatments: Treatment[] = [
     forWho: ['Vello en rostro', 'Axilas', 'Piernas y brazos', 'Espalda y pecho', 'Vello encarnado'],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
-      ['Preparación', 'Llegas con la zona rasurada el día anterior, sin cera ni pinzas en las semanas previas.'],
+      [
+        'Preparación',
+        'Llegas con la zona rasurada el día anterior, sin cera ni pinzas en las semanas previas.',
+      ],
       ['Prueba de piel', 'Ajustamos el láser a tu tono de piel y al tipo de vello.'],
       ['Tratamiento', 'Pasamos el láser por la zona con enfriamiento para que sea cómodo.'],
       ['Siguiente cita', 'Agendamos la próxima sesión según el ciclo de crecimiento del vello.'],
     ]),
     faqs: F([
       ['¿Cuántas sesiones necesito?', 'Lo habitual son 8 sesiones. Por eso los paquetes son de 8.'],
-      ['¿Duele?', 'Se siente como un chasquido leve y caliente. Usamos enfriamiento durante la sesión.'],
-      ['¿Puedo tomar sol después?', 'Evita el sol directo unos días antes y después de cada sesión y usa protector solar.'],
+      [
+        '¿Duele?',
+        'Se siente como un chasquido leve y caliente. Usamos enfriamiento durante la sesión.',
+      ],
+      [
+        '¿Puedo tomar sol después?',
+        'Evita el sol directo unos días antes y después de cada sesión y usa protector solar.',
+      ],
     ]),
     showResults: true,
   },
@@ -268,7 +343,13 @@ export const treatments: Treatment[] = [
     duration: '15–30 min',
     recovery: 'Ninguna',
     by: A,
-    forWho: ['Líneas de expresión', 'Entrecejo', 'Patas de gallo', 'Bruxismo (masetero)', 'Sudoración excesiva'],
+    forWho: [
+      'Líneas de expresión',
+      'Entrecejo',
+      'Patas de gallo',
+      'Bruxismo (masetero)',
+      'Sudoración excesiva',
+    ],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
       ['Valoración', 'Alain observa tus gestos y define las zonas y las unidades necesarias.'],
@@ -277,9 +358,15 @@ export const treatments: Treatment[] = [
       ['Revisión', 'A las dos semanas revisamos el resultado y ajustamos si hace falta.'],
     ]),
     faqs: F([
-      ['¿Cuándo se ve el efecto?', 'Empieza a notarse entre 3 y 5 días después y el resultado completo llega a las 2 semanas.'],
+      [
+        '¿Cuándo se ve el efecto?',
+        'Empieza a notarse entre 3 y 5 días después y el resultado completo llega a las 2 semanas.',
+      ],
       ['¿Cuánto dura?', 'Normalmente de 3 a 4 meses, según la zona y tu metabolismo.'],
-      ['¿Se va a notar que me hice algo?', 'Buscamos un resultado natural: suavizar las líneas sin perder la expresión.'],
+      [
+        '¿Se va a notar que me hice algo?',
+        'Buscamos un resultado natural: suavizar las líneas sin perder la expresión.',
+      ],
     ]),
     showResults: true,
   },
@@ -311,13 +398,19 @@ export const treatments: Treatment[] = [
     steps: S([
       ['Valoración', 'Analizamos tus proporciones y decidimos cuánto producto necesitas.'],
       ['Anestesia', 'Aplicamos anestesia tópica; la mayoría de los rellenos ya traen lidocaína.'],
-      ['Aplicación', 'Colocamos el producto con aguja o cánula, poco a poco y revisando el resultado.'],
+      [
+        'Aplicación',
+        'Colocamos el producto con aguja o cánula, poco a poco y revisando el resultado.',
+      ],
       ['Cuidados', 'Te damos indicaciones para los primeros días y una revisión si la necesitas.'],
     ]),
     faqs: F([
       ['¿Cuánto dura un relleno?', 'Según la zona y el producto, de 6 a 18 meses.'],
       ['¿Se hincha?', 'Puede haber inflamación leve o algún moretón por 1 a 3 días.'],
-      ['¿Cuántos ml necesito?', 'Depende de la zona y de lo que buscas. El precio es por jeringa de 1 ml y lo definimos contigo.'],
+      [
+        '¿Cuántos ml necesito?',
+        'Depende de la zona y de lo que buscas. El precio es por jeringa de 1 ml y lo definimos contigo.',
+      ],
     ]),
     showResults: true,
   },
@@ -359,15 +452,27 @@ export const treatments: Treatment[] = [
     forWho: ['Piel apagada', 'Acné', 'Poros dilatados', 'Manchas', 'Ojeras'],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
-      ['Diagnóstico', 'Revisamos tu piel y elegimos el facial o la combinación que más te conviene.'],
+      [
+        'Diagnóstico',
+        'Revisamos tu piel y elegimos el facial o la combinación que más te conviene.',
+      ],
       ['Limpieza profunda', 'Limpiamos, exfoliamos y extraemos impurezas.'],
-      ['Tratamiento activo', 'Aplicamos el protocolo: HydraFacial, microneedling, MesojectGun o peeling.'],
+      [
+        'Tratamiento activo',
+        'Aplicamos el protocolo: HydraFacial, microneedling, MesojectGun o peeling.',
+      ],
       ['Hidratación y protección', 'Terminamos con sueros, hidratación y protector solar.'],
     ]),
     faqs: F([
       ['¿Cada cuánto debo hacerme un facial?', 'Para mantener resultados, cada 4 a 6 semanas.'],
-      ['¿Puedo maquillarme después?', 'Tras un HydraFacial, sí. Tras microneedling, espera 24 horas.'],
-      ['¿Qué facial me conviene?', 'Lo definimos en tu valoración según tu piel y lo que quieres mejorar.'],
+      [
+        '¿Puedo maquillarme después?',
+        'Tras un HydraFacial, sí. Tras microneedling, espera 24 horas.',
+      ],
+      [
+        '¿Qué facial me conviene?',
+        'Lo definimos en tu valoración según tu piel y lo que quieres mejorar.',
+      ],
     ]),
     showResults: true,
   },
@@ -393,7 +498,13 @@ export const treatments: Treatment[] = [
     duration: '20–30 min',
     recovery: 'Mínima',
     by: A,
-    forWho: ['Incontinencia urinaria leve', 'Laxitud vaginal', 'Resequedad', 'Menopausia', 'Después del parto'],
+    forWho: [
+      'Incontinencia urinaria leve',
+      'Laxitud vaginal',
+      'Resequedad',
+      'Menopausia',
+      'Después del parto',
+    ],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
       ['Consulta privada', 'Hablamos de tus síntomas con total confidencialidad.'],
@@ -403,8 +514,14 @@ export const treatments: Treatment[] = [
     ]),
     faqs: F([
       ['¿Es doloroso?', 'La mayoría siente calor leve. Es un procedimiento bien tolerado.'],
-      ['¿Cuántas sesiones necesito?', 'El protocolo es de 3 sesiones, por eso el paquete de 3 cuesta $2,100.'],
-      ['¿Cuándo noto mejoría?', 'Muchas pacientes notan cambios desde la primera sesión, y mejoran con las siguientes.'],
+      [
+        '¿Cuántas sesiones necesito?',
+        'El protocolo es de 3 sesiones, por eso el paquete de 3 cuesta $2,100.',
+      ],
+      [
+        '¿Cuándo noto mejoría?',
+        'Muchas pacientes notan cambios desde la primera sesión, y mejoran con las siguientes.',
+      ],
     ]),
     showResults: false,
   },
@@ -429,17 +546,28 @@ export const treatments: Treatment[] = [
     duration: 'Varias citas',
     recovery: 'Mínima',
     by: A,
-    forWho: ['Antes de una boda', 'Rejuvenecimiento completo', 'Agenda apretada', 'Mantenimiento mensual'],
+    forWho: [
+      'Antes de una boda',
+      'Rejuvenecimiento completo',
+      'Agenda apretada',
+      'Mantenimiento mensual',
+    ],
     stepsTitle: 'Cómo funciona',
     steps: S([
-      ['Elige tu paquete', 'Gold Glow, 4D Transformation, Bridal Glow, Executive Refresh o la membresía.'],
+      [
+        'Elige tu paquete',
+        'Gold Glow, 4D Transformation, Bridal Glow, Executive Refresh o la membresía.',
+      ],
       ['Valoración', 'Confirmamos que el paquete se ajusta a tu piel y a tus fechas.'],
       ['Calendario', 'Organizamos todas tus sesiones con anticipación.'],
       ['Seguimiento', 'Revisamos el avance en cada cita y ajustamos si hace falta.'],
     ]),
     faqs: F([
       ['¿Puedo pagar el paquete en cuotas?', 'Sí, con Cherry.'],
-      ['¿Cómo funciona la membresía?', 'Pagas $299 al mes y recibes tratamientos periódicos de rejuvenecimiento facial.'],
+      [
+        '¿Cómo funciona la membresía?',
+        'Pagas $299 al mes y recibes tratamientos periódicos de rejuvenecimiento facial.',
+      ],
       ['¿Puedo cambiar un tratamiento del paquete?', 'Lo podemos ajustar en tu valoración.'],
     ]),
     showResults: true,
@@ -515,7 +643,8 @@ export const treatments: Treatment[] = [
 export const needsConsult = (t: Treatment) => t.from === 'Consultar'
 
 /** «desde $300» o «Requiere consulta» (texto en español, se traduce con tr) */
-export const fromLabel = (t: Treatment) => (needsConsult(t) ? 'Requiere consulta' : 'desde ' + t.from)
+export const fromLabel = (t: Treatment) =>
+  needsConsult(t) ? 'Requiere consulta' : 'desde ' + t.from
 
 /** Recuento como en el diseño: «4 tratamientos» */
 export const countLabel = (t: Treatment) =>

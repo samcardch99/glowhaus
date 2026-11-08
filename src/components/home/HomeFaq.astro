@@ -1,0 +1,18 @@
+---
+import FaqWhatsapp from '../shared/FaqWhatsapp.astro'
+import { homeFaqs } from '../../data/home'
+import type { Lang } from '../../i18n'
+
+// «Antes de reservar»: preguntas frecuentes de la página de inicio.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+---
+
+<section
+  data-theme="light"
+  class="bg-cream text-ink stack-shadow px-gutter relative z-[9] -mt-7 flex min-h-[calc(100vh+80px)] flex-col justify-center pt-[clamp(140px,20vh,220px)] pb-24"
+>
+  <FaqWhatsapp lang={lang} faqs={homeFaqs} title="Antes de reservar" />
+</section>

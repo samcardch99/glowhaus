@@ -1,0 +1,45 @@
+---
+import Button from '../ui/Button.astro'
+import type { Treatment } from '../../data/treatments'
+import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
+import { catNumber, fromLabel, relatedFor } from './helpers'
+
+// «Otros tratamientos»: las 3 categorías siguientes, en bucle.
+interface Props {
+  lang: Lang
+  treatment: Treatment
+}
+const { lang, treatment } = Astro.props
+const t = useT(lang)
+const related = relatedFor(treatment)
+---
+
+<section data-theme="light" class="bg-cream px-gutter flex flex-col gap-9 py-[88px]">
+  <div class="flex flex-wrap items-end justify-between gap-5">
+    <h2 data-reveal class="font-display text-brown m-0 text-[clamp(30px,3.6vw,48px)] leading-[1.1]">
+      {t('Otros tratamientos')}
+    </h2>
+    <Button href={pathFor(lang, 'treatments')} tone="dark" class="min-w-[min(100%,200px)]">
+      {t('Todos los tratamientos')}
+    </Button>
+  </div>
+  <ul class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-5 p-0">
+    {related.map(({ t: r, index }, k) => (
+      <li data-reveal data-delay={String(150 + k * 120)}>
+        <a
+          href={treatmentPath(lang, r.slug[lang])}
+          class="hover:border-gold flex h-full min-h-[220px] flex-col gap-3 rounded-[14px] border border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)] p-[26px] transition-[transform,border-color] duration-400 ease-(--ease-glow) hover:-translate-y-1.5"
+        >
+          <span class="label-caps text-gold-dark tracking-[0.14em]">
+            {index === 0 ? 'FOTONA' : t('CATEGORÍA ' + catNumber(index))}
+          </span>
+          <span class="text-[22px] leading-[1.15] font-semibold">{t(r.name)}</span>
+          <span class="text-brown flex-1 text-base leading-[1.55]">{t(r.short)}</span>
+          <span class="border-beige border-t pt-3 text-[17.5px] font-semibold">
+            {t(fromLabel(r))}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>

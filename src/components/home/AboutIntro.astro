@@ -1,0 +1,152 @@
+---
+import { Image } from 'astro:assets'
+import Button from '../ui/Button.astro'
+import isotipo from '../../assets/glowhaus-isotipo-crema.jpg'
+import b1 from '../../assets/about/b1.jpg'
+import b2 from '../../assets/about/b2.jpg'
+import b3 from '../../assets/about/b3.jpg'
+import b4 from '../../assets/about/b4.jpg'
+import { pathFor, useT, type Lang } from '../../i18n'
+
+// «Una casa moderna de estética»: texto y galería de cuatro fotos que rota cada
+// 4 s (se detiene con el ratón encima o el foco dentro; las miniaturas eligen).
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+
+const photos = [
+  { src: b1, pos: '50% 25%' },
+  { src: b2, pos: '50% 55%' },
+  { src: b3, pos: '50% 40%' },
+  { src: b4, pos: '50% 30%' },
+]
+---
+
+<section
+  id="nosotros"
+  data-theme="light"
+  class="bg-sand stack-shadow px-gutter relative z-[1] grid min-h-[calc(100vh+40px)] grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] items-center gap-[clamp(40px,6vw,96px)] pt-[clamp(64px,10vh,120px)] pb-[clamp(96px,14vh,150px)]"
+>
+  <div class="flex max-w-[640px] flex-col gap-7">
+    <h2
+      data-reveal
+      class="font-display text-brown m-0 text-[clamp(30px,3.4vw,54px)] leading-[1.06]"
+    >
+      <span class="inline-block">{t('Una casa moderna')}</span>
+      <br />
+      <span class="inline-block">{t('de estética')}</span>
+    </h2>
+    <p data-reveal class="text-body text-ink m-0 max-w-[688px] !leading-[1.7] text-pretty">
+      {t(
+        'Fundado por Alain Castellat, APRN, FNP-C, GlowHaus no es un medspa tradicional. Es un espacio boutique en Miami, pequeño, íntimo y cuidado, donde atendemos a una sola persona a la vez. Sin volumen, sin esperas y sin mirar el reloj.',
+      )}
+    </p>
+    <p data-reveal class="text-body text-ink m-0 max-w-[713px] !leading-[1.7] text-pretty">
+      {t(
+        'Nació de una idea clara: la estética no debería ser rápida. Debería ser una experiencia, con la atención enfocada solamente en ti.',
+      )}
+    </p>
+    <div data-reveal class="mt-1">
+      <Button href={pathFor(lang, 'about')} tone="dark" class="min-w-[min(100%,200px)]">
+        {t('Ver más')}
+      </Button>
+    </div>
+  </div>
+
+  <div
+    data-about-gal
+    class="flex w-[calc(4*clamp(84px,8vw,120px)+54px)] max-w-full min-w-0 flex-col gap-[clamp(24px,4vh,40px)] justify-self-center"
+  >
+    <div data-reveal class="bg-sand relative aspect-square w-full overflow-hidden rounded-[14px]">
+      {photos.map((p, i) => (
+        <Image
+          src={p.src}
+          alt={i === 0 ? t('Interior de GlowHaus Aesthetics en Miami') : ''}
+          data-about-img={i}
+          widths={[420, 640, 900]}
+          sizes="(min-width: 760px) 534px, 100vw"
+          style={`object-position:${p.pos}`}
+          class:list={[
+            'absolute inset-0 size-full object-cover transition-opacity duration-[1100ms]',
+            i === 0 ? 'opacity-100' : 'opacity-0',
+          ]}
+        />
+      ))}
+      <div class="glass-chip pointer-events-none absolute bottom-3 left-3 flex max-w-[calc(100%-24px)] items-center gap-2.5 rounded-xl py-2 pr-3.5 pl-2">
+        <Image
+          src={isotipo}
+          alt=""
+          width={84}
+          class="size-[clamp(32px,2.6vw,42px)] flex-none rounded-lg object-cover"
+        />
+        <div class="flex min-w-0 flex-col gap-px">
+          <span class="text-cream text-[clamp(15px,calc(10px+0.8vw),21.5px)] leading-[1.2] font-semibold">
+            GlowHaus Aesthetics
+          </span>
+          <span class="text-sand-2 text-[clamp(13.5px,calc(9px+0.6vw),17px)] leading-[1.35]">
+            {t('Boutique spa · Miami')}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div
+      data-reveal
+      class="flex justify-between gap-[18px]"
+      role="group"
+      aria-label={t('Fotos de GlowHaus')}
+    >
+      {photos.map((p, i) => (
+        <button
+          type="button"
+          data-about-thumb={i}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+          aria-label={`${t('Foto')} ${i + 1}`}
+          class="group relative isolate aspect-[5/6] w-[clamp(64px,8vw,120px)] flex-none opacity-60 transition-[opacity,transform] duration-300 ease-(--ease-glow) hover:-translate-y-1.5 hover:scale-[1.04] hover:opacity-100 aria-pressed:opacity-100"
+        >
+          <Image
+            src={p.src}
+            alt=""
+            widths={[120, 240]}
+            sizes="120px"
+            class="absolute inset-0 -z-10 size-full rounded-[14px] object-cover object-[center_25%]"
+          />
+          <span
+            aria-hidden="true"
+            class="group-aria-pressed:border-gold pointer-events-none absolute inset-y-0 -inset-x-1.5 rounded-[18px] border-x-2 border-transparent transition-colors duration-400"
+          />
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const gal = document.querySelector<HTMLElement>('[data-about-gal]')
+  if (gal) {
+    const imgs = gal.querySelectorAll<HTMLElement>('[data-about-img]')
+    const thumbs = gal.querySelectorAll<HTMLButtonElement>('[data-about-thumb]')
+    let idx = 0
+    let paused = false
+    const show = (i: number) => {
+      idx = i
+      imgs.forEach((im, k) => {
+        im.classList.toggle('opacity-100', k === i)
+        im.classList.toggle('opacity-0', k !== i)
+      })
+      thumbs.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)))
+    }
+    thumbs.forEach((b, i) => b.addEventListener('click', () => show(i)))
+    gal.addEventListener('mouseenter', () => (paused = true))
+    gal.addEventListener('mouseleave', () => (paused = false))
+    gal.addEventListener('focusin', () => (paused = true))
+    gal.addEventListener('focusout', () => (paused = false))
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.setInterval(() => {
+        if (!paused && !document.hidden) show((idx + 1) % imgs.length)
+      }, 4000)
+    }
+  }
+</script>

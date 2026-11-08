@@ -1,0 +1,85 @@
+---
+import Button from '../ui/Button.astro'
+import type { Faq } from '../../data/treatments'
+import { whatsappHref } from '../../data/site'
+import { useT, type Lang } from '../../i18n'
+
+// Bloque de preguntas frecuentes: tarjeta de WhatsApp + acordeón (<details>).
+interface Props {
+  lang: Lang
+  faqs: Faq[]
+  eyebrow?: string
+  title: string
+  /** Texto de la tarjeta de WhatsApp */
+  note?: string
+  tone?: 'light' | 'dark'
+  headingLevel?: 'h2' | 'h3'
+}
+const {
+  lang,
+  faqs,
+  eyebrow = 'PREGUNTAS FRECUENTES',
+  title,
+  note = 'Escríbenos por WhatsApp y te responde el equipo.',
+  tone = 'light',
+  headingLevel = 'h2',
+} = Astro.props
+const t = useT(lang)
+const H = headingLevel
+const dark = tone === 'dark'
+---
+
+<div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] gap-x-16 gap-y-10">
+  <div class="flex flex-col gap-6">
+    <span class:list={['eyebrow', dark ? 'text-tan' : 'text-gold-dark']}>{t(eyebrow)}</span>
+    <H data-reveal class="font-display m-0 text-[clamp(34px,4.4vw,60px)] leading-[1.05]">
+      {t(title)}
+    </H>
+    <div
+      class:list={[
+        'mt-4 flex max-w-[460px] flex-col gap-4 rounded-[14px] border p-7',
+        dark
+          ? 'border-[rgb(250_248_245/0.35)] bg-[rgb(250_248_245/0.06)]'
+          : 'border-[rgb(24_18_14/0.18)] bg-[rgb(24_18_14/0.03)]',
+      ]}
+    >
+      <p class="m-0 text-[clamp(20px,1.8vw,26px)] leading-tight font-semibold">
+        {t('¿Te queda una duda?')}
+      </p>
+      <p class:list={['text-body-sm m-0', dark ? 'text-cream-3' : 'text-taupe']}>{t(note)}</p>
+      <Button href={whatsappHref(lang)} external tone={dark ? 'light' : 'dark'} class="self-start">
+        WhatsApp
+      </Button>
+    </div>
+  </div>
+  <div
+    class:list={[
+      'border-t',
+      dark ? 'border-[rgb(250_248_245/0.2)]' : 'border-[rgb(24_18_14/0.15)]',
+    ]}
+  >
+    {faqs.map((f) => (
+      <details
+        class:list={[
+          'group border-b',
+          dark ? 'border-[rgb(250_248_245/0.2)]' : 'border-[rgb(24_18_14/0.15)]',
+        ]}
+      >
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-[clamp(18px,1.5vw,22px)] font-semibold [&::-webkit-details-marker]:hidden">
+          <span>{t(f.q)}</span>
+          <span
+            aria-hidden="true"
+            class="text-gold text-2xl leading-none transition-transform group-open:rotate-45"
+          >
+            +
+          </span>
+        </summary>
+        <p
+          class:list={['text-body-sm m-0 max-w-[640px] pb-6', dark ? 'text-cream-3' : 'text-taupe']}
+        >
+          {t(f.a)}
+        </p>
+      </details>
+    ))}
+  </div>
+</div>

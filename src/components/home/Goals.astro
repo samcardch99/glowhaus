@@ -1,0 +1,139 @@
+---
+import { Image } from 'astro:assets'
+import Arrow from '../ui/Arrow.astro'
+import { goals } from '../../data/home'
+import { treatments } from '../../data/treatments'
+import { treatmentPath, useT, type Lang } from '../../i18n'
+
+// «¿Qué desearías mejorar?»: ocho objetivos y, para el elegido, dos tratamientos
+// sugeridos sobre una foto. Sin JS se ve el primero.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+---
+
+<section
+  data-theme="light"
+  data-goals
+  class="bg-sand stack-shadow relative z-[5] -mt-7 flex min-h-[calc(100vh+80px)] items-center"
+>
+  <div class="px-gutter grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] items-stretch gap-[clamp(32px,5vw,80px)] pt-[clamp(110px,calc(4vw+120px),180px)] pb-[clamp(56px,8vh,90px)]">
+    <div class="flex flex-col justify-between gap-[clamp(18px,3vh,28px)] md:pl-[clamp(12px,2vw,36px)]">
+      <div class="flex flex-col gap-[22px]">
+        <h2
+          data-reveal
+          class="font-display text-brown m-0 text-[clamp(30px,3.6vw,48px)] leading-[1.08]"
+        >
+          {t('¿Qué desearías mejorar?')}
+        </h2>
+        <p
+          data-reveal
+          data-delay="200"
+          class="text-ink m-0 max-w-[440px] text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.6]"
+        >
+          {t(
+            'Elige lo que te preocupa y te sugerimos por dónde empezar. En tu valoración confirmamos el plan.',
+          )}
+        </p>
+      </div>
+      <div
+        data-reveal
+        data-delay="400"
+        role="group"
+        aria-label={t('¿Qué desearías mejorar?')}
+        class="mt-1.5 grid w-[calc(clamp(30px,3.6vw,48px)*12.7)] max-w-full grid-cols-2 gap-2.5 sm:grid-cols-3"
+      >
+        {goals.map((g, i) => (
+          <button
+            type="button"
+            data-goal={i}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            aria-controls="goal-panel"
+            class="aria-pressed:bg-gold aria-pressed:border-gold aria-pressed:text-cream hover:bg-gold hover:border-gold hover:text-cream text-ink flex min-w-0 items-center rounded-[14px] border border-[rgb(24_18_14/0.55)] bg-[rgb(24_18_14/0.06)] px-3.5 py-3 text-left sm:px-[18px] text-[clamp(15px,1.2vw,17px)] font-semibold tracking-[0.03em] backdrop-blur-[10px] transition-colors duration-300 max-sm:rounded-lg"
+          >
+            <span class="sm:truncate">{t(g.label)}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div
+      id="goal-panel"
+      aria-live="polite"
+      class="bg-ink relative aspect-[4/5] min-h-[580px] w-full max-w-[560px] justify-self-center overflow-hidden rounded-[14px] lg:aspect-[20/21] lg:h-[min(72vh,640px)] lg:min-h-[540px] lg:w-auto lg:max-w-full"
+    >
+      {goals.map((g, i) => (
+        <Image
+          src={g.img}
+          alt=""
+          data-goal-img={i}
+          widths={[480, 800, 1120]}
+          sizes="(min-width: 1100px) 560px, 100vw"
+          class:list={[
+            'absolute inset-0 size-full object-cover transition-[opacity,transform] duration-[900ms,1600ms] ease-(--ease-glow)',
+            i === 0 ? 'scale-100 opacity-100' : 'scale-[1.08] opacity-0',
+          ]}
+        />
+      ))}
+      <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.15)_0%,rgb(24_18_14/0.05)_40%,rgb(24_18_14/0.7)_100%)]" />
+      <div class="text-cream absolute inset-x-0 bottom-0 flex flex-col gap-3 p-[clamp(16px,2vw,28px)]">
+        <span class="eyebrow tracking-[0.2em]">{t('TE SUGERIMOS EMPEZAR POR')}</span>
+        {goals.map((g, i) => (
+          <div data-goal-sugs={i} hidden={i !== 0} class="flex flex-col gap-3">
+            {g.s.map((s) => (
+              <div class="grid grid-cols-1 items-center gap-x-5 gap-y-3 rounded-[14px] border border-[rgb(250_248_245/0.2)] bg-[rgb(24_18_14/0.32)] p-[clamp(16px,1.6vw,22px)] backdrop-blur-[16px] lg:grid-cols-[minmax(0,1fr)_auto]">
+                <div class="flex min-w-0 flex-col gap-[5px]">
+                  <span class="text-gold-light text-xs font-semibold tracking-[0.16em]">
+                    {t(s.tag)}
+                  </span>
+                  <h3 class="m-0 text-[clamp(19px,calc(14px+1vw),22px)] leading-[1.15] font-semibold">
+                    {t(s.name)}
+                  </h3>
+                  <p class="text-cream-3 m-0 text-[clamp(16px,calc(12px+0.8vw),17px)] leading-normal">
+                    {t(s.desc)}
+                  </p>
+                </div>
+                <div class="flex items-center justify-between gap-2.5 lg:flex-col lg:items-end">
+                  <span class="text-[clamp(18px,calc(14px+0.8vw),20.5px)] font-semibold">
+                    {t(s.price)}
+                  </span>
+                  <a
+                    href={treatmentPath(lang, treatments[s.tx]!.slug[lang])}
+                    class="btn-glass !gap-2.5 !px-4 !py-2.5"
+                    aria-label={`${t('Ver y reservar')}: ${t(s.name)}`}
+                  >
+                    <span>{t('Ver y reservar')}</span>
+                    <Arrow />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-goals]').forEach((root) => {
+    const btns = root.querySelectorAll<HTMLButtonElement>('[data-goal]')
+    const imgs = root.querySelectorAll<HTMLElement>('[data-goal-img]')
+    const sugs = root.querySelectorAll<HTMLElement>('[data-goal-sugs]')
+    btns.forEach((b, i) =>
+      b.addEventListener('click', () => {
+        btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)))
+        imgs.forEach((im, k) => {
+          const on = k === i
+          im.classList.toggle('opacity-100', on)
+          im.classList.toggle('scale-100', on)
+          im.classList.toggle('opacity-0', !on)
+          im.classList.toggle('scale-[1.08]', !on)
+        })
+        sugs.forEach((s, k) => (s.hidden = k !== i))
+      }),
+    )
+  })
+</script>

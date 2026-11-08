@@ -1,0 +1,34 @@
+---
+import Button from '../ui/Button.astro'
+import { pathFor, useT, type Lang } from '../../i18n'
+
+// «Atrás»: vuelve a la página anterior si viene del mismo sitio; si no (o sin JS),
+// lleva a Inicio.
+interface Props {
+  lang: Lang
+  tone?: 'light' | 'dark'
+}
+const { lang, tone = 'light' } = Astro.props
+const t = useT(lang)
+---
+
+<Button href={pathFor(lang, 'home')} tone={tone} back data-back class="!px-[18px] !py-[11px]">
+  {t('Atrás')}
+</Button>
+
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('a[data-back]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      let sameOrigin = false
+      try {
+        sameOrigin = new URL(document.referrer).origin === location.origin
+      } catch {
+        sameOrigin = false
+      }
+      if (sameOrigin && history.length > 1) {
+        e.preventDefault()
+        history.back()
+      }
+    })
+  })
+</script>

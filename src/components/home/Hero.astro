@@ -1,0 +1,173 @@
+---
+import Button from '../ui/Button.astro'
+import Arrow from '../ui/Arrow.astro'
+import PauseButton from './PauseButton.astro'
+import { site, whatsappHref } from '../../data/site'
+import { pathFor, useT, type Lang } from '../../i18n'
+
+// Primera pantalla: reel vertical enmarcado a la derecha sobre una copia
+// difuminada (en móvil, a pantalla completa). La sección es sticky y la
+// siguiente la tapa (data-cover).
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+
+const stats = [
+  {
+    label: 'TRATAMIENTOS CON PRECIO',
+    value: '80+',
+    href: pathFor(lang, 'treatments'),
+    aria: 'Ver tratamientos',
+  },
+  {
+    label: 'RESEÑAS EN GOOGLE',
+    value: '5.0 ★',
+    href: site.googleReviews,
+    aria: 'Ver reseñas en Google',
+    external: true,
+  },
+  { label: 'DIRECCIÓN MÉDICA', value: 'APRN', href: '#equipo', aria: 'Ver equipo' },
+]
+---
+
+<section
+  data-theme="overlay"
+  data-cover
+  class="bg-brown text-cream sticky top-0 z-0 flex h-svh min-h-[620px] flex-col overflow-hidden"
+>
+  <div data-cover-target class="absolute inset-0">
+    <!-- Copia difuminada, solo en escritorio -->
+    <video
+      data-autoplay
+      data-hero-bg
+      data-src="/media/hero-reel.mp4"
+      poster="/media/hero-reel.jpg"
+      muted
+      loop
+      playsinline
+      preload="none"
+      aria-hidden="true"
+      tabindex="-1"
+      class="absolute -inset-10 hidden size-[calc(100%+80px)] max-w-none object-cover blur-[28px] brightness-70 md:block"
+    ></video>
+    <video
+      id="hero-video"
+      data-autoplay
+      data-src="/media/hero-reel.mp4"
+      poster="/media/hero-reel.jpg"
+      muted
+      loop
+      playsinline
+      preload="none"
+      aria-label={t('Vídeo de la clínica GlowHaus')}
+      class="absolute inset-0 size-full object-cover object-[center_40%] md:right-0 md:left-auto md:w-[min(62vh,38vw)]"
+    ></video>
+    <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.55)_0%,rgb(24_18_14/0.1)_30%,rgb(24_18_14/0.25)_55%,rgb(24_18_14/0.8)_100%)]"></div>
+  </div>
+
+  <div class="px-gutter relative flex flex-1 flex-col justify-end pt-[clamp(120px,16vh,150px)] pb-[clamp(28px,6vh,64px)] md:pr-[calc(min(62vh,38vw)+48px)]">
+    <div class="flex flex-col gap-[18px]">
+      <h1
+        data-hero-h1
+        class="font-display m-0 max-w-[12.8em] text-[clamp(30px,min(4.4vw,7.8vh),68px)] leading-none tracking-[0.01em] [text-wrap:wrap]"
+      >
+        {t('Resultados naturales, con un equipo que conoces')}
+      </h1>
+      <div class="flex flex-wrap items-end gap-x-8 gap-y-5">
+        <p
+          data-reveal
+          data-delay="200"
+          class="text-body text-cream-2 m-0 max-w-[520px] text-pretty"
+        >
+          {t(
+            'Láser Fotona, inyectables, rellenos, depilación láser y faciales médicos en Miami. Cada tratamiento empieza con una valoración y un plan pensado para tu piel.',
+          )}
+        </p>
+        <div data-reveal data-delay="320">
+          <Button href={whatsappHref(lang)} external>
+            {t('Reservar cita')}
+          </Button>
+        </div>
+      </div>
+      <ul
+        role="list"
+        class="m-0 mt-[clamp(8px,2.4vh,32px)] flex w-full max-w-full md:w-[calc(clamp(30px,min(4.4vw,7.8vh),68px)*12.07)] list-none gap-2 p-0 sm:gap-3"
+      >
+        {stats.map((s, i) => (
+          <li
+            data-reveal
+            data-delay={String(420 + i * 160)}
+            class="relative flex min-w-0 flex-1 flex-col gap-2 rounded-[14px] border border-[rgb(250_248_245/0.18)] bg-[rgb(250_248_245/0.08)] px-[clamp(10px,1.6vw,22px)] py-[clamp(12px,1.4vw,18px)]"
+          >
+            <span class="text-sand text-[clamp(9.5px,0.9vw,13px)] leading-[1.4] font-medium tracking-[0.1em]">
+              {t(s.label)}
+            </span>
+            <span class="text-[clamp(20px,2.4vw,34px)] leading-none font-semibold">{s.value}</span>
+            <a
+              href={s.href}
+              aria-label={t(s.aria)}
+              {...(s.external ? { target: '_blank', rel: 'noopener' } : {})}
+              class="text-cream hover:text-gold absolute inset-0 flex items-center justify-center rounded-[14px] opacity-85 transition hover:opacity-100 md:inset-auto md:right-1 md:bottom-0.5 md:size-11 md:rounded-[10px]"
+            >
+              <Arrow class="max-md:hidden" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <PauseButton
+    lang={lang}
+    controls="hero-video"
+    class="absolute top-[clamp(96px,14vh,120px)] right-4 z-10 md:top-auto md:right-6 md:bottom-6"
+  />
+</section>
+
+<script>
+  import { gsap, SplitText, prefersReducedMotion } from '../../scripts/gsap'
+
+  // El fondo difuminado sigue al vídeo principal (pausa y reproducción)
+  const main = document.getElementById('hero-video') as HTMLVideoElement | null
+  const bg = document.querySelector<HTMLVideoElement>('[data-hero-bg]')
+  if (main && bg) {
+    main.addEventListener('pause', () => {
+      if (main.dataset.userPaused) {
+        bg.dataset.userPaused = '1'
+        bg.pause()
+      }
+    })
+    main.addEventListener('play', () => {
+      delete bg.dataset.userPaused
+      if (getComputedStyle(bg).display !== 'none') bg.play().catch(() => {})
+    })
+  }
+
+  // Título: las líneas suben desde una máscara
+  const h1 = document.querySelector<HTMLElement>('[data-hero-h1]')
+  if (h1 && !prefersReducedMotion()) {
+    document.fonts.ready.then(() => {
+      SplitText.create(h1, {
+        type: 'lines',
+        mask: 'lines',
+        autoSplit: true,
+        onSplit: (self) => {
+          // La máscara no debe cortar las colas de las letras (Q, comas)
+          self.masks.forEach((m) => {
+            m.style.paddingBottom = '0.14em'
+            m.style.marginBottom = '-0.14em'
+          })
+          return gsap.from(self.lines, {
+            yPercent: 105,
+            duration: 1.1,
+            stagger: 0.09,
+            ease: 'power4.out',
+            delay: document.documentElement.classList.contains('gh-intro-on') ? 1.6 : 0.1,
+          })
+        },
+      })
+    })
+  }
+</script>

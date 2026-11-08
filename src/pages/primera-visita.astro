@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro'
+import FirstVisit from '../components/pages/FirstVisit.astro'
+import sala from '../assets/clinica-sala.jpg'
+import { pathFor } from '../i18n'
+---
+
+<Layout
+  lang="es"
+  title="Tu primera visita"
+  description="Cómo es tu primera cita en GlowHaus Miami: llegada, valoración con Alain Castellat, APRN, tu plan con precios y formas de pago, incluidas las cuotas con Cherry."
+  altPath={pathFor('en', 'visit')}
+  headerTheme="light"
+  ogImage={sala}
+>
+  <FirstVisit lang="es" />
+</Layout>

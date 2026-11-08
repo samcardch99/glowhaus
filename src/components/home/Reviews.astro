@@ -1,0 +1,133 @@
+---
+import { Image } from 'astro:assets'
+import Button from '../ui/Button.astro'
+import Testimonials from './Testimonials.astro'
+import { reviewColumns } from '../../data/home'
+import { site } from '../../data/site'
+import { useT, type Lang } from '../../i18n'
+
+// Reseñas de Google en tres columnas (texto original de cada paciente) y,
+// debajo, los testimonios en vídeo.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+---
+
+<section
+  data-theme="dark"
+  data-reviews
+  class="bg-ink text-cream stack-shadow px-gutter relative z-[8] -mt-7 flex min-h-screen flex-col gap-10 py-24"
+>
+  <div class="flex flex-col gap-3.5">
+    <span class="eyebrow text-tan">{t('RESEÑAS DE GOOGLE')}</span>
+    <h2 data-reveal class="font-display m-0 text-[clamp(32px,4vw,52px)] leading-[1.08]">
+      {t('Lo que dicen nuestros pacientes')}
+    </h2>
+  </div>
+
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] items-stretch gap-5">
+    {reviewColumns.map((col, ci) => (
+      <div class="flex flex-col gap-5">
+        {col.map((r, k) => (
+          <figure
+            data-reveal
+            data-delay={String(300 + (ci * 2 + k) * 140)}
+            class="m-0 flex flex-[1_1_auto] flex-col justify-between gap-7 rounded-[20px] border border-[rgb(250_248_245/0.16)] bg-[rgb(250_248_245/0.07)] px-6 pt-6 pb-3 backdrop-blur-[14px] transition-colors duration-400 hover:bg-[rgb(250_248_245/0.11)]"
+          >
+            <div class="flex flex-col gap-3.5">
+              <span
+                class="text-gold text-base font-medium tracking-[3px]"
+                role="img"
+                aria-label={t('5 de 5 estrellas')}
+              >
+                ★★★★★
+              </span>
+              <div class="flex flex-col items-start gap-2">
+                <blockquote
+                  lang={r.lang}
+                  data-review-text
+                  class="review-text m-0 text-[clamp(17px,calc(12px+0.8vw),19px)] leading-[1.6] text-pretty"
+                >
+                  “{r.t}”
+                </blockquote>
+                <button
+                  type="button"
+                  data-review-more
+                  aria-expanded="false"
+                  hidden
+                  class="text-gold-light py-1 text-[14.5px] font-medium underline underline-offset-[3px]"
+                  data-more={t('Ver más')}
+                  data-less={t('Ver menos')}
+                >
+                  {t('Ver más')}
+                </button>
+              </div>
+            </div>
+            <figcaption class="-mx-3 flex items-center gap-3.5 rounded-lg bg-[rgb(250_248_245/0.08)] px-3.5 py-3">
+              <span class="bg-brown text-gold flex size-12 flex-none items-center justify-center overflow-hidden rounded-full text-[19px] font-medium">
+                {r.img ? (
+                  <Image src={r.img} alt="" width={96} class="size-full object-cover" />
+                ) : (
+                  <span aria-hidden="true">{r.n[0]}</span>
+                )}
+              </span>
+              <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span class="text-[17px] font-medium">{r.n}</span>
+                <span class="text-silver text-[15px]">{t(r.s)}</span>
+              </span>
+            </figcaption>
+          </figure>
+        ))}
+        {ci === reviewColumns.length - 1 && (
+          <div data-reveal data-delay="1100">
+            <Button href={site.googleReviews} external class="min-w-[min(100%,200px)]">
+              {t('Ver todas en Google')}
+            </Button>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+
+  <Testimonials lang={lang} />
+</section>
+
+<style>
+  /* En pantallas medianas y pequeñas las reseñas se recortan con «Ver más» */
+  @media (width < 1100px) {
+    :global(.js) .review-text:not([data-open]) {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+      overflow: hidden;
+    }
+  }
+</style>
+
+<script>
+  const mq = window.matchMedia('(width < 1100px)')
+  const sync = () =>
+    document.querySelectorAll<HTMLElement>('[data-reviews] [data-review-text]').forEach((el) => {
+      const btn = el.parentElement?.querySelector<HTMLButtonElement>('[data-review-more]')
+      if (!btn) return
+      btn.hidden =
+        !mq.matches || (!el.hasAttribute('data-open') && el.scrollHeight <= el.clientHeight + 2)
+    })
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-reviews] [data-review-more]')
+    .forEach((btn) => {
+      const text = btn.parentElement?.querySelector<HTMLElement>('[data-review-text]')
+      btn.addEventListener('click', () => {
+        if (!text) return
+        const open = !text.hasAttribute('data-open')
+        text.toggleAttribute('data-open', open)
+        btn.setAttribute('aria-expanded', String(open))
+        btn.textContent = (open ? btn.dataset.less : btn.dataset.more) ?? ''
+      })
+    })
+  sync()
+  mq.addEventListener('change', sync)
+  document.fonts?.ready.then(sync)
+</script>

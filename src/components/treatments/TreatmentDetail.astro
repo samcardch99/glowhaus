@@ -1,0 +1,250 @@
+---
+import { Image } from 'astro:assets'
+import Button from '../ui/Button.astro'
+import BeforeAfter from '../shared/BeforeAfter.astro'
+import FaqWhatsapp from '../shared/FaqWhatsapp.astro'
+import VideoToggle from './VideoToggle.astro'
+import StepsTimeline from './StepsTimeline.astro'
+import PaymentMethods from './PaymentMethods.astro'
+import RelatedTreatments from './RelatedTreatments.astro'
+import type { Treatment } from '../../data/treatments'
+import { whatsappHref } from '../../data/site'
+import { pathFor, useT, type Lang } from '../../i18n'
+import { baSetsFor, posterFor } from './helpers'
+
+// Ficha de un tratamiento: cabecera con fondo desenfocado, pasos, precios y
+// formas de pago, antes y después, preguntas frecuentes y otros tratamientos.
+interface Props {
+  lang: Lang
+  treatment: Treatment
+}
+const { lang, treatment: tx } = Astro.props
+const t = useT(lang)
+const name = t(tx.title)
+// Foto fija de la ficha si la hay; si no, el vídeo; si no, la foto de la categoría
+const still = tx.detailImg ?? (tx.video ? undefined : tx.img)
+const stillPos = tx.detailImg ? (tx.detailPos ?? 'center 45%') : (tx.imgPos ?? 'center')
+const videoId = `tx-video-${tx.slug.es}`
+const book = whatsappHref(lang, name)
+---
+
+<div class="relative isolate overflow-clip">
+  <!-- Fondo desenfocado -->
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <Image
+      src={tx.detailImg ?? tx.img}
+      alt=""
+      widths={[480, 800]}
+      sizes="100vw"
+      class="absolute -inset-20 h-[calc(100%+160px)] w-[calc(100%+160px)] max-w-none object-cover blur-[38px] saturate-[1.1]"
+    />
+    <div class="absolute inset-0 bg-[rgb(234_224_209/0.72)]"></div>
+  </div>
+
+  <section
+    data-theme="light"
+    class="px-gutter flex flex-col gap-9 pt-[clamp(120px,15vh,150px)] pb-[88px]"
+  >
+    <Button href={pathFor(lang, 'treatments')} tone="dark" back class="self-start">
+      {t('Atrás')}
+    </Button>
+    <nav aria-label={t('Migas de pan')}>
+      <ol class="text-taupe m-0 flex list-none flex-wrap gap-2 p-0 text-[14.5px] font-medium">
+        <li>
+          <a href={pathFor(lang, 'home')} class="hover:text-ink underline-offset-4 hover:underline">
+            {t('Inicio')}
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a
+            href={pathFor(lang, 'treatments')}
+            class="hover:text-ink underline-offset-4 hover:underline"
+          >
+            {t('Tratamientos')}
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-ink">
+          {t(tx.name)}
+        </li>
+      </ol>
+    </nav>
+
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] items-start gap-14">
+      <div class="flex flex-col gap-[30px]">
+        <div class="flex flex-col gap-3.5">
+          <span class="eyebrow text-gold-dark">{t(tx.tag)}</span>
+          <h1 data-reveal class="font-display m-0 text-[clamp(44px,6vw,84px)] leading-none">
+            {name}
+          </h1>
+        </div>
+        <div class="border-beige flex flex-col gap-2.5 border-t pt-[22px]">
+          <h2 class="label-caps text-brown m-0 tracking-[0.18em]">{t('EN QUÉ CONSISTE')}</h2>
+          <p
+            data-reveal
+            data-delay="200"
+            class="text-brown m-0 text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.6] text-pretty"
+          >
+            {t(tx.what)}
+          </p>
+        </div>
+        <dl class="m-0 grid grid-cols-3 gap-3 py-[22px] min-[760px]:gap-5">
+          {[
+            ['SESIONES', tx.sessions],
+            ['DURACIÓN', tx.duration],
+            ['RECUPERACIÓN', tx.recovery],
+          ].map(([k, v]) => (
+            <div class="flex flex-col gap-1.5">
+              <dt class="label-caps text-gold-dark max-[759px]:text-[11.5px] max-[759px]:tracking-[0.08em]">
+                {t(k!)}
+              </dt>
+              <dd class="m-0 text-[clamp(19px,2vw,24px)] leading-tight font-semibold">{t(v!)}</dd>
+            </div>
+          ))}
+        </dl>
+        <div class="flex flex-col gap-3">
+          <h2 class="label-caps text-brown m-0 tracking-[0.18em]">{t('RECOMENDADO PARA')}</h2>
+          <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+            {tx.forWho.map((w) => (
+              <li class="bg-sand rounded-[14px] px-4 py-[9px] text-base font-medium">{t(w)}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <figure class="relative m-0 aspect-[4/5] overflow-hidden rounded-[14px] max-[759px]:aspect-[4/4.4]">
+        <div class="bg-sand size-full overflow-hidden">
+          {still ? (
+            <Image
+              src={still}
+              alt={name}
+              widths={[480, 800, 1200, 1600]}
+              sizes="(min-width: 1000px) 50vw, 100vw"
+              loading="eager"
+              fetchpriority="high"
+              class="block size-full object-cover"
+              style={`object-position:${stillPos}`}
+            />
+          ) : (
+            <video
+              id={videoId}
+              data-autoplay
+              data-src={tx.video}
+              poster={posterFor(tx.video!)}
+              muted
+              loop
+              playsinline
+              preload="none"
+              aria-label={name}
+              class="block size-full object-cover"
+            />
+          )}
+        </div>
+        <figcaption class="glass-chip pointer-events-none absolute inset-x-4 bottom-4 flex flex-col gap-px rounded-[14px] px-[18px] py-3.5 max-[759px]:rounded-lg">
+          <span class="text-cream text-[clamp(17px,1.4vw,20px)] leading-[1.2] font-semibold">
+            {name}
+          </span>
+          <span class="text-sand-2 text-[clamp(14.5px,1.1vw,16px)] leading-[1.35]">
+            {t('Lo realiza')} {t(tx.by)}
+          </span>
+        </figcaption>
+        {!still && <VideoToggle lang={lang} controls={videoId} class="absolute top-4 right-4" />}
+      </figure>
+    </div>
+  </section>
+
+  <StepsTimeline lang={lang} title={tx.stepsTitle} steps={tx.steps} />
+
+  <section
+    data-theme="light"
+    class="bg-cream stack-shadow px-gutter relative z-[2] grid grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] gap-14 pt-[clamp(96px,17vh,170px)] pb-24"
+  >
+    <div class="flex flex-col gap-[22px]">
+      <h2 data-reveal class="font-display m-0 text-[clamp(30px,3.6vw,48px)] leading-[1.1]">
+        {t('Precios de cada tratamiento')}
+      </h2>
+      <table
+        data-reveal
+        data-delay="200"
+        class="w-full border-collapse border-t border-ink text-left"
+      >
+        <caption class="sr-only">
+          {t('Precios de cada tratamiento')}:{t(tx.name)}
+        </caption>
+        <thead>
+          <tr class="border-beige border-b">
+            <th
+              scope="col"
+              class="label-caps text-taupe w-[62%] py-3.5 pr-3 font-semibold tracking-[0.14em]"
+            >
+              {t('TRATAMIENTO')}
+            </th>
+            <th scope="col" class="label-caps text-taupe py-3.5 font-semibold tracking-[0.14em]">
+              {t('POR SESIÓN')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {tx.items.map((it) => (
+            <tr class="border-beige border-b align-baseline">
+              <th
+                scope="row"
+                class="py-[18px] pr-3 text-[clamp(16.5px,1.3vw,18.5px)] font-semibold"
+              >
+                {t(it.n)}
+              </th>
+              <td class="py-[18px] text-[clamp(18px,1.6vw,22px)] font-semibold">{t(it.p)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="text-gold-dark m-0 text-[20px] leading-[1.55] font-medium">{t(tx.desc)}</p>
+      <p class="text-body-sm text-gold-dark m-0">
+        {t('Precios sujetos a cambios. El plan final se confirma en tu valoración.')}
+      </p>
+      <Button href={book} external tone="dark" class="mt-2 self-start">
+        {t('Reservar cita')}
+      </Button>
+    </div>
+    <PaymentMethods lang={lang} class="self-end" />
+  </section>
+</div>
+
+{tx.showResults && (
+  <section
+    data-theme="dark"
+    class="bg-ink text-cream px-gutter grid grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] items-center gap-14 py-[clamp(64px,10vh,112px)]"
+  >
+    <div class="flex flex-col gap-5 lg:order-2">
+      <span class="eyebrow text-tan">{t('RESULTADOS')}</span>
+      <h2 data-reveal class="font-display m-0 text-[clamp(30px,3.6vw,48px)] leading-[1.1]">
+        {t('Antes y después')}
+      </h2>
+      <p
+        data-reveal
+        data-delay="200"
+        class="text-cream-3 m-0 max-w-[520px] text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.6]"
+      >
+        {t(
+          'Desliza para comparar. Los cambios se notan de forma gradual y se consolidan en las semanas siguientes a cada sesión.',
+        )}
+      </p>
+    </div>
+    <div class="w-full max-w-[720px] justify-self-center lg:order-1">
+      <BeforeAfter lang={lang} sets={baSetsFor(tx)} id={`ba-${tx.slug.es}`} />
+    </div>
+  </section>
+)}
+
+<section data-theme="light" class="bg-cream px-gutter py-24">
+  <FaqWhatsapp
+    lang={lang}
+    faqs={tx.faqs}
+    eyebrow="ANTES DE TU CITA"
+    title="Preguntas frecuentes"
+    note="Escríbenos y te responde el equipo, no un bot."
+  />
+</section>
+
+<RelatedTreatments lang={lang} treatment={tx} />

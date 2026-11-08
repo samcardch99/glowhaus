@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets'
+import BeforeAfter from '../shared/BeforeAfter.astro'
+import { baSets } from '../../data/results'
+import { useT, type Lang } from '../../i18n'
+
+// «Antes y después, por tratamiento» (el menú enlaza a /#resultados).
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+const bg = baSets[0]!.pairs[0]!.after
+---
+
+<section
+  id="resultados"
+  data-theme="dark"
+  class="bg-ink text-cream stack-shadow px-gutter relative z-[6] -mt-7 grid min-h-[calc(100vh+120px)] scroll-mt-20 grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] content-center items-center gap-[clamp(32px,5vw,80px)] overflow-hidden pt-[clamp(110px,14vh,140px)] pb-[clamp(90px,12vh,130px)]"
+>
+  <Image
+    src={bg}
+    alt=""
+    aria-hidden="true"
+    width={480}
+    class="pointer-events-none absolute inset-0 size-full scale-125 object-cover blur-[40px] saturate-[1.05]"
+  />
+  <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.78),rgb(24_18_14/0.62)_50%,rgb(24_18_14/0.8))]"></div>
+
+  <div class="relative flex flex-col gap-6">
+    <h2 data-reveal class="font-display m-0 text-[clamp(28px,4vw,52px)] leading-[1.08]">
+      {t('Antes y después, por tratamiento')}
+    </h2>
+    <p
+      data-reveal
+      data-delay="200"
+      class="text-beige m-0 max-w-[440px] text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.6]"
+    >
+      {t('Desliza para comparar. Pacientes reales de GlowHaus, publicados con su autorización.')}
+    </p>
+  </div>
+  <div data-reveal data-delay="300" class="relative mx-auto w-full max-w-[640px] min-w-0">
+    <BeforeAfter lang={lang} sets={baSets} id="ba-home" />
+  </div>
+</section>

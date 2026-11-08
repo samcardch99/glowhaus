@@ -18,7 +18,10 @@ const DICT: Record<string, string> = Object.assign(
 const RULES: [RegExp, (s: string) => string][] = [
   [/^desde \$/, (s) => s.replace(/^desde/, 'from')],
   [/^Desde \$/, (s) => s.replace(/^Desde/, 'From')],
-  [/^(\d+) tratamientos?$/, (s) => s.replace(/tratamientos?/, (m) => (m === 'tratamiento' ? 'treatment' : 'treatments'))],
+  [
+    /^(\d+) tratamientos?$/,
+    (s) => s.replace(/tratamientos?/, (m) => (m === 'tratamiento' ? 'treatment' : 'treatments')),
+  ],
   [/^Categoría (\d+)$/, (s) => s.replace('Categoría', 'Category')],
   [/^CATEGORÍA /, (s) => s.replace('CATEGORÍA', 'CATEGORY')],
   [/ · hace un mes$/, (s) => s.replace('hace un mes', 'a month ago')],
@@ -58,14 +61,7 @@ export const useT = (lang: Lang) => (es: string) => tr(lang, es)
 
 // ---------- Rutas ----------
 
-export type PageKey =
-  | 'home'
-  | 'about'
-  | 'treatments'
-  | 'visit'
-  | 'contact'
-  | 'privacy'
-  | 'terms'
+export type PageKey = 'home' | 'about' | 'treatments' | 'visit' | 'contact' | 'privacy' | 'terms'
 
 const PATHS: Record<PageKey, Record<Lang, string>> = {
   home: { es: '/', en: '/en/' },
@@ -80,7 +76,6 @@ const PATHS: Record<PageKey, Record<Lang, string>> = {
 export const pathFor = (lang: Lang, page: PageKey) => PATHS[page][lang]
 
 /** Ruta de la ficha de un tratamiento */
-export const treatmentPath = (lang: Lang, slug: string) =>
-  `${PATHS.treatments[lang]}${slug}/`
+export const treatmentPath = (lang: Lang, slug: string) => `${PATHS.treatments[lang]}${slug}/`
 
 export const otherLang = (lang: Lang): Lang => (lang === 'es' ? 'en' : 'es')

@@ -25,22 +25,20 @@ const classes = [tone === 'light' ? 'btn-glass' : 'btn-glass-dark', cls]
 const ext = external ? { target: '_blank', rel: 'noopener' } : {}
 ---
 
-{
-  href ? (
-    <a href={href} class:list={classes} {...ext} {...rest}>
-      {back && <Arrow back />}
-      <span>
-        <slot />
-      </span>
-      {!back && <Arrow />}
-    </a>
-  ) : (
-    <button type={type} class:list={classes} {...rest}>
-      {back && <Arrow back />}
-      <span>
-        <slot />
-      </span>
-      {!back && <Arrow />}
-    </button>
-  )
-}
+{href ? (
+  <a href={href} class:list={classes} {...ext} {...rest}>
+    {back && <Arrow back />}
+    <span>
+      <slot />
+    </span>
+    {!back && <Arrow />}
+  </a>
+) : (
+  <button type={type} class:list={classes} {...rest}>
+    {back && <Arrow back />}
+    <span>
+      <slot />
+    </span>
+    {!back && <Arrow />}
+  </button>
+)}

@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import TreatmentsIndex from '../../components/treatments/TreatmentsIndex.astro'
+import { listJsonLd } from '../../components/treatments/helpers'
+import { pathFor } from '../../i18n'
+---
+
+<Layout
+  lang="es"
+  title="Tratamientos y precios en Miami | GlowHaus Aesthetics"
+  description="Láser Fotona, inyectables, rellenos, depilación láser, faciales médicos y más en Miami. Mira qué incluye cada categoría y sus precios por sesión."
+  altPath={pathFor('en', 'treatments')}
+  headerTheme="dark"
+  jsonLd={listJsonLd('es')}
+>
+  <TreatmentsIndex lang="es" />
+</Layout>

@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import FirstVisit from '../../components/pages/FirstVisit.astro'
+import sala from '../../assets/clinica-sala.jpg'
+import { pathFor } from '../../i18n'
+---
+
+<Layout
+  lang="en"
+  title="Your first visit"
+  description="What your first appointment at GlowHaus Miami looks like: arrival, assessment with Alain Castellat, APRN, your plan with pricing, and payment options including Cherry installments."
+  altPath={pathFor('es', 'visit')}
+  headerTheme="light"
+  ogImage={sala}
+>
+  <FirstVisit lang="en" />
+</Layout>

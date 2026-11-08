@@ -1,0 +1,84 @@
+---
+import { Image } from 'astro:assets'
+import Button from '../ui/Button.astro'
+import { steps } from '../../data/home'
+import { pathFor, useT, type Lang } from '../../i18n'
+
+// «Una experiencia que se siente desde el principio»: intro sticky y tres
+// tarjetas a pantalla completa que se apilan (data-stack-wrap, en site.ts).
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+---
+
+<div class="bg-sand text-ink border-ink relative z-[2] -mt-7 border-t">
+  <section
+    data-theme="light"
+    class="bg-sand px-gutter sticky top-0 z-0 grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] items-end gap-x-16 gap-y-6 pt-[clamp(120px,18vh,180px)] pb-[clamp(56px,8vh,88px)]"
+  >
+    <h2
+      data-reveal
+      class="font-display text-brown m-0 max-w-[900px] text-[clamp(36px,5vw,72px)] leading-[1.04]"
+    >
+      {t('Una experiencia que se siente desde el principio')}
+    </h2>
+    <p
+      data-reveal
+      data-delay="220"
+      class="text-body-sm text-ink m-0 max-w-[440px] text-pretty md:justify-self-end"
+    >
+      {t(
+        'Desde que reservas hasta que termina tu tratamiento, todo está pensado para que lo vivas con calma.',
+      )}
+    </p>
+  </section>
+
+  <div data-stack-wrap class="bg-ink relative z-[1]">
+    {steps.map((s, i) => (
+      <article
+        data-stack
+        data-theme="dark"
+        class="bg-ink text-cream sticky top-0 h-[calc(100svh+28px)] origin-top overflow-hidden will-change-[transform,filter]"
+      >
+        <Image
+          src={s.img}
+          alt=""
+          widths={[640, 1080, 1600, 2160]}
+          sizes="100vw"
+          style={`object-position:${s.pos}`}
+          class="absolute inset-0 size-full object-cover"
+        />
+        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.6)_0%,rgb(24_18_14/0.2)_38%,rgb(24_18_14/0.85)_100%)]" />
+        <div class="px-gutter relative flex h-full flex-col justify-between gap-[clamp(32px,6vh,64px)] pt-[clamp(120px,16vh,150px)] pb-[clamp(80px,9vh,104px)]">
+          <div class="flex flex-1 flex-col items-start justify-center">
+            <h3
+              data-reveal
+              class="font-display m-0 max-w-[624px] text-[clamp(30px,4vw,60px)] leading-[1.05]"
+            >
+              {s.num} {t(s.label)}
+            </h3>
+          </div>
+          <div
+            data-reveal
+            data-delay="260"
+            class="mb-[clamp(40px,10vh,120px)] grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] items-start gap-x-16 gap-y-5 rounded-[14px] border border-[rgb(250_248_245/0.18)] bg-[rgb(24_18_14/0.38)] p-[clamp(22px,2.6vw,36px)] backdrop-blur-[16px]"
+          >
+            <p class="m-0 text-[clamp(26px,2.8vw,40px)] leading-[1.08] text-balance">
+              {t(s.title)}
+            </p>
+            <div class="flex w-full flex-col items-start gap-3.5">
+              <p class="text-body m-0 max-w-[520px] text-pretty">{t(s.text)}</p>
+              {i === steps.length - 1 && (
+                <Button href={pathFor(lang, 'visit')} class="mt-2 min-w-[min(100%,200px)] self-end">
+                  {t('Tu primera visita')}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>

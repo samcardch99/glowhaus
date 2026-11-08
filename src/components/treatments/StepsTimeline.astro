@@ -1,0 +1,156 @@
+---
+import type { Step } from '../../data/treatments'
+import { useT, type Lang } from '../../i18n'
+
+// Línea de tiempo de 4 pasos. La línea dorada se llena con el scroll (GSAP scrub)
+// y cada paso se enciende al alcanzarlo. Sin JS o con movimiento reducido, todo
+// se ve completo.
+interface Props {
+  lang: Lang
+  title: string
+  steps: Step[]
+}
+const { lang, title, steps } = Astro.props
+const t = useT(lang)
+---
+
+<section
+  data-theme="light"
+  data-steps
+  class="relative z-0 flex items-center lg:sticky lg:top-0 lg:min-h-screen"
+>
+  <div class="px-gutter flex w-full flex-col gap-[clamp(44px,8vh,88px)] pt-[clamp(64px,10vh,120px)] pb-[clamp(140px,22vh,220px)]">
+    <h2 data-reveal class="font-display text-brown m-0 text-[clamp(36px,5vw,72px)] leading-[1.04]">
+      {t(title)}
+    </h2>
+    <div data-tl class="relative">
+      <div
+        aria-hidden="true"
+        class="bg-beige pointer-events-none absolute top-0 bottom-0 left-[6px] w-0.5 rounded-sm lg:right-0 lg:bottom-auto lg:left-0 lg:h-0.5 lg:w-auto"
+      >
+        <div data-tl-fill class="tl-fill bg-gold absolute inset-0 rounded-sm"></div>
+      </div>
+      <ol class="m-0 grid list-none grid-cols-1 gap-0 p-0 lg:grid-cols-4">
+        {steps.map((s, i) => (
+          <li
+            data-tl-step
+            class="tl-step relative flex flex-col gap-4 pt-0 pr-7 pb-10 pl-10 lg:pt-[clamp(28px,4vh,44px)] lg:pb-2 lg:pl-0"
+          >
+            <span
+              data-tl-dot
+              aria-hidden="true"
+              class="tl-dot border-beige bg-sand absolute top-1 left-0 size-3.5 rounded-full border-2 lg:-top-1.5"
+            />
+            <span
+              aria-hidden="true"
+              class="text-gold-dark text-[clamp(44px,5vw,72px)] leading-none font-semibold"
+            >
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3 class="m-0 text-[21.5px] font-semibold">{t(s.t)}</h3>
+            <p class="text-body-sm text-brown m-0 max-w-[340px]">{t(s.d)}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Estado inicial solo con JS: sin él, la línea está llena y los pasos encendidos */
+  :global(.js) .tl-step {
+    opacity: 0.35;
+    transition: opacity 0.45s;
+  }
+  :global(.js) .tl-step[data-on] {
+    opacity: 1;
+  }
+  .tl-dot {
+    transition:
+      background 0.35s,
+      border-color 0.35s,
+      transform 0.35s;
+  }
+  :global(.js) .tl-step[data-on] .tl-dot,
+  :global(html:not(.js)) .tl-dot {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    transform: scale(1.15);
+  }
+  .tl-fill {
+    transform-origin: 0 0;
+  }
+  :global(.js) .tl-fill {
+    transform: scaleY(var(--p, 0));
+  }
+  @media (min-width: 1024px) {
+    :global(.js) .tl-fill {
+      transform: scaleX(var(--p, 0));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .tl-step {
+      opacity: 1;
+    }
+    :global(.js) .tl-fill {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from '../../scripts/gsap'
+
+  document.querySelectorAll<HTMLElement>('[data-steps]').forEach((section) => {
+    const tl = section.querySelector<HTMLElement>('[data-tl]')
+    const fill = section.querySelector<HTMLElement>('[data-tl-fill]')
+    const steps = Array.from(section.querySelectorAll<HTMLElement>('[data-tl-step]'))
+    if (!tl || !fill) return
+
+    // Si la sección es más alta que la pantalla, se pega por abajo para que se lea entera
+    const fit = () => {
+      section.style.top = ''
+      if (getComputedStyle(section).position !== 'sticky') return
+      section.style.top = Math.min(0, window.innerHeight - section.offsetHeight) + 'px'
+    }
+    fit()
+    window.addEventListener('resize', fit)
+
+    if (prefersReducedMotion()) {
+      steps.forEach((s) => s.setAttribute('data-on', ''))
+      return
+    }
+
+    const update = (p: number) => {
+      tl.style.setProperty('--p', String(p))
+      steps.forEach((s, i) =>
+        s.toggleAttribute('data-on', p >= i / steps.length + 0.02 || p >= 0.999),
+      )
+    }
+    update(0)
+
+    const mm = gsap.matchMedia()
+    // Escritorio: línea horizontal, se llena mientras la sección sube hasta pegarse
+    mm.add('(min-width: 1024px)', () => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 70%',
+        end: 'top top',
+        scrub: 0.4,
+        onUpdate: (st) => update(st.progress),
+        onRefresh: (st) => update(st.progress),
+      })
+    })
+    // Móvil: línea vertical, avanza con la lista
+    mm.add('(max-width: 1023px)', () => {
+      ScrollTrigger.create({
+        trigger: tl,
+        start: 'top 75%',
+        end: 'bottom 60%',
+        scrub: 0.4,
+        onUpdate: (st) => update(st.progress),
+        onRefresh: (st) => update(st.progress),
+      })
+    })
+  })
+</script>

@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import ContactSection from '../../components/sections/ContactSection.astro'
+import { pathFor } from '../../i18n'
+---
+
+<Layout
+  lang="en"
+  title="Contact"
+  description="Book your appointment at GlowHaus Aesthetics: 11890 SW 8th St, Suite 211, Miami, FL 33184. Monday to Friday, 9:00 a.m. to 6:00 p.m. Phone (786) 918-2997."
+  altPath={pathFor('es', 'contact')}
+  headerTheme="dark"
+  contact={false}
+>
+  <ContactSection lang="en" standalone />
+</Layout>

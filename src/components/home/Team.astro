@@ -1,0 +1,112 @@
+---
+import { Image } from 'astro:assets'
+import { team } from '../../data/home'
+import { useT, type Lang } from '../../i18n'
+
+// «Las manos detrás de cada tratamiento». En escritorio, cada foto abre su
+// ficha a la derecha (una a la vez); en móvil, la ficha va siempre debajo.
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+---
+
+<section
+  id="equipo"
+  data-theme="dark"
+  data-team
+  class="bg-ink text-cream stack-shadow relative z-[7] -mt-7 scroll-mt-20"
+>
+  <div class="px-gutter flex flex-col gap-11 pt-[clamp(108px,13vh,128px)] pb-24">
+    <div class="flex flex-col gap-3.5">
+      <span class="eyebrow text-tan">{t('EQUIPO')}</span>
+      <h2
+        data-reveal
+        class="font-display m-0 max-w-[900px] text-[clamp(32px,4vw,52px)] leading-[1.08]"
+      >
+        {t('Las manos detrás de cada tratamiento')}
+      </h2>
+    </div>
+
+    <ul role="list" class="m-0 flex list-none flex-col gap-10 p-0 lg:flex-row lg:gap-5">
+      {team.map((p, i) => (
+        <li
+          data-team-item={i}
+          data-open={i === 0 ? '' : undefined}
+          class="team-item flex flex-col gap-5 lg:flex-row lg:gap-0"
+        >
+          <button
+            type="button"
+            data-team-btn={i}
+            aria-expanded={i === 0 ? 'true' : 'false'}
+            aria-controls={`team-info-${i}`}
+            class="team-photo bg-sand relative h-[min(72vh,620px)] w-full flex-none overflow-hidden rounded-[14px] text-left outline outline-offset-4 outline-transparent transition-[outline-color] duration-400 max-lg:pointer-events-none sm:w-[clamp(240px,22vw,340px)]"
+          >
+            <Image
+              src={p.img}
+              alt=""
+              widths={[360, 680, 1000]}
+              sizes="(min-width: 1100px) 340px, 100vw"
+              class="absolute inset-0 size-full object-cover object-[center_20%] transition-transform duration-800 ease-(--ease-glow) hover:scale-[1.04]"
+            />
+            <span class="glass-chip pointer-events-none absolute inset-x-4 bottom-4 flex flex-col gap-0.5 rounded-xl px-4 py-3">
+              <span class="text-[clamp(19px,1.6vw,22px)] leading-[1.2] font-semibold">
+                {p.name}
+              </span>
+              <span class="text-sand-2 text-base leading-[1.35]">{t(p.role)}</span>
+            </span>
+          </button>
+          <div id={`team-info-${i}`} class="team-info overflow-hidden">
+            <div class="flex h-full w-full flex-col justify-end gap-3.5 rounded-[14px] border border-[rgb(250_248_245/0.16)] bg-[rgb(250_248_245/0.06)] p-[clamp(24px,2.6vw,40px)] backdrop-blur-[14px] lg:w-[clamp(260px,26vw,380px)]">
+              <span class="label-caps text-tan">{t(p.tag)}</span>
+              <h3 class="m-0 text-[clamp(26px,2.4vw,36px)] leading-[1.1] font-semibold">
+                {p.name}
+              </h3>
+              <span class="text-[17.5px] font-semibold">{t(p.cred)}</span>
+              <p class="text-beige m-0 text-[17.5px] leading-[1.6] text-pretty">{t(p.bio)}</p>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  @media (width >= 64rem) {
+    .team-info {
+      height: min(72vh, 620px);
+      width: clamp(260px, 26vw, 380px);
+      margin-left: 20px;
+      transition:
+        width 0.7s var(--ease-glow),
+        margin 0.7s var(--ease-glow),
+        opacity 0.5s 0.15s;
+    }
+    :global(.js) .team-item:not([data-open]) .team-info {
+      width: 0;
+      margin-left: 0;
+      opacity: 0;
+    }
+    .team-item[data-open] .team-photo {
+      outline-color: var(--color-gold);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-team]').forEach((root) => {
+    const items = root.querySelectorAll<HTMLElement>('[data-team-item]')
+    const open = (i: number) =>
+      items.forEach((it, k) => {
+        it.toggleAttribute('data-open', k === i)
+        it.querySelector('[data-team-btn]')?.setAttribute('aria-expanded', String(k === i))
+      })
+    items.forEach((it, i) => {
+      const btn = it.querySelector<HTMLButtonElement>('[data-team-btn]')
+      btn?.addEventListener('click', () => open(i))
+      btn?.addEventListener('mouseenter', () => open(i))
+    })
+  })
+</script>

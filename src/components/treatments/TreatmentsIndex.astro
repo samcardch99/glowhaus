@@ -1,0 +1,307 @@
+---
+import { Image } from 'astro:assets'
+import Button from '../ui/Button.astro'
+import VideoToggle from './VideoToggle.astro'
+import { treatments, countLabel } from '../../data/treatments'
+import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
+import { catNumber, fromLabel, itemCols, needsConsult, posterFor } from './helpers'
+
+// Página «Tratamientos»: cabecera oscura, 11 categorías apiladas a pantalla
+// completa (o vista de lista) y conmutador flotante «Desplazar / Lista».
+interface Props {
+  lang: Lang
+}
+const { lang } = Astro.props
+const t = useT(lang)
+const MOBILE_MAX = 12
+---
+
+<section
+  data-theme="dark"
+  class="bg-ink text-cream px-gutter grid min-h-[68vh] grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] content-end items-end gap-x-16 gap-y-7 pt-[clamp(150px,20vh,220px)] pb-[72px]"
+>
+  <div class="flex flex-col items-start gap-6">
+    <Button href={pathFor(lang, 'home')} back>
+      {t('Atrás')}
+    </Button>
+    <h1 data-reveal class="font-display m-0 text-[clamp(40px,5.4vw,80px)] leading-[1.04]">
+      {t('Encuentra el tratamiento para ti')}
+    </h1>
+  </div>
+  <p
+    data-reveal
+    data-delay="200"
+    class="text-cream-3 m-0 max-w-[440px] justify-self-end text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.65] max-[899px]:justify-self-start"
+  >
+    {t(
+      'Del láser Fotona a los inyectables y el cuidado médico de la piel. Recorre cada categoría, mira qué incluye y elige por dónde empezar.',
+    )}
+  </p>
+</section>
+
+<div id="tx-views" data-view="scroll">
+  <script is:inline>
+    // Vista guardada antes de pintar, para que no parpadee
+    try {
+      if (localStorage.getItem('gh-tx-view') === 'list')
+        document.getElementById('tx-views').dataset.view = 'list'
+    } catch (e) {}
+  </script>
+
+  <!-- Vista «Desplazar»: tarjetas sticky apiladas -->
+  <div data-view-pane="scroll" data-stack-wrap class="bg-ink relative">
+    {treatments.map((c, i) => {
+      const n = c.items.length
+      const shown = n > MOBILE_MAX ? c.items.slice(0, MOBILE_MAX - 1) : c.items
+      const vid = `tx-slide-video-${i}`
+      return (
+        <>
+          <article
+            data-stack
+            data-theme="overlay"
+            aria-labelledby={`tx-slide-${i}`}
+            class="bg-ink text-cream sticky top-0 h-[calc(100vh+28px)] origin-top overflow-hidden will-change-[transform,filter] max-[759px]:h-auto max-[759px]:min-h-[calc(100svh+28px)]"
+          >
+            {c.video ? (
+              <video
+                id={vid}
+                data-autoplay
+                data-src={c.video}
+                poster={posterFor(c.video)}
+                muted
+                loop
+                playsinline
+                preload="none"
+                aria-hidden="true"
+                class="absolute inset-0 size-full object-cover"
+              />
+            ) : (
+              <Image
+                src={c.img}
+                alt=""
+                widths={[640, 1024, 1600, 2200]}
+                sizes="100vw"
+                class="absolute inset-0 size-full object-cover"
+                style={c.imgPos ? `object-position:${c.imgPos}` : undefined}
+              />
+            )}
+            <div
+              aria-hidden="true"
+              class="absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.55)_0%,rgb(24_18_14/0.25)_35%,rgb(24_18_14/0.88)_100%)]"
+            />
+
+            <div class="px-gutter relative flex h-full flex-col justify-between gap-[clamp(32px,6vh,64px)] pt-[clamp(120px,16vh,150px)] pb-[clamp(80px,9vh,104px)]">
+              <div class="flex flex-1 flex-col items-start justify-center gap-3.5">
+                <span class="eyebrow text-beige">{t('CATEGORÍA ' + catNumber(i))}</span>
+                <h2
+                  id={`tx-slide-${i}`}
+                  class="font-display m-0 max-w-[832px] text-[clamp(30px,4vw,60px)] leading-[1.05]"
+                >
+                  {t(c.name)}
+                </h2>
+                <Button
+                  href={treatmentPath(lang, c.slug[lang])}
+                  class="mt-1.5 min-w-[min(100%,200px)]"
+                >
+                  {t('Ver y reservar')}
+                  <span class="sr-only">: {t(c.name)}</span>
+                </Button>
+              </div>
+
+              <div class="grid grid-cols-1 gap-x-12 gap-y-6 rounded-[14px] min-[760px]:grid-cols-[minmax(0,1fr)_auto] min-[1200px]:grid-cols-[minmax(0,0.85fr)_auto_minmax(0,2.6fr)] border border-[rgb(250_248_245/0.18)] bg-[rgb(24_18_14/0.28)] p-[clamp(18px,2.4vw,32px)] backdrop-blur-[16px]">
+                <div class="flex flex-col gap-2 max-[759px]:hidden">
+                  <span class="label-caps text-beige text-[14px] tracking-[0.2em]">
+                    {t('DESCRIPCIÓN')}
+                  </span>
+                  <p class="text-cream-2 m-0 max-w-[420px] text-[clamp(16px,1.2vw,18.5px)] leading-[1.55]">
+                    {t(c.desc)}
+                  </p>
+                </div>
+                <dl class="m-0 flex gap-10 max-[759px]:hidden">
+                  <div class="flex flex-col gap-1.5">
+                    <dt class="label-caps text-beige text-[14px] tracking-[0.2em]">
+                      {t(needsConsult(c) ? 'PRECIO' : 'DESDE')}
+                    </dt>
+                    <dd class="m-0 text-[32px] font-semibold">
+                      {needsConsult(c) ? t('Con consulta') : t(c.from)}
+                    </dd>
+                  </div>
+                  <div class="flex flex-col gap-1.5">
+                    <dt class="label-caps text-beige text-[14px] tracking-[0.2em]">
+                      {t('TRATAMIENTOS')}
+                    </dt>
+                    <dd class="m-0 text-[32px] font-semibold">{n}</dd>
+                  </div>
+                </dl>
+                <div class="flex flex-col gap-2 min-[760px]:col-span-2 min-[1200px]:col-span-1">
+                  <span class="label-caps text-beige text-[14px] tracking-[0.2em]">
+                    {t('INCLUYE')}
+                  </span>
+                  <ul
+                    class:list={[
+                      'm-0 grid list-none gap-x-[clamp(14px,2.4vw,36px)] p-0',
+                      itemCols(n),
+                    ]}
+                  >
+                    {c.items.map((it, k) => (
+                      <li
+                        class:list={[
+                          'text-cream flex justify-between gap-3 py-1 text-[clamp(14.5px,1.05vw,16.5px)] max-[759px]:py-0.5 max-[759px]:text-[13.5px] max-[759px]:leading-[1.3]',
+                          k >= shown.length && 'max-[759px]:hidden',
+                        ]}
+                      >
+                        <span>· {t(it.n)}</span>
+                        <span class="text-beige whitespace-nowrap max-[759px]:hidden">
+                          {t(it.p)}
+                        </span>
+                      </li>
+                    ))}
+                    {n > MOBILE_MAX && (
+                      <li class="text-cream py-0.5 text-[14.5px] min-[760px]:hidden">
+                        · {t('y ' + (n - shown.length) + ' más')}
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            {c.video && (
+              <VideoToggle
+                lang={lang}
+                controls={vid}
+                class="absolute right-[clamp(16px,1.8vw,28px)] bottom-[52px] z-10"
+              />
+            )}
+          </article>
+          <div aria-hidden="true" class="pointer-events-none h-[60vh]" />
+        </>
+      )
+    })}
+  </div>
+
+  <!-- Vista «Lista» -->
+  <section
+    data-view-pane="list"
+    data-theme="light"
+    aria-label={t('Lista')}
+    class="bg-sand text-ink px-gutter grid grid-cols-[repeat(auto-fill,minmax(min(100%,360px),1fr))] gap-6 pt-16 pb-[120px]"
+  >
+    {treatments.map((c, i) => (
+      <article class="flex flex-col gap-1.5">
+        <div class="flex items-baseline justify-between gap-3 rounded-xl border border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)] px-4 py-3 text-[17.5px] font-medium">
+          <span>{t('Categoría ' + catNumber(i))}</span>
+          <span class="text-gold-dark">{t(countLabel(c))}</span>
+        </div>
+        <div class="flex flex-col gap-3.5 rounded-xl border border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)] p-3">
+          <div class="bg-sand aspect-[16/10] overflow-hidden rounded-md">
+            <Image
+              src={c.img}
+              alt={t(c.name)}
+              widths={[400, 720, 1080]}
+              sizes="(min-width: 1200px) 30vw, (min-width: 760px) 45vw, 100vw"
+              class="size-full object-cover"
+              style={c.imgPos ? `object-position:${c.imgPos}` : undefined}
+            />
+          </div>
+          <div class="flex items-baseline justify-between gap-3 px-1 pb-1">
+            <h2 class="m-0 text-[23px] leading-[1.1] font-semibold">{t(c.name)}</h2>
+            <span class="text-gold-dark text-base font-medium whitespace-nowrap">
+              {t(fromLabel(c))}
+            </span>
+          </div>
+        </div>
+        <div class="flex flex-1 flex-col gap-3 rounded-xl border border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)] px-4 pt-3.5 pb-[18px]">
+          <span class="text-gold-dark text-base font-medium">{t('Descripción')}</span>
+          <p class="text-body-sm m-0 text-pretty">{t(c.desc)}</p>
+          <ul class="border-beige m-0 flex list-none flex-col border-t p-0">
+            {c.items.map((it) => (
+              <li class="border-beige flex justify-between gap-3 border-b py-2 text-[17px]">
+                <span>{t(it.n)}</span>
+                <span class="text-brown whitespace-nowrap">{t(it.p)}</span>
+              </li>
+            ))}
+          </ul>
+          <Button
+            href={treatmentPath(lang, c.slug[lang])}
+            tone="dark"
+            class="mt-auto min-w-[min(100%,200px)] self-start"
+          >
+            {t('Ver y reservar')}
+            <span class="sr-only">: {t(c.name)}</span>
+          </Button>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <div
+    role="group"
+    aria-label={t('Vista de los tratamientos')}
+    data-view-switch
+    class="fixed bottom-5 left-1/2 z-[28] hidden -translate-x-1/2 gap-1 rounded-[14px] bg-[rgb(24_18_14/0.82)] p-1 backdrop-blur-[10px] [.js_&]:flex"
+  >
+    <button
+      type="button"
+      data-view-btn="scroll"
+      class="rounded-[14px] px-4 py-[9px] text-[14.5px] font-semibold max-[759px]:rounded-lg"
+    >
+      {t('Desplazar')}
+    </button>
+    <button
+      type="button"
+      data-view-btn="list"
+      class="rounded-[14px] px-4 py-[9px] text-[14.5px] font-semibold max-[759px]:rounded-lg"
+    >
+      {t('Lista')}
+    </button>
+  </div>
+</div>
+
+<style>
+  #tx-views[data-view='scroll'] [data-view-pane='list'],
+  #tx-views[data-view='list'] [data-view-pane='scroll'] {
+    display: none;
+  }
+  [data-view-btn] {
+    color: var(--color-cream);
+    background: transparent;
+    transition:
+      background 0.3s,
+      color 0.3s;
+  }
+  [data-view-btn][aria-pressed='true'] {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  import { ScrollTrigger } from '../../scripts/gsap'
+
+  const root = document.getElementById('tx-views')
+  const btns = document.querySelectorAll<HTMLButtonElement>('[data-view-btn]')
+  const sync = () =>
+    btns.forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.viewBtn === root?.dataset.view)),
+    )
+  sync()
+  // Las animaciones apiladas se midieron con la vista visible en la carga
+  if (root?.dataset.view === 'list') requestAnimationFrame(() => ScrollTrigger.refresh())
+
+  btns.forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!root || root.dataset.view === b.dataset.viewBtn) return
+      const view = b.dataset.viewBtn ?? 'scroll'
+      root.dataset.view = view
+      try {
+        localStorage.setItem('gh-tx-view', view)
+      } catch {
+        /* sin almacenamiento: la elección dura lo que la visita */
+      }
+      sync()
+      const top = root.getBoundingClientRect().top + window.scrollY
+      if (window.scrollY > top) window.scrollTo({ top: Math.max(0, top - 96) })
+      ScrollTrigger.refresh()
+    }),
+  )
+</script>

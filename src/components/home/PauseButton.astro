@@ -1,0 +1,47 @@
+---
+import { useT, type Lang } from '../../i18n'
+
+// Botón de pausa de un vídeo en bucle (site.ts lo conecta con data-video-toggle).
+// aria-pressed="true" = vídeo en pausa.
+interface Props {
+  lang: Lang
+  controls: string
+  class?: string
+}
+const { lang, controls, class: cls = '' } = Astro.props
+const t = useT(lang)
+---
+
+<button
+  type="button"
+  data-video-toggle
+  aria-controls={controls}
+  aria-pressed="false"
+  aria-label={t('Pausar vídeo')}
+  class:list={[
+    'group glass-chip text-cream hover:bg-gold flex size-11 items-center justify-center rounded-full transition-colors',
+    cls,
+  ]}
+>
+  <svg
+    viewBox="0 0 20 20"
+    width="16"
+    height="16"
+    fill="currentColor"
+    aria-hidden="true"
+    class="group-aria-pressed:hidden"
+  >
+    <rect x="4" y="3" width="4" height="14" rx="1"></rect>
+    <rect x="12" y="3" width="4" height="14" rx="1"></rect>
+  </svg>
+  <svg
+    viewBox="0 0 20 20"
+    width="16"
+    height="16"
+    fill="currentColor"
+    aria-hidden="true"
+    class="hidden group-aria-pressed:block"
+  >
+    <path d="M6 3.5v13l11-6.5z"></path>
+  </svg>
+</button>

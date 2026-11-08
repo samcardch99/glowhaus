@@ -1,0 +1,78 @@
+---
+import { Image } from 'astro:assets'
+import wordmark from '../../assets/glowhaus-wordmark-vector.svg'
+import { useT, type Lang } from '../../i18n'
+
+// Entrada de marca: el logotipo crece hasta abrir la página. No bloquea el scroll
+// ni los clics, sale sola a los dos segundos o al primer gesto, y solo se ve una
+// vez por sesión. Sin JS o con movimiento reducido no aparece.
+interface Props {
+  lang: Lang
+}
+const t = useT(Astro.props.lang)
+---
+
+<script is:inline>
+  try {
+    if (
+      !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      window.scrollY < 10 &&
+      !location.hash &&
+      !sessionStorage.getItem('gh-intro')
+    )
+      document.documentElement.classList.add('gh-intro-on')
+  } catch (e) {}
+</script>
+
+<div
+  data-intro
+  aria-hidden="true"
+  class="bg-ink text-cream pointer-events-none fixed inset-0 z-[250] hidden flex-col items-center justify-center"
+>
+  <Image
+    src={wordmark}
+    alt=""
+    width={390}
+    data-intro-mark
+    class="w-[min(64vw,920px)] brightness-0 invert-[0.97]"
+    loading="eager"
+  />
+  <span data-intro-hint class="eyebrow text-beige absolute bottom-[clamp(28px,6vh,56px)]">
+    {t('Desliza para entrar')}
+  </span>
+</div>
+
+<style is:global>
+  .gh-intro-on [data-intro] {
+    display: flex;
+  }
+</style>
+
+<script>
+  import { gsap } from '../../scripts/gsap'
+
+  const el = document.querySelector<HTMLElement>('[data-intro]')
+  const root = document.documentElement
+  if (el && root.classList.contains('gh-intro-on')) {
+    try {
+      sessionStorage.setItem('gh-intro', '1')
+    } catch {}
+    const mark = el.querySelector('[data-intro-mark]')
+    const hint = el.querySelector('[data-intro-hint]')
+    gsap.from(mark, { opacity: 0, scale: 0.92, duration: 0.8, ease: 'power2.out' })
+    let done = false
+    const events = ['wheel', 'touchmove', 'keydown', 'scroll', 'pointerdown'] as const
+    const leave = () => {
+      if (done) return
+      done = true
+      events.forEach((e) => window.removeEventListener(e, leave))
+      gsap
+        .timeline({ onComplete: () => root.classList.remove('gh-intro-on') })
+        .to(hint, { opacity: 0, duration: 0.25 }, 0)
+        .to(mark, { scale: 14, duration: 1.1, ease: 'power3.in' }, 0)
+        .to(el, { opacity: 0, duration: 0.55, ease: 'power1.in' }, 0.5)
+    }
+    events.forEach((e) => window.addEventListener(e, leave, { passive: true, once: true }))
+    window.setTimeout(leave, 2200)
+  }
+</script>

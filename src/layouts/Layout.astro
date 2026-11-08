@@ -36,6 +36,8 @@ const {
   noindex = false,
 } = Astro.props
 const t = useT(lang)
+// El dominio temporal de Hostinger no debe indexarse
+const staging = Astro.site?.hostname.endsWith('hostingersite.com') ?? false
 
 const canonical = new URL(Astro.url.pathname, Astro.site)
 const alternate = new URL(altPath, Astro.site)
@@ -52,7 +54,7 @@ const business = {
   name: site.name,
   url: site.url,
   image: ogUrl.href,
-  logo: new URL('/favicon.svg', Astro.site).href,
+  logo: new URL('/apple-touch-icon.png', Astro.site).href,
   telephone: '+1-786-918-2997',
   email: site.email,
   priceRange: '$$',
@@ -93,13 +95,13 @@ const fullTitle = title.includes('GlowHaus') ? title : `${title} · GlowHaus Aes
     </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    {(noindex || staging) && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="es" href={esUrl} />
     <link rel="alternate" hreflang="en" href={enUrl} />
     <link rel="alternate" hreflang="x-default" href={esUrl} />
     <meta name="theme-color" content="#18120E" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />

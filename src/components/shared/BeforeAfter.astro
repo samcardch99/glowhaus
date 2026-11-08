@@ -1,0 +1,142 @@
+---
+import { Image } from 'astro:assets'
+import type { BASet } from '../../data/results'
+import { useT, type Lang } from '../../i18n'
+
+// Comparador de antes y después con pestañas por tratamiento y paginación.
+// El tirador es un <input type="range">: se arrastra y también se mueve con las flechas.
+interface Props {
+  lang: Lang
+  sets: BASet[]
+  id?: string
+}
+const { lang, sets, id = 'ba' } = Astro.props
+const t = useT(lang)
+---
+
+<div data-ba class="flex flex-col gap-6" id={id}>
+  {sets.length > 1 && (
+    <div
+      role="tablist"
+      aria-label={t('Antes y después, por tratamiento')}
+      class="no-scrollbar flex gap-2 overflow-x-auto"
+    >
+      {sets.map((s, i) => (
+        <button
+          type="button"
+          role="tab"
+          data-ba-tab={i}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          class="aria-selected:bg-gold aria-selected:border-gold text-cream rounded-full border border-[rgb(250_248_245/0.35)] px-4 py-2 text-[15px] font-medium whitespace-nowrap transition-colors"
+        >
+          {t(s.tab)} <span class="opacity-70">({s.pairs.length})</span>
+        </button>
+      ))}
+    </div>
+  )}
+
+  {sets.map((s, si) => (
+    <div data-ba-set={si} hidden={si !== 0} role={sets.length > 1 ? 'tabpanel' : undefined}>
+      {s.pairs.map((p, pi) => (
+        <div data-ba-pair={pi} hidden={pi !== 0} class="flex flex-col gap-4">
+          <div
+            class="ba-frame relative aspect-[4/5] w-full overflow-hidden rounded-[14px] select-none sm:aspect-[5/4]"
+            style="--pos:50%"
+          >
+            <Image
+              src={p.after}
+              alt={`${t(s.tab)}: ${t('después')}`}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 1100px) 50vw, 100vw"
+              class="absolute inset-0 size-full object-cover"
+            />
+            <div class="absolute inset-0 [clip-path:inset(0_calc(100%-var(--pos))_0_0)]">
+              <Image
+                src={p.before}
+                alt={`${t(s.tab)}: ${t('antes')}`}
+                widths={[480, 800, 1200]}
+                sizes="(min-width: 1100px) 50vw, 100vw"
+                class="absolute inset-0 size-full object-cover"
+              />
+            </div>
+            <span class="glass-chip text-cream label-caps absolute top-4 left-4 rounded-lg px-3 py-1.5">
+              {t('ANTES')}
+            </span>
+            <span class="glass-chip text-cream label-caps absolute top-4 right-4 rounded-lg px-3 py-1.5">
+              {t('DESPUÉS')}
+            </span>
+            <div
+              aria-hidden="true"
+              class="bg-cream pointer-events-none absolute inset-y-0 left-(--pos) w-0.5 -translate-x-1/2"
+            >
+              <span class="bg-cream text-ink absolute top-1/2 left-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full shadow-lg">
+                ⟷
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              data-ba-range
+              aria-label={t('Deslizar para comparar antes y después')}
+              class="absolute inset-0 size-full cursor-ew-resize opacity-0"
+            />
+          </div>
+        </div>
+      ))}
+      {s.pairs.length > 1 && (
+        <div class="text-cream flex items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            {s.pairs.map((_, pi) => (
+              <button
+                type="button"
+                data-ba-dot={pi}
+                aria-label={`${pi + 1} / ${s.pairs.length}`}
+                aria-current={pi === 0 ? 'true' : undefined}
+                class="aria-[current]:bg-gold aria-[current]:w-[34px] h-[11px] w-[11px] rounded-full bg-[rgb(250_248_245/0.35)] transition-[width,background]"
+              />
+            ))}
+          </div>
+          <span class="text-[15px] font-medium" data-ba-count>
+            1 / {s.pairs.length}
+          </span>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ba]').forEach((root) => {
+    // Tirador
+    root.querySelectorAll<HTMLInputElement>('[data-ba-range]').forEach((r) => {
+      const frame = r.closest<HTMLElement>('.ba-frame')
+      r.addEventListener('input', () => frame?.style.setProperty('--pos', r.value + '%'))
+    })
+    // Pestañas
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-ba-tab]')
+    const setsEls = root.querySelectorAll<HTMLElement>('[data-ba-set]')
+    tabs.forEach((tab, i) =>
+      tab.addEventListener('click', () => {
+        tabs.forEach((x, k) => x.setAttribute('aria-selected', String(k === i)))
+        setsEls.forEach((s, k) => (s.hidden = k !== i))
+      }),
+    )
+    // Paginación
+    setsEls.forEach((set) => {
+      const pairs = set.querySelectorAll<HTMLElement>('[data-ba-pair]')
+      const dots = set.querySelectorAll<HTMLButtonElement>('[data-ba-dot]')
+      const count = set.querySelector('[data-ba-count]')
+      dots.forEach((d, i) =>
+        d.addEventListener('click', () => {
+          pairs.forEach((p, k) => (p.hidden = k !== i))
+          dots.forEach((x, k) =>
+            k === i ? x.setAttribute('aria-current', 'true') : x.removeAttribute('aria-current'),
+          )
+          if (count) count.textContent = `${i + 1} / ${pairs.length}`
+        }),
+      )
+    })
+  })
+</script>

@@ -1,0 +1,90 @@
+---
+import LegalPage from '../../components/pages/LegalPage.astro'
+import { site } from '../../data/site'
+import { pathFor } from '../../i18n'
+---
+
+<LegalPage
+  lang="en"
+  page="terms"
+  title="Terms of use"
+  description="Terms of use for the GlowHaus Aesthetics Miami website: information, pricing, appointments and Cherry financing."
+>
+  <!--
+  General template written for the website. The clinic should review it with its
+  legal advisor before treating it as final.
+  -->
+  <p>
+    These terms govern your use of the {site.name} website ("GlowHaus," "we," "us"). By using the
+    site you agree to them. If you do not agree, please do not use the site.
+  </p>
+
+  <h2>Information, not medical advice</h2>
+  <p>
+    The content on this site is general and for informational purposes only. It is not a substitute
+    for a medical assessment and does not create a provider-patient relationship. Before any
+    treatment, a clinic provider will review your case in person and tell you whether it is right
+    for you. In a medical emergency, call 911.
+  </p>
+
+  <h2>Pricing</h2>
+  <p>
+    Prices shown on the site are a guide, are in U.S. dollars and may change without notice. The
+    final price, number of sessions and package terms are confirmed during your consultation, before
+    treatment begins.
+  </p>
+
+  <h2>Results</h2>
+  <p>
+    Results vary from person to person and depend on factors such as skin type, age, health and
+    aftercare. Before-and-after photos and testimonials show real cases but do not guarantee any
+    specific outcome.
+  </p>
+
+  <h2>Appointments</h2>
+  <p>
+    Requesting an appointment through the form, WhatsApp or by phone does not automatically book it.
+    Your appointment is confirmed only once the clinic confirms it with you. If you can't make it,
+    please let us know as early as possible.
+  </p>
+
+  <h2>Cherry financing</h2>
+  <p>
+    Installment payments are offered through Cherry, an independent financing provider. Approval,
+    terms, interest and conditions are decided by Cherry, not GlowHaus, and are subject to Cherry's
+    review and its own terms.
+  </p>
+
+  <h2>Links to other sites</h2>
+  <p>
+    The site links to third-party services (WhatsApp, Google Maps, Instagram, Cherry). We don't
+    control those services and are not responsible for their content or policies.
+  </p>
+
+  <h2>Intellectual property</h2>
+  <p>
+    The text, photos, videos, logos and design of this site belong to GlowHaus or its licensors. You
+    may not copy, modify or use them commercially without our written permission. Third-party
+    trademarks (such as Fotona, HydraFacial or Cherry) belong to their respective owners.
+  </p>
+
+  <h2>Limitation of liability</h2>
+  <p>
+    We work to keep the information accurate and up to date, but the site is provided "as is." To
+    the extent permitted by law, GlowHaus is not liable for damages arising from the use of, or
+    inability to use, the site.
+  </p>
+
+  <h2>Governing law</h2>
+  <p>
+    These terms are governed by the laws of the State of Florida and applicable U.S. federal law.
+    Any dispute will be handled by the competent courts of Miami-Dade County, Florida.
+  </p>
+
+  <h2>Changes and contact</h2>
+  <p>
+    We may update these terms; the date above shows the latest version. For any questions, email us
+    at <a href={`mailto:${site.email}`}>{site.email}</a>. Please also see our{' '}
+    <a href={pathFor('en', 'privacy')}>privacy policy</a>.
+  </p>
+</LegalPage>

@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets'
+import visa from '../../assets/pay/visa.png'
+import mastercard from '../../assets/pay/mastercard.png'
+import amex from '../../assets/pay/amex.png'
+import discover from '../../assets/pay/discover.png'
+import Arrow from '../ui/Arrow.astro'
+import { site, whatsappHref } from '../../data/site'
+import { useT, type Lang } from '../../i18n'
+
+// Tarjeta oscura «Formas de pago»: tarjeta, efectivo y cuotas con Cherry.
+// Mientras la clínica no pase su enlace de Cherry (site.cherry vacío), se
+// pregunta por WhatsApp.
+interface Props {
+  lang: Lang
+  class?: string
+}
+const { lang, class: cls = '' } = Astro.props
+const t = useT(lang)
+const cards = [
+  { src: visa, alt: 'Visa' },
+  { src: mastercard, alt: 'Mastercard' },
+  { src: amex, alt: 'American Express' },
+  { src: discover, alt: 'Discover' },
+]
+const cherry = site.cherry
+const cherryHref = cherry || whatsappHref(lang, 'Cherry')
+---
+
+<div
+  class:list={[
+    'bg-brown text-cream flex flex-col justify-center gap-[18px] rounded-[14px] p-[clamp(24px,3vw,40px)]',
+    cls,
+  ]}
+>
+  <span class="eyebrow text-tan">{t('FORMAS DE PAGO')}</span>
+  <h2 class="text-gold m-0 text-[30px] leading-[1.15] font-semibold">{t('Paga como prefieras')}</h2>
+  <ul class="m-0 flex list-none flex-col p-0">
+    <li class="flex flex-col gap-1 border-t border-[rgb(250_248_245/0.16)] py-3.5">
+      <h3 class="m-0 text-[18.5px] font-semibold">{t('Tarjeta de crédito o débito')}</h3>
+      <p class="text-beige m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
+        {t('Visa, Mastercard, American Express y Discover.')}
+      </p>
+      <div class="mt-1.5 flex flex-wrap gap-2">
+        {cards.map((c) => (
+          <Image src={c.src} alt={c.alt} height={60} class="block h-[30px] w-auto rounded-[3px]" />
+        ))}
+      </div>
+    </li>
+    <li class="flex flex-col gap-1 border-t border-[rgb(250_248_245/0.16)] py-3.5">
+      <h3 class="m-0 text-[18.5px] font-semibold">{t('Efectivo')}</h3>
+      <p class="text-beige m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
+        {t('Al momento de tu cita, en la clínica.')}
+      </p>
+    </li>
+    <li class="flex flex-col gap-1 border-t border-[rgb(250_248_245/0.16)] py-3.5">
+      <h3 class="m-0 text-[18.5px] font-semibold">{t('En cuotas con Cherry')}</h3>
+      <p class="text-beige m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
+        {t(
+          'Divide el costo de tu paquete en pagos mensuales. La solicitud se hace en línea y te responden en minutos.',
+        )}
+      </p>
+      <a
+        href={cherryHref}
+        target="_blank"
+        rel="noopener"
+        class="text-gold-light hover:text-cream mt-1.5 inline-flex items-center gap-2 self-start text-[17px] font-medium underline decoration-1 underline-offset-4 transition-colors"
+      >
+        {cherry ? t('Solicitar con Cherry') : t('Pregunta por Cherry')}
+        <Arrow />
+      </a>
+    </li>
+  </ul>
+</div>

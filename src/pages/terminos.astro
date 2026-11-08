@@ -1,0 +1,92 @@
+---
+import LegalPage from '../components/pages/LegalPage.astro'
+import { site } from '../data/site'
+import { pathFor } from '../i18n'
+---
+
+<LegalPage
+  lang="es"
+  page="terms"
+  title="Términos de uso"
+  description="Condiciones de uso del sitio web de GlowHaus Aesthetics en Miami: información, precios, reservas y financiación con Cherry."
+>
+  <!--
+  Plantilla general redactada para el sitio web. La clínica debe revisarla con su
+  asesor legal antes de publicarla como definitiva.
+  -->
+  <p>
+    Estos términos regulan el uso del sitio web de {site.name} («GlowHaus», «nosotros»). Al usar el
+    sitio aceptas estas condiciones. Si no estás de acuerdo, por favor no lo uses.
+  </p>
+
+  <h2>Información, no consejo médico</h2>
+  <p>
+    Los contenidos de este sitio son informativos y generales. No sustituyen una valoración médica
+    ni crean una relación profesional sanitaria. Antes de cualquier tratamiento, un profesional de
+    la clínica revisará tu caso en persona y te dirá si es adecuado para ti. Ante una urgencia
+    médica, llama al 911.
+  </p>
+
+  <h2>Precios</h2>
+  <p>
+    Los precios que aparecen en el sitio son orientativos, están en dólares estadounidenses y pueden
+    cambiar sin previo aviso. El precio final, el número de sesiones y las condiciones de cada
+    paquete se confirman en tu consulta, antes de empezar el tratamiento.
+  </p>
+
+  <h2>Resultados</h2>
+  <p>
+    Los resultados varían de una persona a otra y dependen de factores como la piel, la edad, la
+    salud y el cuidado posterior. Las fotos de antes y después y los testimonios muestran casos
+    reales, pero no garantizan un resultado concreto.
+  </p>
+
+  <h2>Citas y reservas</h2>
+  <p>
+    Pedir una cita por el formulario, por WhatsApp o por teléfono no la reserva automáticamente. Tu
+    cita solo queda confirmada cuando la clínica te lo confirma. Si no puedes asistir, avísanos con
+    la mayor antelación posible.
+  </p>
+
+  <h2>Financiación con Cherry</h2>
+  <p>
+    El pago en cuotas se ofrece a través de Cherry, un proveedor de financiación independiente. La
+    aprobación, los plazos, los intereses y las condiciones los decide Cherry, no GlowHaus, y están
+    sujetos a su evaluación y a sus propios términos.
+  </p>
+
+  <h2>Enlaces a otros sitios</h2>
+  <p>
+    El sitio incluye enlaces a servicios de terceros (WhatsApp, Google Maps, Instagram, Cherry). No
+    controlamos esos servicios y no respondemos de su contenido ni de sus políticas.
+  </p>
+
+  <h2>Propiedad intelectual</h2>
+  <p>
+    Los textos, fotos, vídeos, logotipos y el diseño de este sitio pertenecen a GlowHaus o a sus
+    licenciantes. No puedes copiarlos, modificarlos ni usarlos con fines comerciales sin nuestro
+    permiso por escrito. Las marcas de terceros (como Fotona, HydraFacial o Cherry) pertenecen a sus
+    titulares.
+  </p>
+
+  <h2>Limitación de responsabilidad</h2>
+  <p>
+    Procuramos que la información sea correcta y esté al día, pero el sitio se ofrece «tal cual». En
+    la medida en que lo permita la ley, GlowHaus no responde de los daños derivados del uso del
+    sitio o de la imposibilidad de usarlo.
+  </p>
+
+  <h2>Ley aplicable</h2>
+  <p>
+    Estos términos se rigen por las leyes del estado de Florida y por las leyes federales de los
+    Estados Unidos aplicables. Cualquier disputa se someterá a los tribunales competentes del
+    condado de Miami-Dade, Florida.
+  </p>
+
+  <h2>Cambios y contacto</h2>
+  <p>
+    Podemos actualizar estos términos; la fecha de arriba indica la última versión. Para cualquier
+    pregunta, escríbenos a <a href={`mailto:${site.email}`}>{site.email}</a>. Consulta también
+    nuestra <a href={pathFor('es', 'privacy')}>política de privacidad</a>.
+  </p>
+</LegalPage>

@@ -1,0 +1,115 @@
+---
+import LegalPage from '../../components/pages/LegalPage.astro'
+import { site } from '../../data/site'
+import { pathFor } from '../../i18n'
+---
+
+<LegalPage
+  lang="en"
+  page="privacy"
+  title="Privacy policy"
+  description="How GlowHaus Aesthetics handles the information you send us through this website: contact form, WhatsApp and map."
+>
+  <!--
+  General template written for the website. The clinic should review it with its
+  legal advisor before treating it as final.
+  -->
+  <p>
+    At {site.name} ("GlowHaus," "we," "us") we respect your privacy. This policy explains what
+    information we collect through this website, how we use it, and the choices you have. It applies
+    to the website only; the clinical information you share during your appointment is governed by
+    our Notice of Privacy Practices (HIPAA), which we provide at the clinic.
+  </p>
+
+  <h2>Who we are</h2>
+  <p>
+    {site.name}, {site.address.street}, {site.address.city}, {site.address.region}{' '}
+    {site.address.zip}, United States. Email: <a href={`mailto:${site.email}`}>{site.email}</a>.
+    Phone: <a href={site.phoneHref}>{site.phone}</a>.
+  </p>
+
+  <h2>What we collect</h2>
+  <p>When you use the contact form, you send us:</p>
+  <ul>
+    <li>your name;</li>
+    <li>your phone number and/or email address;</li>
+    <li>
+      the reason you are contacting us and, if you choose one, the treatment you are interested in;
+    </li>
+    <li>the message you write.</li>
+  </ul>
+  <p>
+    We do not ask for or need any other information to reply. Like any website, our hosting provider
+    may log basic technical data (IP address, browser, date and time) for security purposes.
+  </p>
+
+  <h2>Please don't send medical information through the form</h2>
+  <p>
+    The form and email are not appropriate channels for health information. Please do not include
+    diagnoses, medications, photos or other medical details. We will go over all of that in person
+    during your assessment. This website does not store medical records.
+  </p>
+
+  <h2>How we use your information</h2>
+  <ul>
+    <li>To reply to your message and to schedule or confirm your appointment.</li>
+    <li>To give you the information you ask for about treatments, pricing and payment options.</li>
+  </ul>
+  <p>
+    We do not sell or rent your information, and we do not use it for third-party advertising. We
+    will only send you promotions if you specifically ask us to.
+  </p>
+
+  <h2>How the form is sent</h2>
+  <p>
+    The form is delivered by email through EmailJS, a service that sends the message to the clinic's
+    inbox. EmailJS processes the data only to deliver it, under its own privacy policy. We keep
+    messages in our email for as long as we need to assist you and keep our records.
+  </p>
+
+  <h2>WhatsApp, phone and social media</h2>
+  <p>
+    WhatsApp buttons open a conversation in the WhatsApp app (Meta). From that point on, WhatsApp's
+    terms and privacy policy apply. The same goes for links to Instagram and other social networks.
+  </p>
+
+  <h2>Google Maps</h2>
+  <p>
+    The Google Maps embed in the contact section does not load until you click "View map." When you
+    do, Google may receive your IP address and use cookies under its own privacy policy. If you
+    don't click it, no connection to Google is made.
+  </p>
+
+  <h2>Cookies</h2>
+  <p>
+    This website currently does not use analytics or advertising cookies. If we add them in the
+    future, we will update this policy and, where required, ask for your consent.
+  </p>
+
+  <h2>Security</h2>
+  <p>
+    The site is served over an encrypted connection (HTTPS), and access to messages is limited to
+    clinic staff who need it. No system is completely secure, but we take reasonable steps to
+    protect your information.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    You can ask us at any time what information we have about you, to correct it or delete it, or to
+    stop contacting you. Email us at <a href={`mailto:${site.email}`}>{site.email}</a> and we will
+    get back to you as soon as possible. As a patient, you also have the rights HIPAA grants you
+    over your health information, described in our Notice of Privacy Practices.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    This website is intended for people 18 and older. We do not knowingly collect information from
+    minors through the form.
+  </p>
+
+  <h2>Changes to this policy</h2>
+  <p>
+    We may update this policy. The date above shows the latest version. Please also see our{' '}
+    <a href={pathFor('en', 'terms')}>terms of use</a>.
+  </p>
+</LegalPage>

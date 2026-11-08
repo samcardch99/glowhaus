@@ -1,0 +1,32 @@
+---
+import type { GetStaticPaths } from 'astro'
+import Layout from '../../layouts/Layout.astro'
+import TreatmentDetail from '../../components/treatments/TreatmentDetail.astro'
+import { detailJsonLd, detailMeta } from '../../components/treatments/helpers'
+import { treatments, type Treatment } from '../../data/treatments'
+import { treatmentPath } from '../../i18n'
+
+export const getStaticPaths = (() =>
+  treatments.map((treatment) => ({
+    params: { slug: treatment.slug.es },
+    props: { treatment },
+  }))) satisfies GetStaticPaths
+
+interface Props {
+  treatment: Treatment
+}
+const { treatment } = Astro.props
+const meta = detailMeta('es', treatment)
+---
+
+<Layout
+  lang="es"
+  title={meta.title}
+  description={meta.description}
+  altPath={treatmentPath('en', treatment.slug.en)}
+  headerTheme="light"
+  ogImage={treatment.detailImg ?? treatment.img}
+  jsonLd={detailJsonLd('es', treatment)}
+>
+  <TreatmentDetail lang="es" treatment={treatment} />
+</Layout>

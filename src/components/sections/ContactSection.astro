@@ -29,9 +29,7 @@ const Heading = standalone ? 'h1' : 'h2'
   ]}
 >
   <div class="pointer-events-none absolute inset-0 bg-[rgb(24_18_14/0.74)]"></div>
-  <div
-    class="relative flex w-full flex-col gap-[clamp(32px,5vh,56px)] px-gutter pt-[clamp(110px,14vh,140px)] pb-[clamp(48px,7vh,80px)]"
-  >
+  <div class="relative flex w-full flex-col gap-[clamp(32px,5vh,56px)] px-gutter pt-[clamp(110px,14vh,140px)] pb-[clamp(48px,7vh,80px)]">
     <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] items-end gap-x-16 gap-y-5">
       <div class="flex flex-col gap-[18px]">
         <span class="eyebrow text-tan">{t('CONTACTO')}</span>
@@ -39,7 +37,11 @@ const Heading = standalone ? 'h1' : 'h2'
           {t('Tu cita empieza aquí')}
         </Heading>
       </div>
-      <p data-reveal data-delay="200" class="text-body text-cream-3 m-0 max-w-[440px] justify-self-end">
+      <p
+        data-reveal
+        data-delay="200"
+        class="text-body text-cream-3 m-0 max-w-[440px] justify-self-end"
+      >
         {t('Déjanos tus datos y te contactamos, o visítanos en la clínica.')}
       </p>
     </div>
@@ -51,7 +53,9 @@ const Heading = standalone ? 'h1' : 'h2'
         data-msg-name={t('Escribe tu nombre.')}
         data-msg-contact={t('Déjanos un teléfono o un correo para contactarte.')}
         data-msg-email={t('Revisa el correo: parece incompleto.')}
-        data-msg-error={t('No pudimos enviar el mensaje. Escríbenos por WhatsApp o llámanos al (786) 918-2997.')}
+        data-msg-error={t(
+          'No pudimos enviar el mensaje. Escríbenos por WhatsApp o llámanos al (786) 918-2997.',
+        )}
         data-msg-sending={t('Enviando…')}
         novalidate
         class="glass-panel flex flex-col gap-6 self-stretch p-[clamp(28px,3.4vw,48px)]"
@@ -71,26 +75,54 @@ const Heading = standalone ? 'h1' : 'h2'
           <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-x-7 gap-y-[22px]">
             <label class="flex flex-col gap-2">
               <span class="label-caps text-beige">{t('NOMBRE')}</span>
-              <input name="name" type="text" autocomplete="name" required placeholder={t('Tu nombre')} class={field} />
+              <input
+                name="name"
+                type="text"
+                autocomplete="name"
+                required
+                placeholder={t('Tu nombre')}
+                class={field}
+              />
             </label>
             <label class="flex flex-col gap-2">
               <span class="label-caps text-beige">{t('TELÉFONO')}</span>
-              <input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(786) 000-0000" class={field} />
+              <input
+                name="phone"
+                type="tel"
+                autocomplete="tel"
+                inputmode="tel"
+                placeholder="(786) 000-0000"
+                class={field}
+              />
             </label>
             <label class="flex flex-col gap-2">
               <span class="label-caps text-beige">{t('CORREO')}</span>
-              <input name="email" type="email" autocomplete="email" placeholder={t('tu@correo.com')} class={field} />
+              <input
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder={t('tu@correo.com')}
+                class={field}
+              />
             </label>
             <label class="flex flex-col gap-2">
               <span class="label-caps text-beige">{t('MOTIVO DE CONTACTO')}</span>
               <select name="reason" data-reason class={field}>
-                {motives.map((m) => <option value={t(m)} class="text-ink">{t(m)}</option>)}
+                {motives.map((m) => (
+                  <option value={t(m)} class="text-ink">
+                    {t(m)}
+                  </option>
+                ))}
               </select>
             </label>
             <label data-treatment-field hidden class="col-span-full flex flex-col gap-2">
               <span class="label-caps text-beige">{t('¿QUÉ TRATAMIENTO?')}</span>
               <select name="treatment" class={field}>
-                {treatments.map((c) => <option value={t(c.name)} class="text-ink">{t(c.name)}</option>)}
+                {treatments.map((c) => (
+                  <option value={t(c.name)} class="text-ink">
+                    {t(c.name)}
+                  </option>
+                ))}
               </select>
             </label>
           </div>
@@ -100,7 +132,8 @@ const Heading = standalone ? 'h1' : 'h2'
               name="message"
               rows="3"
               placeholder={t('Cuéntanos qué te gustaría mejorar')}
-              class:list={[field, 'resize-y leading-normal']}></textarea>
+              class:list={[field, 'resize-y leading-normal']}
+            ></textarea>
           </label>
           <!-- Trampa para bots: un humano no la ve ni la rellena -->
           <label class="sr-only" aria-hidden="true">
@@ -108,7 +141,9 @@ const Heading = standalone ? 'h1' : 'h2'
             <input name="website" type="text" tabindex="-1" autocomplete="off" />
           </label>
           <p data-form-error hidden role="alert" class="text-gold-light m-0 text-[15px]"></p>
-          <Button type="submit" class="mt-1 self-start min-w-[min(100%,200px)]">{t('Enviar')}</Button>
+          <Button type="submit" class="mt-1 self-start min-w-[min(100%,200px)]">
+            {t('Enviar')}
+          </Button>
         </div>
       </form>
 
@@ -117,17 +152,31 @@ const Heading = standalone ? 'h1' : 'h2'
           <dl class="mt-2">
             <div class="grid grid-cols-[110px_minmax(0,1fr)] gap-4 border-b border-[rgb(250_248_245/0.14)] py-4">
               <dt class="label-caps text-tan pt-[3px]">{t('DIRECCIÓN')}</dt>
-              <dd class="text-body-sm text-cream-2 m-0">11890 SW 8th St, Suite 211<br />Miami, FL 33184</dd>
+              <dd class="text-body-sm text-cream-2 m-0">
+                11890 SW 8th St, Suite 211
+                <br />
+                Miami, FL 33184
+              </dd>
             </div>
             <div class="grid grid-cols-[110px_minmax(0,1fr)] gap-4 border-b border-[rgb(250_248_245/0.14)] py-4">
               <dt class="label-caps text-tan pt-[3px]">{t('HORARIO')}</dt>
-              <dd class="text-body-sm text-cream-2 m-0">{t('Lunes a viernes')}<br />{t('9:00 a. m. a 6:00 p. m.')}</dd>
+              <dd class="text-body-sm text-cream-2 m-0">
+                {t('Lunes a viernes')}
+                <br />
+                {t('9:00 a. m. a 6:00 p. m.')}
+              </dd>
             </div>
             <div class="grid grid-cols-[110px_minmax(0,1fr)] gap-4 py-4">
               <dt class="label-caps text-tan pt-[3px]">{t('CÓMO LLEGAR')}</dt>
               <dd class="m-0">
-                <a href={site.mapsLink} target="_blank" rel="noopener" class="btn-glass max-w-full !whitespace-normal">
-                  <span>{t('Abrir en Google Maps')}</span><Arrow />
+                <a
+                  href={site.mapsLink}
+                  target="_blank"
+                  rel="noopener"
+                  class="btn-glass max-w-full !whitespace-normal"
+                >
+                  <span>{t('Abrir en Google Maps')}</span>
+                  <Arrow />
                 </a>
               </dd>
             </div>
@@ -145,7 +194,18 @@ const Heading = standalone ? 'h1' : 'h2'
             data-title={t('Mapa de GlowHaus Aesthetics')}
             class="text-cream hover:text-gold absolute inset-0 flex flex-col items-center justify-center gap-3 transition-colors"
           >
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.4"
+              aria-hidden="true"
+            >
+              <path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"></path>
+              <circle cx="12" cy="9.5" r="2.5"></circle>
+            </svg>
             <span class="label-caps">{t('Ver mapa')}</span>
           </button>
         </div>

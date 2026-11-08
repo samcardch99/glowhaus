@@ -1,12 +1,46 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import Button from '../components/ui/Button.astro'
+import { pathFor } from '../i18n'
 ---
 
-<Layout title="Página no encontrada · GlowHaus" description="Esta página no existe.">
-  <main class="bg-ink text-cream grid min-h-screen place-content-center gap-6 px-6 text-center">
-    <h1 class="font-display text-5xl">404</h1>
-    <a href="/" class="text-gold underline underline-offset-4">
-      Volver al inicio
-    </a>
-  </main>
+<Layout
+  lang="es"
+  title="Página no encontrada"
+  description="Esta página no existe. Vuelve al inicio o mira los tratamientos de GlowHaus Aesthetics en Miami."
+  altPath={pathFor('en', 'home')}
+  headerTheme="dark"
+  contact={false}
+  noindex
+>
+  <section
+    data-theme="dark"
+    class="bg-ink text-cream flex min-h-screen flex-col items-start justify-center gap-7 px-gutter pt-[clamp(110px,14vh,140px)] pb-[clamp(56px,8vh,90px)]"
+  >
+    <p
+      aria-hidden="true"
+      class="font-display text-gold m-0 text-[clamp(120px,22vw,320px)] leading-[0.9]"
+    >
+      404
+    </p>
+    <h1 class="font-display m-0 text-[clamp(32px,4vw,56px)] leading-[1.08]">
+      Esta página no existe
+    </h1>
+    <p class="text-body text-cream-3 m-0 max-w-[520px]">
+      Puede que el enlace haya cambiado o que la dirección tenga un error. Te llevamos de vuelta.
+    </p>
+    <div class="flex flex-wrap gap-3">
+      <Button href={pathFor('es', 'home')}>Ir al inicio</Button>
+      <Button href={pathFor('es', 'treatments')}>Ver tratamientos</Button>
+    </div>
+    <p lang="en" class="text-body-sm text-beige m-0 mt-4">
+      Page not found ·{' '}
+      <a
+        href={pathFor('en', 'home')}
+        class="text-cream hover:text-gold underline underline-offset-4"
+      >
+        Go to the English site
+      </a>
+    </p>
+  </section>
 </Layout>
