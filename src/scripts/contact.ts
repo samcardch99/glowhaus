@@ -21,7 +21,11 @@ export async function sendContact(form: HTMLFormElement) {
   const label = submit?.querySelector('span')
 
   const fail = (msg: string | undefined, focus?: string) => {
+    form.dataset.state = 'error'
     if (errorEl) {
+      // Se oculta y se vuelve a mostrar para repetir el fundido de entrada
+      errorEl.hidden = true
+      void errorEl.offsetWidth
       errorEl.textContent = msg ?? ''
       errorEl.hidden = false
     }
@@ -38,6 +42,7 @@ export async function sendContact(form: HTMLFormElement) {
   if (!phone && !email) return fail(form.dataset.msgContact, 'phone')
   if (email && !EMAIL_RE.test(email)) return fail(form.dataset.msgEmail, 'email')
   if (errorEl) errorEl.hidden = true
+  delete form.dataset.state
 
   const reason = get('reason')
   const treatment = form.querySelector<HTMLElement>('[data-treatment-field]')?.hidden
@@ -69,6 +74,7 @@ export async function sendContact(form: HTMLFormElement) {
   const original = label?.textContent ?? ''
   if (submit) submit.disabled = true
   if (label) label.textContent = form.dataset.msgSending ?? ''
+  form.dataset.state = 'sending'
   try {
     const emailjs = await import('@emailjs/browser')
     await emailjs.send(SERVICE_ID, TEMPLATE_ID, params, {
@@ -79,18 +85,25 @@ export async function sendContact(form: HTMLFormElement) {
   } catch {
     fail(form.dataset.msgError)
   } finally {
+    if (form.dataset.state === 'sending') delete form.dataset.state
     if (submit) submit.disabled = false
     if (label) label.textContent = original
   }
 }
 
+// Enviado. La interfaz puede animar el cambio escuchando «gh:contact-sent» y
+// llamando a preventDefault(); si nadie lo hace, se cambia al instante.
 function done(form: HTMLFormElement) {
+  form.dataset.state = 'sent'
   const fields = form.querySelector<HTMLElement>('[data-form-fields]')
   const sent = form.querySelector<HTMLElement>('[data-form-sent]')
-  if (fields) fields.hidden = true
-  if (sent) {
-    sent.hidden = false
-    sent.focus?.()
+  const handled = !form.dispatchEvent(new CustomEvent('gh:contact-sent', { cancelable: true }))
+  if (!handled) {
+    if (fields) fields.hidden = true
+    if (sent) {
+      sent.hidden = false
+      sent.focus?.()
+    }
   }
   form.reset()
 }

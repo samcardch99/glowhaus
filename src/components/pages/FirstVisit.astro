@@ -77,11 +77,15 @@ const tips = [
 >
   <div class="flex flex-col items-start gap-[22px]">
     <BackButton lang={lang} tone="dark" />
-    <h1 data-reveal class="font-display m-0 text-[clamp(40px,5.4vw,72px)] leading-[1.04]">
+    <h1
+      data-words
+      data-wdelay="80"
+      class="font-display m-0 text-[clamp(40px,5.4vw,72px)] leading-[1.04] text-balance"
+    >
       {t('Tu primera visita, paso a paso')}
     </h1>
   </div>
-  <p data-reveal data-delay="200" class="text-body text-brown m-0 max-w-[520px] justify-self-end">
+  <p data-reveal data-delay="450" class="text-body text-brown m-0 max-w-[520px] justify-self-end">
     {t(
       'Tu primera cita empieza con una valoración. Te explicamos qué tratamiento te conviene, cuántas sesiones necesitas y cuánto cuesta antes de empezar.',
     )}
@@ -89,37 +93,40 @@ const tips = [
 </section>
 
 <section data-theme="light" class="bg-cream px-gutter pb-24">
-  <div class="bg-sand aspect-[4/5] overflow-hidden rounded-[14px] sm:aspect-[16/9] lg:aspect-[21/9]">
+  <div
+    data-visit-photo
+    class="bg-sand aspect-[4/5] overflow-hidden rounded-[14px] sm:aspect-[16/9] lg:aspect-[21/9]"
+  >
     <Image
       src={sala}
       alt={t('Sala de tratamiento de la clínica GlowHaus')}
       widths={[480, 768]}
       sizes="100vw"
+      data-visit-img
       class="size-full object-cover object-[50%_60%]"
     />
   </div>
 </section>
 
 <section id="visit-steps" data-theme="light" class="bg-cream text-ink px-gutter">
-  <div class="relative flex flex-col pb-24 pl-[clamp(40px,4vw,64px)]">
+  <div data-vs class="relative flex flex-col pb-24 pl-[clamp(40px,4vw,64px)]">
     <h2 class="sr-only">{t('Paso a paso')}</h2>
     <div
       aria-hidden="true"
       class="bg-beige pointer-events-none absolute top-0 bottom-24 left-[clamp(10px,1.2vw,18px)] w-0.5 rounded-sm"
     >
-      <div data-vs-fill class="bg-gold absolute inset-0 origin-top rounded-sm"></div>
+      <div data-vs-fill class="vs-fill bg-gold absolute inset-0 origin-top rounded-sm"></div>
     </div>
     <ol class="m-0 list-none p-0">
       {steps.map((s) => (
         <li
           data-vs-row
-          class="border-beige relative grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3 border-b py-9 md:grid-cols-[minmax(80px,120px)_minmax(0,1fr)_minmax(0,1.4fr)] md:gap-x-10"
+          class="vs-row border-beige relative grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3 border-b py-9 md:grid-cols-[minmax(80px,120px)_minmax(0,1fr)_minmax(0,1.4fr)] md:gap-x-10"
         >
           <span
-            data-vs-dot
             aria-hidden="true"
-            class="border-beige bg-gold absolute top-[58px] left-[calc(-1*clamp(40px,4vw,64px)+clamp(10px,1.2vw,18px)-6px)] size-3.5 rounded-full border-2 transition-[background,transform] duration-300"
-          />
+            class="vs-dot absolute top-[58px] left-[calc(-1*clamp(40px,4vw,64px)+clamp(10px,1.2vw,18px)-6px)] size-3.5 rounded-full border-2"
+          ></span>
           <span class="text-gold-dark text-[48px] leading-none font-semibold">{s.n}</span>
           <div class="flex flex-col gap-1.5">
             <h3 class="m-0 text-[24px] leading-[1.15] font-semibold">{t(s.title)}</h3>
@@ -143,27 +150,28 @@ const tips = [
   <section data-theme="light" aria-labelledby="pay-title" class="px-gutter">
     <h2
       id="pay-title"
-      data-reveal
-      class="font-display m-0 mb-8 text-[clamp(30px,3.4vw,44px)] leading-[1.1]"
+      data-words
+      class="font-display m-0 mb-8 text-[clamp(30px,3.4vw,44px)] leading-[1.1] text-balance"
     >
       {t('Tres formas de pago')}
     </h2>
-    <ul class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-[22px] p-0">
+    <ul
+      data-pay
+      class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-[22px] p-0"
+    >
       {payments.map((p, i) => (
         <li
           data-reveal
-          data-delay={String(120 + i * 140)}
-          class="pay-card group text-ink relative flex flex-col gap-5 overflow-hidden rounded-[14px] border border-[rgb(24_18_14/0.18)] bg-[rgb(250_248_245/0.55)] p-[clamp(22px,2.2vw,32px)] backdrop-blur-[14px] transition-[background,color,border-color,transform,box-shadow] duration-500 ease-(--ease-glow) hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(24_18_14/0.12)]"
+          data-delay="120"
+          data-pay-i={i}
+          data-active={i === 0 ? '' : undefined}
+          class="pay-card relative flex cursor-pointer flex-col gap-5 overflow-hidden rounded-[14px] border p-[clamp(22px,2.2vw,32px)] backdrop-blur-[14px]"
         >
-          <span
-            aria-hidden="true"
-            class="bg-gold absolute top-0 left-0 h-0.5 w-0 transition-[width] duration-[1.2s] ease-linear group-hover:w-full group-focus-within:w-full"
-          />
           <h3 class="m-0 text-[clamp(22px,2vw,26px)] leading-[1.2] font-semibold">{t(p.title)}</h3>
-          <p class="text-taupe m-0 text-[17.5px] leading-[1.6] text-pretty">{t(p.text)}</p>
+          <p class="pay-sub m-0 text-[17.5px] leading-[1.6] text-pretty">{t(p.text)}</p>
           <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
             {p.tags.map((tag) => (
-              <li class="text-taupe rounded-lg border border-[rgb(24_18_14/0.18)] px-3 py-[7px] text-[14.5px] font-medium">
+              <li class="pay-tag rounded-lg border px-3 py-[7px] text-[14.5px] font-medium">
                 {t(tag)}
               </li>
             ))}
@@ -173,7 +181,7 @@ const tips = [
               href={p.link.href}
               target="_blank"
               rel="noopener"
-              class="text-gold-dark hover:text-ink mt-auto inline-flex items-center gap-2 self-start pt-1 text-[17px] font-semibold underline-offset-4 hover:underline"
+              class="text-cream hover:text-gold-light mt-auto inline-flex items-center gap-2 self-start pt-1 text-[17px] font-semibold underline underline-offset-4 transition-colors"
             >
               <span>{p.link.label}</span>
               <Arrow />
@@ -189,22 +197,31 @@ const tips = [
     class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-14 px-gutter"
   >
     <div class="flex flex-col gap-[18px]">
-      <span class="eyebrow text-gold-dark">{t('ANTES DE VENIR')}</span>
+      <span data-reveal class="eyebrow text-gold-dark">
+        {t('ANTES DE VENIR')}
+      </span>
       <h2
-        data-reveal
-        class="font-display m-0 max-w-[519px] text-[clamp(30px,3.4vw,44px)] leading-[1.1]"
+        data-words
+        class="font-display m-0 max-w-[519px] text-[clamp(30px,3.4vw,44px)] leading-[1.1] text-balance"
       >
         {t('Lo que conviene saber')}
       </h2>
     </div>
     <ul class="border-ink text-body-sm text-brown m-0 flex list-none flex-col border-t p-0">
       {tips.map((tip) => (
-        <li class="border-beige flex items-baseline gap-3.5 border-b py-[18px]">
+        <li data-typerow class="border-beige flex items-baseline gap-3.5 border-b py-[18px]">
           <span
+            data-dot
             aria-hidden="true"
             class="border-gold size-[9px] flex-none rounded-full border-[1.5px] bg-[rgb(168_132_79/0.25)]"
-          />
-          <span data-type>{t(tip)}</span>
+          ></span>
+          <!-- El texto completo reserva el alto (sin saltos al escribirse) y es el que se lee -->
+          <span class="grid min-w-0 flex-1">
+            <span class="col-start-1 row-start-1 opacity-0">{t(tip)}</span>
+            <span data-type aria-hidden="true" class="col-start-1 row-start-1">
+              {t(tip)}
+            </span>
+          </span>
         </li>
       ))}
     </ul>
@@ -212,63 +229,191 @@ const tips = [
 </div>
 
 <style>
-  /* Sin JS o con movimiento reducido, todos los pasos se ven encendidos */
-  :global(.js) [data-vs-row] {
+  /* Pasos: sin JS o con movimiento reducido se ven todos encendidos */
+  .vs-dot {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    transition:
+      background 0.35s,
+      border-color 0.35s,
+      transform 0.35s;
+  }
+  :global(.js) .vs-row {
     opacity: 0.35;
     transition: opacity 0.45s;
   }
-  :global(.js) [data-vs-row][data-on] {
+  :global(.js) .vs-row[data-on] {
     opacity: 1;
   }
-  :global(.js) [data-vs-row]:not([data-on]) [data-vs-dot] {
+  :global(.js) .vs-row:not([data-on]) .vs-dot {
     background: var(--color-sand);
+    border-color: var(--color-beige);
   }
-  :global(.js) [data-vs-row][data-on] [data-vs-dot] {
+  :global(.js) .vs-row[data-on] .vs-dot {
     transform: scale(1.15);
   }
-  @media (prefers-reduced-motion: reduce) {
-    :global(.js) [data-vs-row] {
-      opacity: 1;
+  :global(.js) .vs-fill {
+    transform: scaleY(0);
+  }
+
+  /* Formas de pago (diseño: la activa en dorado, las demás en cristal oscuro).
+     Los tonos van un punto más hondos que en el diseño para que el texto
+     claro cumpla el contraste AA sobre el fondo arena. */
+  .pay-card {
+    --pay-bd: rgb(250 248 245 / 0.16);
+    background: rgb(24 18 14 / 0.58);
+    border-color: var(--pay-bd);
+    color: var(--color-cream);
+    transition:
+      background 0.5s,
+      color 0.5s,
+      border-color 0.5s,
+      translate 0.5s var(--ease-glow),
+      box-shadow 0.5s;
+  }
+  .pay-card[data-active] {
+    --pay-bd: rgb(250 248 245 / 0.35);
+    background: color-mix(in srgb, var(--color-gold) 35%, var(--color-gold-dark));
+  }
+  .pay-sub,
+  .pay-tag {
+    color: var(--color-cream-2);
+    transition:
+      color 0.5s,
+      border-color 0.5s;
+  }
+  .pay-tag {
+    border-color: var(--pay-bd);
+  }
+  .pay-card[data-active] .pay-sub,
+  .pay-card[data-active] .pay-tag {
+    color: var(--color-cream);
+  }
+  /* «translate» y no «transform»: la aparición de GSAP usa transform */
+  @media (hover: hover) and (pointer: fine) {
+    .pay-card:hover {
+      translate: 0 -6px;
+      box-shadow: 0 14px 32px rgb(24 18 14 / 0.18);
     }
   }
 </style>
 
 <script>
   import { gsap, prefersReducedMotion } from '../../scripts/gsap'
+  import { revealImage } from './page-motion'
 
-  // Línea dorada vertical que se llena con el scroll y enciende cada paso
-  const section = document.getElementById('visit-steps')
-  const fill = section?.querySelector<HTMLElement>('[data-vs-fill]')
-  const rows = section ? [...section.querySelectorAll<HTMLElement>('[data-vs-row]')] : []
+  const reduce = prefersReducedMotion()
 
-  if (section && fill) {
-    if (prefersReducedMotion()) {
+  // ---- Foto ancha: se descubre desde abajo y se asienta ----
+  const frame = document.querySelector<HTMLElement>('[data-visit-photo]')
+  if (frame) revealImage(frame, frame.querySelector<HTMLElement>('[data-visit-img]'))
+
+  // ---- Paso a paso: fórmula del diseño ----
+  // La punta de la línea va al 62 % de la pantalla: relleno = (vh·0,62 − top) /
+  // (alto − 96). Una fila se enciende cuando su offsetTop + 65 ≤ esa punta.
+  const vs = document.querySelector<HTMLElement>('[data-vs]')
+  const fill = vs?.querySelector<HTMLElement>('[data-vs-fill]')
+  const rows = vs ? [...vs.querySelectorAll<HTMLElement>('[data-vs-row]')] : []
+
+  if (vs && fill) {
+    if (reduce) {
       rows.forEach((r) => r.setAttribute('data-on', ''))
+      fill.style.transform = 'scaleY(1)'
     } else {
-      const line = fill.parentElement ?? section
-      gsap.fromTo(
-        fill,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: line,
-            start: 'top 60%',
-            end: 'bottom 60%',
-            scrub: true,
-            onUpdate: () => {
-              // Un paso se enciende cuando la punta de la línea llega a su punto
-              const tip = fill.getBoundingClientRect().bottom
-              rows.forEach((r) => {
-                const dot = r.querySelector('[data-vs-dot]')
-                const y = dot ? dot.getBoundingClientRect().top : r.getBoundingClientRect().top
-                r.toggleAttribute('data-on', tip >= y)
-              })
-            },
-          },
+      const setFill = gsap.quickTo(fill, 'scaleY', { duration: 0.35, ease: 'power3.out' })
+      let raf = 0
+      let near = false
+      const update = () => {
+        raf = 0
+        const r = vs.getBoundingClientRect()
+        const line = window.innerHeight * 0.62 - r.top
+        setFill(Math.max(0, Math.min(1, line / (r.height - 96))))
+        rows.forEach((row) => row.toggleAttribute('data-on', row.offsetTop + 65 <= line))
+      }
+      const queue = () => {
+        if (near && !raf) raf = requestAnimationFrame(update)
+      }
+      new IntersectionObserver(
+        ([e]) => {
+          near = !!e?.isIntersecting
+          if (raf) cancelAnimationFrame(raf)
+          raf = 0
+          update()
         },
-      )
+        { rootMargin: '25% 0px' },
+      ).observe(vs)
+      window.addEventListener('scroll', queue, { passive: true })
+      window.addEventListener('resize', queue)
     }
+  }
+
+  // ---- Formas de pago ----
+  // Escritorio (≥760): la tarjeta activa rota cada 2,5 s; un clic la fija y pausa
+  // la rotación 4 s. Solo corre con la sección en pantalla y la pestaña visible.
+  // Móvil: la activa es la más cercana al centro de la pantalla.
+  const pay = document.querySelector<HTMLElement>('[data-pay]')
+  const cards = pay ? [...pay.querySelectorAll<HTMLElement>(':scope > [data-pay-i]')] : []
+  if (pay && cards.length) {
+    let idx = 0
+    let pausedAt = 0
+    let onScreen = false
+    let timer = 0
+    const setActive = (i: number) => {
+      idx = i
+      cards.forEach((c, k) => c.toggleAttribute('data-active', k === i))
+    }
+    const narrow = () => window.innerWidth < 760
+    const tick = () => {
+      if (document.hidden || !onScreen || narrow()) return
+      if (Date.now() - pausedAt < 4000) return
+      setActive((idx + 1) % cards.length)
+    }
+    const sync = () => {
+      const run = !reduce && onScreen && !document.hidden && !narrow()
+      if (run && !timer) timer = window.setInterval(tick, 2500)
+      if (!run && timer) {
+        clearInterval(timer)
+        timer = 0
+      }
+    }
+    cards.forEach((c, k) => {
+      const pick = () => {
+        pausedAt = Date.now()
+        setActive(k)
+      }
+      c.addEventListener('click', pick)
+      c.addEventListener('focusin', pick)
+    })
+    new IntersectionObserver(([e]) => {
+      onScreen = !!e?.isIntersecting
+      sync()
+    }).observe(pay)
+    document.addEventListener('visibilitychange', sync)
+    let sraf = 0
+    const nearest = () => {
+      sraf = 0
+      if (!narrow() || !onScreen) return
+      const mid = window.innerHeight / 2
+      let best = -1
+      let bd = Infinity
+      cards.forEach((c, k) => {
+        const r = c.getBoundingClientRect()
+        if (r.bottom < 0 || r.top > window.innerHeight) return
+        const d = Math.abs(r.top + r.height / 2 - mid)
+        if (d < bd) {
+          bd = d
+          best = k
+        }
+      })
+      if (best >= 0 && best !== idx) setActive(best)
+    }
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!sraf) sraf = requestAnimationFrame(nearest)
+      },
+      { passive: true },
+    )
+    window.addEventListener('resize', sync)
   }
 </script>

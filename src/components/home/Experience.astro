@@ -6,6 +6,8 @@ import { pathFor, useT, type Lang } from '../../i18n'
 
 // «Una experiencia que se siente desde el principio»: intro sticky y tres
 // tarjetas a pantalla completa que se apilan (data-stack-wrap, en site.ts).
+// El contenido de cada tarjeta entra cuando la tarjeta se posa (y vuelve a
+// entrar si se sube y se baja de nuevo).
 interface Props {
   lang: Lang
 }
@@ -54,15 +56,14 @@ const t = useT(lang)
         <div class="px-gutter relative flex h-full flex-col justify-between gap-[clamp(32px,6vh,64px)] pt-[clamp(120px,16vh,150px)] pb-[clamp(80px,9vh,104px)]">
           <div class="flex flex-1 flex-col items-start justify-center">
             <h3
-              data-reveal
+              data-card-title
               class="font-display m-0 max-w-[624px] text-[clamp(30px,4vw,60px)] leading-[1.05]"
             >
               {s.num} {t(s.label)}
             </h3>
           </div>
           <div
-            data-reveal
-            data-delay="260"
+            data-card-panel
             class="mb-[clamp(40px,10vh,120px)] grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] items-start gap-x-16 gap-y-5 rounded-[14px] border border-[rgb(250_248_245/0.18)] bg-[rgb(24_18_14/0.38)] p-[clamp(22px,2.6vw,36px)] backdrop-blur-[16px]"
           >
             <p class="m-0 text-[clamp(26px,2.8vw,40px)] leading-[1.08] text-balance">
@@ -82,3 +83,78 @@ const t = useT(lang)
     ))}
   </div>
 </div>
+
+<style>
+  :global(.js) [data-card-title],
+  :global(.js) [data-card-panel] {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) [data-card-title],
+    :global(.js) [data-card-panel] {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, SplitText, prefersReducedMotion } from '../../scripts/gsap'
+  import { introDone } from '../../scripts/intro-state'
+
+  const wrap = document.querySelector<HTMLElement>('[data-stack-wrap]')
+  const cards = wrap ? [...wrap.querySelectorAll<HTMLElement>(':scope > [data-stack]')] : []
+
+  if (prefersReducedMotion()) {
+    cards.forEach((c) =>
+      gsap.set(c.querySelectorAll('[data-card-title],[data-card-panel]'), { opacity: 1 }),
+    )
+  } else if (wrap && cards.length) {
+    void Promise.all([document.fonts.ready, introDone]).then(() => {
+      cards.forEach((card, i) => {
+        const title = card.querySelector<HTMLElement>('[data-card-title]')
+        const panel = card.querySelector<HTMLElement>('[data-card-panel]')
+        if (!title || !panel) return
+        const split = SplitText.create(title, { type: 'lines', mask: 'lines', aria: 'auto' })
+        split.masks.forEach((m) => {
+          m.style.paddingBottom = '0.12em'
+          m.style.marginBottom = '-0.12em'
+        })
+        gsap.set(title, { opacity: 1 })
+        const rows = panel.children
+        const tl = gsap
+          .timeline({ paused: true })
+          .fromTo(
+            split.lines,
+            { yPercent: 110 },
+            { yPercent: 0, duration: 1, ease: 'power4.out', stagger: 0.08 },
+          )
+          .fromTo(
+            panel,
+            { opacity: 0, y: 56, scale: 0.96 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'glow' },
+            0.26,
+          )
+          .fromTo(
+            rows,
+            { opacity: 0, y: 18 },
+            { opacity: 1, y: 0, duration: 0.7, ease: 'glow', stagger: 0.12 },
+            0.45,
+          )
+        tl.progress(0)
+        // Las tarjetas son sticky: su posición «en el flujo» es la del contenedor
+        // más la altura de las anteriores. Se posa cuando cubre ~el 38 % de la pantalla.
+        ScrollTrigger.create({
+          start: () =>
+            wrap.getBoundingClientRect().top +
+            window.scrollY +
+            i * card.offsetHeight -
+            window.innerHeight * 0.62,
+          end: 'max',
+          invalidateOnRefresh: true,
+          onEnter: () => tl.timeScale(1).play(),
+          onLeaveBack: () => tl.timeScale(2.5).reverse(),
+        })
+      })
+    })
+  }
+</script>

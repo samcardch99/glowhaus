@@ -29,10 +29,14 @@ const glowhausLinks = [
 const year = new Date().getFullYear()
 ---
 
-<footer data-theme="dark" class="bg-ink text-silver relative z-[11] flex min-h-screen flex-col">
+<footer
+  data-footer
+  data-theme="dark"
+  class="bg-ink text-silver relative z-[11] flex min-h-screen flex-col overflow-hidden"
+>
   <div class="flex min-h-0 flex-1 flex-col justify-between gap-12 px-gutter pt-[clamp(110px,18vh,200px)] pb-[clamp(20px,3vh,32px)]">
     <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,190px),1fr))] gap-9">
-      <div class="flex w-max flex-col gap-1.5">
+      <div data-reveal class="flex w-max flex-col gap-1.5">
         <Image src={isotipo} alt="GlowHaus" width={144} class="block h-auto w-[72px] self-center" />
         <div class="mt-[18px] flex gap-2.5">
           <SocialIcon name="whatsapp" href={`https://wa.me/${site.whatsapp}`} label="WhatsApp" />
@@ -42,78 +46,126 @@ const year = new Date().getFullYear()
         </div>
       </div>
 
-      <nav aria-label={t('Tratamientos')} class="flex flex-col gap-2.5 text-base">
+      <nav data-reveal aria-label={t('Tratamientos')} class="flex flex-col gap-2.5 text-base">
         <span class="label-caps text-tan">{t('TRATAMIENTOS')}</span>
         {treatments.map((c) => (
-          <a href={treatmentPath(lang, c.slug[lang])} class="hover:text-gold transition-colors">
+          <a href={treatmentPath(lang, c.slug[lang])} class="foot-link">
             {t(c.name)}
           </a>
         ))}
       </nav>
 
-      <nav aria-label="GlowHaus" class="flex flex-col gap-2.5 text-base">
+      <nav data-reveal aria-label="GlowHaus" class="flex flex-col gap-2.5 text-base">
         <span class="label-caps text-tan">GLOWHAUS</span>
         {glowhausLinks.map((l) => (
-          <a href={l.href} class="hover:text-gold transition-colors">
+          <a href={l.href} class="foot-link">
             {t(l.label)}
           </a>
         ))}
       </nav>
 
-      <div class="flex flex-col gap-2.5 text-base">
+      <div data-reveal class="flex flex-col gap-2.5 text-base">
         <span class="label-caps text-tan">{t('CONTACTO')}</span>
-        <a
-          href={site.mapsLink}
-          target="_blank"
-          rel="noopener"
-          class="hover:text-gold transition-colors"
-        >
+        <a href={site.mapsLink} target="_blank" rel="noopener" class="foot-link">
           {site.address.short}
         </a>
-        <a href={site.phoneHref} class="hover:text-gold transition-colors">
+        <a href={site.phoneHref} class="foot-link">
           {site.phone}
         </a>
-        <a href={`mailto:${site.email}`} class="hover:text-gold transition-colors">
+        <a href={`mailto:${site.email}`} class="foot-link">
           {site.email}
         </a>
-        <a
-          href={site.instagram}
-          target="_blank"
-          rel="noopener"
-          class="hover:text-gold transition-colors"
-        >
+        <a href={site.instagram} target="_blank" rel="noopener" class="foot-link">
           {site.instagramHandle}
         </a>
       </div>
     </div>
 
-    <div class="text-ash flex flex-wrap justify-between gap-3 border-t border-brown-2 pt-6 text-[14.5px]">
+    <div
+      data-reveal="solo"
+      data-delay="300"
+      class="text-ash border-brown-2 flex flex-wrap justify-between gap-3 border-t pt-6 text-[14.5px]"
+    >
       <span>© {year} GlowHaus Aesthetics</span>
       <span>
-        <a href={pathFor(lang, 'privacy')} class="hover:text-gold transition-colors">
+        <a href={pathFor(lang, 'privacy')} class="foot-link">
           {t('Privacidad')}
         </a>
         {' · '}
-        <a href={pathFor(lang, 'terms')} class="hover:text-gold transition-colors">
+        <a href={pathFor(lang, 'terms')} class="foot-link">
           {t('Términos')}
         </a>
         {' · '}
-        <a href={esHref} hreflang="es" lang="es" class="hover:text-gold transition-colors">
+        <a href={esHref} hreflang="es" lang="es" class="foot-link">
           Español
         </a>
         {' / '}
-        <a href={enHref} hreflang="en" lang="en" class="hover:text-gold transition-colors">
+        <a href={enHref} hreflang="en" lang="en" class="foot-link">
           English
         </a>
       </span>
     </div>
 
-    <Image
-      src={wordmarkGold}
-      alt="GLOWHAUS™"
-      width={1600}
-      class="block h-auto max-h-[22vh] w-full object-contain object-[left_bottom]"
-      data-foot-mark
-    />
+    <!-- Logotipo: sube y se descubre con el scroll mientras entra el pie -->
+    <div data-foot-mark-wrap class="overflow-hidden">
+      <Image
+        src={wordmarkGold}
+        alt="GLOWHAUS™"
+        width={1600}
+        class="block h-auto max-h-[22vh] w-full object-contain object-[left_bottom]"
+        data-foot-mark
+      />
+    </div>
   </div>
 </footer>
+
+<style>
+  /* Enlaces: subrayado que se dibuja de izquierda a derecha (escritorio) */
+  .foot-link {
+    align-self: flex-start;
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+    padding-bottom: 2px;
+    transition:
+      color 0.3s,
+      background-size 0.45s var(--ease-glow);
+  }
+  span > .foot-link {
+    padding-bottom: 0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .foot-link:hover {
+      color: var(--color-gold);
+      background-size: 100% 1px;
+    }
+  }
+  .foot-link:focus-visible {
+    color: var(--color-gold);
+  }
+</style>
+
+<script>
+  import { gsap, prefersReducedMotion } from '../../scripts/gsap'
+
+  // El logotipo grande sube desde abajo y se descubre mientras el pie entra en
+  // pantalla, ligado al scroll (sin JS o con movimiento reducido, se ve quieto).
+  const footer = document.querySelector<HTMLElement>('[data-footer]')
+  const mark = footer?.querySelector<HTMLElement>('[data-foot-mark]')
+  if (footer && mark && !prefersReducedMotion()) {
+    gsap.fromTo(
+      mark,
+      { yPercent: 70, clipPath: 'inset(0% 0% 100% 0%)', opacity: 0.4 },
+      {
+        yPercent: 0,
+        clipPath: 'inset(0% 0% 0% 0%)',
+        opacity: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: footer,
+          start: 'top 75%',
+          end: 'bottom bottom',
+          scrub: 0.8,
+        },
+      },
+    )
+  }
+</script>

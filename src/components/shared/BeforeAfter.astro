@@ -4,7 +4,11 @@ import type { BASet } from '../../data/results'
 import { useT, type Lang } from '../../i18n'
 
 // Comparador de antes y después con pestañas por tratamiento y paginación.
-// El tirador es un <input type="range">: se arrastra y también se mueve con las flechas.
+// El tirador es un <input type="range">: se arrastra y también se mueve con las
+// flechas. Comportamiento del diseño: tras 3 s sin tocarlo, el tirador vuelve
+// suave al centro; si ya estaba ahí, pasa al siguiente caso fundiendo el
+// anterior (800 ms). Se detiene fuera de pantalla, con el foco dentro, con la
+// pestaña oculta y con movimiento reducido. Pensado para fondo oscuro.
 interface Props {
   lang: Lang
   sets: BASet[]
@@ -19,124 +23,290 @@ const t = useT(lang)
     <div
       role="tablist"
       aria-label={t('Antes y después, por tratamiento')}
-      class="no-scrollbar flex gap-2 overflow-x-auto"
+      class="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-1"
     >
       {sets.map((s, i) => (
         <button
           type="button"
           role="tab"
+          id={`${id}-tab-${i}`}
           data-ba-tab={i}
           aria-selected={i === 0 ? 'true' : 'false'}
-          class="aria-selected:bg-gold aria-selected:border-gold text-cream rounded-full border border-[rgb(250_248_245/0.35)] px-4 py-2 text-[15px] font-medium whitespace-nowrap transition-colors"
+          aria-controls={`${id}-set-${i}`}
+          tabindex={i === 0 ? undefined : -1}
+          class="aria-selected:bg-gold aria-selected:border-gold hover:border-gold text-cream rounded-[clamp(8px,calc(2px+1vw),14px)] border border-[rgb(250_248_245/0.35)] bg-[rgb(250_248_245/0.06)] px-[clamp(12px,calc(5px+1.3vw),18px)] py-[clamp(8px,calc(4px+0.6vw),10px)] text-[clamp(13.5px,calc(11px+0.6vw),16px)] font-semibold tracking-[0.03em] whitespace-nowrap backdrop-blur-[10px] transition-colors duration-300"
         >
-          {t(s.tab)} <span class="opacity-70">({s.pairs.length})</span>
+          {t(s.tab)} <span class="font-medium opacity-70">({s.pairs.length})</span>
         </button>
       ))}
     </div>
   )}
 
-  {sets.map((s, si) => (
-    <div data-ba-set={si} hidden={si !== 0} role={sets.length > 1 ? 'tabpanel' : undefined}>
-      {s.pairs.map((p, pi) => (
-        <div data-ba-pair={pi} hidden={pi !== 0} class="flex flex-col gap-4">
-          <div
-            class="ba-frame relative aspect-[4/5] w-full overflow-hidden rounded-[14px] select-none sm:aspect-[5/4]"
-            style="--pos:50%"
-          >
-            <Image
-              src={p.after}
-              alt={`${t(s.tab)}: ${t('después')}`}
-              widths={[480, 800, 1200]}
-              sizes="(min-width: 1100px) 50vw, 100vw"
-              class="absolute inset-0 size-full object-cover"
-            />
-            <div class="absolute inset-0 [clip-path:inset(0_calc(100%-var(--pos))_0_0)]">
+  <div class="grid">
+    {sets.map((s, si) => (
+      <div
+        data-ba-set={si}
+        id={`${id}-set-${si}`}
+        hidden={si !== 0}
+        role={sets.length > 1 ? 'tabpanel' : undefined}
+        aria-labelledby={sets.length > 1 ? `${id}-tab-${si}` : undefined}
+        class="flex min-w-0 flex-col gap-[18px] [grid-area:1/1]"
+      >
+        <div class="grid">
+          {s.pairs.map((p, pi) => (
+            <div
+              data-ba-pair={pi}
+              hidden={pi !== 0}
+              class="ba-frame bg-brown relative aspect-[4/5] w-full overflow-hidden rounded-[14px] select-none [grid-area:1/1] sm:aspect-[5/4]"
+              style="--pos:50%"
+            >
               <Image
-                src={p.before}
-                alt={`${t(s.tab)}: ${t('antes')}`}
+                src={p.after}
+                alt={`${t(s.tab)}: ${t('después')}`}
                 widths={[480, 800, 1200]}
                 sizes="(min-width: 1100px) 50vw, 100vw"
-                class="absolute inset-0 size-full object-cover"
+                draggable="false"
+                class="pointer-events-none absolute inset-0 size-full object-cover"
+              />
+              <div class="ba-before pointer-events-none absolute inset-0">
+                <Image
+                  src={p.before}
+                  alt={`${t(s.tab)}: ${t('antes')}`}
+                  widths={[480, 800, 1200]}
+                  sizes="(min-width: 1100px) 50vw, 100vw"
+                  draggable="false"
+                  class="absolute inset-0 size-full object-cover"
+                />
+              </div>
+              <span class="text-cream pointer-events-none absolute top-[18px] left-5 text-[14.5px] font-semibold tracking-[0.18em] [text-shadow:0_1px_6px_rgb(24_18_14/0.55)]">
+                {t('ANTES')}
+              </span>
+              <span class="text-cream pointer-events-none absolute top-[18px] right-5 text-[14.5px] font-semibold tracking-[0.18em] [text-shadow:0_1px_6px_rgb(24_18_14/0.55)]">
+                {t('DESPUÉS')}
+              </span>
+              <div
+                aria-hidden="true"
+                class="bg-cream pointer-events-none absolute inset-y-0 left-(--pos) w-0.5 -translate-x-1/2"
+              >
+                <span class="ba-knob bg-cream text-ink absolute top-1/2 left-1/2 flex size-[46px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[17.5px] font-semibold shadow-[0_2px_10px_rgb(24_18_14/0.25)] transition-transform duration-300">
+                  ⇆
+                </span>
+              </div>
+              <input
+                type="range"
+                min="2"
+                max="98"
+                step="0.5"
+                value="50"
+                data-ba-range
+                aria-label={t('Deslizar para comparar antes y después')}
+                class="absolute inset-0 m-0 size-full cursor-ew-resize opacity-0"
               />
             </div>
-            <span class="glass-chip text-cream label-caps absolute top-4 left-4 rounded-lg px-3 py-1.5">
-              {t('ANTES')}
-            </span>
-            <span class="glass-chip text-cream label-caps absolute top-4 right-4 rounded-lg px-3 py-1.5">
-              {t('DESPUÉS')}
-            </span>
-            <div
-              aria-hidden="true"
-              class="bg-cream pointer-events-none absolute inset-y-0 left-(--pos) w-0.5 -translate-x-1/2"
-            >
-              <span class="bg-cream text-ink absolute top-1/2 left-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full shadow-lg">
-                ⟷
+          ))}
+        </div>
+        {s.pairs.length > 1 && (
+          <div class="flex justify-center">
+            <div class="flex items-center gap-[18px] rounded-[14px] border border-[rgb(250_248_245/0.55)] bg-[rgb(250_248_245/0.14)] px-5 py-3.5 backdrop-blur-[10px]">
+              <div class="flex items-center gap-2">
+                {s.pairs.map((_, pi) => (
+                  <button
+                    type="button"
+                    data-ba-dot={pi}
+                    aria-label={`${t('Caso')} ${pi + 1} / ${s.pairs.length}`}
+                    aria-current={pi === 0 ? 'true' : undefined}
+                    class="aria-[current]:bg-gold hover:bg-gold-light relative h-[11px] w-[11px] rounded-full bg-[rgb(250_248_245/0.35)] transition-[width,background-color] duration-300 before:absolute before:-inset-2 before:content-[''] aria-[current]:w-[34px]"
+                  />
+                ))}
+              </div>
+              <span
+                class="text-beige text-[clamp(16px,1.4vw,20px)] font-medium tracking-[0.08em] tabular-nums"
+                data-ba-count
+              >
+                1/{s.pairs.length}
               </span>
             </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              data-ba-range
-              aria-label={t('Deslizar para comparar antes y después')}
-              class="absolute inset-0 size-full cursor-ew-resize opacity-0"
-            />
           </div>
-        </div>
-      ))}
-      {s.pairs.length > 1 && (
-        <div class="text-cream flex items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            {s.pairs.map((_, pi) => (
-              <button
-                type="button"
-                data-ba-dot={pi}
-                aria-label={`${pi + 1} / ${s.pairs.length}`}
-                aria-current={pi === 0 ? 'true' : undefined}
-                class="aria-[current]:bg-gold aria-[current]:w-[34px] h-[11px] w-[11px] rounded-full bg-[rgb(250_248_245/0.35)] transition-[width,background]"
-              />
-            ))}
-          </div>
-          <span class="text-[15px] font-medium" data-ba-count>
-            1 / {s.pairs.length}
-          </span>
-        </div>
-      )}
-    </div>
-  ))}
+        )}
+      </div>
+    ))}
+  </div>
 </div>
 
+<style>
+  .ba-before {
+    clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  }
+  .ba-frame:has(input:focus-visible) {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+  .ba-frame:has(input:active) .ba-knob {
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+</style>
+
 <script>
+  import { gsap, prefersReducedMotion } from '../../scripts/gsap'
+
+  const reduce = prefersReducedMotion()
+
   document.querySelectorAll<HTMLElement>('[data-ba]').forEach((root) => {
-    // Tirador
-    root.querySelectorAll<HTMLInputElement>('[data-ba-range]').forEach((r) => {
-      const frame = r.closest<HTMLElement>('.ba-frame')
-      r.addEventListener('input', () => frame?.style.setProperty('--pos', r.value + '%'))
-    })
-    // Pestañas
-    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-ba-tab]')
-    const setsEls = root.querySelectorAll<HTMLElement>('[data-ba-set]')
-    tabs.forEach((tab, i) =>
-      tab.addEventListener('click', () => {
-        tabs.forEach((x, k) => x.setAttribute('aria-selected', String(k === i)))
-        setsEls.forEach((s, k) => (s.hidden = k !== i))
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-ba-tab]')]
+    const setEls = [...root.querySelectorAll<HTMLElement>('[data-ba-set]')]
+    const state = setEls.map(() => 0)
+    let cur = 0
+    let pos = 50
+    let glide: gsap.core.Tween | null = null
+
+    const pairsOf = (s: number) => [
+      ...(setEls[s]?.querySelectorAll<HTMLElement>('[data-ba-pair]') ?? []),
+    ]
+    const frame = () => pairsOf(cur)[state[cur] ?? 0]
+    const setPos = (v: number, f = frame()) => {
+      pos = v
+      if (!f) return
+      f.style.setProperty('--pos', `${v}%`)
+      const r = f.querySelector<HTMLInputElement>('[data-ba-range]')
+      if (r && Number(r.value) !== v) r.value = String(v)
+    }
+    // Carga por adelantado las fotos del caso siguiente para que el fundido no parpadee
+    const warm = (el: HTMLElement | undefined) =>
+      el?.querySelectorAll('img').forEach((im) => (im.loading = 'eager'))
+
+    // ---------- Tirador ----------
+    root.querySelectorAll<HTMLInputElement>('[data-ba-range]').forEach((r) =>
+      r.addEventListener('input', () => {
+        glide?.kill()
+        setPos(Number(r.value), r.closest<HTMLElement>('.ba-frame') ?? undefined)
       }),
     )
-    // Paginación
-    setsEls.forEach((set) => {
-      const pairs = set.querySelectorAll<HTMLElement>('[data-ba-pair]')
-      const dots = set.querySelectorAll<HTMLButtonElement>('[data-ba-dot]')
+
+    // ---------- Casos ----------
+    const showPair = (i: number) => {
+      const pairs = pairsOf(cur)
+      const from = state[cur] ?? 0
+      if (i === from || !pairs[i]) return
+      glide?.kill()
+      const old = pairs[from]!
+      const next = pairs[i]!
+      const s = cur
+      state[s] = i
+      next.hidden = false
+      next.style.zIndex = '0'
+      setPos(50, next)
+      if (reduce) old.hidden = true
+      else {
+        old.style.zIndex = '1'
+        old.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 800, easing: 'ease' }).onfinish =
+          () => {
+            if (pairsOf(s)[state[s] ?? 0] === old) return
+            old.hidden = true
+            old.style.zIndex = ''
+          }
+      }
+      warm(pairs[(i + 1) % pairs.length])
+      const set = setEls[cur]!
+      set
+        .querySelectorAll('[data-ba-dot]')
+        .forEach((d, k) =>
+          k === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'),
+        )
       const count = set.querySelector('[data-ba-count]')
-      dots.forEach((d, i) =>
+      if (count) count.textContent = `${i + 1}/${pairs.length}`
+    }
+    setEls.forEach((set, s) =>
+      set.querySelectorAll<HTMLButtonElement>('[data-ba-dot]').forEach((d, i) =>
         d.addEventListener('click', () => {
-          pairs.forEach((p, k) => (p.hidden = k !== i))
-          dots.forEach((x, k) =>
-            k === i ? x.setAttribute('aria-current', 'true') : x.removeAttribute('aria-current'),
-          )
-          if (count) count.textContent = `${i + 1} / ${pairs.length}`
+          if (s === cur) showPair(i)
         }),
+      ),
+    )
+
+    // ---------- Pestañas (con flechas, como un tablist) ----------
+    const showSet = (i: number, focus = false) => {
+      if (i === cur || !setEls[i]) return
+      glide?.kill()
+      const old = setEls[cur]!
+      const next = setEls[i]!
+      cur = i
+      tabs.forEach((x, k) => {
+        x.setAttribute('aria-selected', String(k === i))
+        x.tabIndex = k === i ? 0 : -1
+      })
+      if (focus) tabs[i]?.focus()
+      next.hidden = false
+      setPos(50)
+      warm(pairsOf(i)[(state[i] ?? 0) + 1])
+      if (reduce) {
+        old.hidden = true
+        return
+      }
+      gsap.killTweensOf([old, next])
+      gsap.set(old, { zIndex: 1 })
+      gsap.to(old, {
+        opacity: 0,
+        duration: 0.35,
+        ease: 'power1.out',
+        onComplete: () => {
+          old.hidden = true
+          gsap.set(old, { clearProps: 'opacity,zIndex' })
+        },
+      })
+      gsap.fromTo(
+        next,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'glow', clearProps: 'all' },
       )
+    }
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => showSet(i))
+      tab.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
+        if (!d) return
+        e.preventDefault()
+        showSet((i + d + tabs.length) % tabs.length, true)
+      })
     })
+    warm(pairsOf(0)[1])
+
+    // ---------- Reposo (diseño: cada 3 s) ----------
+    if (reduce) return
+    let visible = false
+    let focusIn = false
+    let idle = 0
+    const arm = () => {
+      window.clearTimeout(idle)
+      idle = window.setTimeout(step, 3000)
+    }
+    function step() {
+      arm()
+      if (!visible || focusIn || document.hidden) return
+      if (Math.abs(pos - 50) > 0.5) {
+        const o = { v: pos }
+        glide = gsap.to(o, {
+          v: 50,
+          duration: 0.9,
+          ease: 'swift',
+          onUpdate: () => setPos(o.v),
+        })
+      } else {
+        const n = pairsOf(cur).length
+        if (n > 1) showPair(((state[cur] ?? 0) + 1) % n)
+      }
+    }
+    ;['pointerdown', 'pointermove', 'input', 'keydown', 'wheel'].forEach((ev) =>
+      root.addEventListener(ev, arm, { passive: true }),
+    )
+    // Solo el foco de teclado detiene el reposo (un clic también enfoca el botón)
+    root.addEventListener(
+      'focusin',
+      (e) => (focusIn = (e.target as Element).matches(':focus-visible')),
+    )
+    root.addEventListener('focusout', () => (focusIn = false))
+    new IntersectionObserver(([en]) => (visible = !!en?.isIntersecting), {
+      threshold: 0.4,
+    }).observe(root)
+    arm()
   })
 </script>

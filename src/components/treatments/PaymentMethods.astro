@@ -9,13 +9,17 @@ import { site, whatsappHref } from '../../data/site'
 import { useT, type Lang } from '../../i18n'
 
 // Tarjeta oscura «Formas de pago»: tarjeta, efectivo y cuotas con Cherry.
-// Mientras la clínica no pase su enlace de Cherry (site.cherry vacío), se
-// pregunta por WhatsApp.
+// Como las tarjetas de pago del diseño, la forma destacada (dorada) rota cada
+// 2,5 s en escritorio y se detiene 4 s tras pulsar una; en móvil se destaca la
+// más cercana al centro de la pantalla. Sin JS o con movimiento reducido no
+// rota. Mientras la clínica no pase su enlace de Cherry (site.cherry vacío),
+// se pregunta por WhatsApp.
 interface Props {
   lang: Lang
   class?: string
+  [key: string]: unknown
 }
-const { lang, class: cls = '' } = Astro.props
+const { lang, class: cls = '', ...rest } = Astro.props
 const t = useT(lang)
 const cards = [
   { src: visa, alt: 'Visa' },
@@ -25,20 +29,23 @@ const cards = [
 ]
 const cherry = site.cherry
 const cherryHref = cherry || whatsappHref(lang, 'Cherry')
+const tile = 'pay-tile flex flex-col gap-1 rounded-[12px] border px-[18px] py-4 max-[759px]:px-4'
 ---
 
 <div
+  data-pay
   class:list={[
-    'bg-brown text-cream flex flex-col justify-center gap-[18px] rounded-[14px] p-[clamp(24px,3vw,40px)]',
+    'bg-brown text-cream flex flex-col justify-center gap-[18px] rounded-[14px] p-[clamp(22px,3vw,40px)]',
     cls,
   ]}
+  {...rest}
 >
   <span class="eyebrow text-tan">{t('FORMAS DE PAGO')}</span>
   <h2 class="text-gold m-0 text-[30px] leading-[1.15] font-semibold">{t('Paga como prefieras')}</h2>
-  <ul class="m-0 flex list-none flex-col p-0">
-    <li class="flex flex-col gap-1 border-t border-[rgb(250_248_245/0.16)] py-3.5">
+  <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+    <li data-pay-i="0" class={tile}>
       <h3 class="m-0 text-[18.5px] font-semibold">{t('Tarjeta de crédito o débito')}</h3>
-      <p class="text-beige m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
+      <p class="pay-sub m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
         {t('Visa, Mastercard, American Express y Discover.')}
       </p>
       <div class="mt-1.5 flex flex-wrap gap-2">
@@ -47,15 +54,15 @@ const cherryHref = cherry || whatsappHref(lang, 'Cherry')
         ))}
       </div>
     </li>
-    <li class="flex flex-col gap-1 border-t border-[rgb(250_248_245/0.16)] py-3.5">
+    <li data-pay-i="1" class={tile}>
       <h3 class="m-0 text-[18.5px] font-semibold">{t('Efectivo')}</h3>
-      <p class="text-beige m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
+      <p class="pay-sub m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
         {t('Al momento de tu cita, en la clínica.')}
       </p>
     </li>
-    <li class="flex flex-col gap-1 border-t border-[rgb(250_248_245/0.16)] py-3.5">
+    <li data-pay-i="2" class={tile}>
       <h3 class="m-0 text-[18.5px] font-semibold">{t('En cuotas con Cherry')}</h3>
-      <p class="text-beige m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
+      <p class="pay-sub m-0 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55]">
         {t(
           'Divide el costo de tu paquete en pagos mensuales. La solicitud se hace en línea y te responden en minutos.',
         )}
@@ -64,7 +71,7 @@ const cherryHref = cherry || whatsappHref(lang, 'Cherry')
         href={cherryHref}
         target="_blank"
         rel="noopener"
-        class="text-gold-light hover:text-cream mt-1.5 inline-flex items-center gap-2 self-start text-[17px] font-medium underline decoration-1 underline-offset-4 transition-colors"
+        class="pay-link mt-1.5 inline-flex items-center gap-2 self-start text-[17px] font-medium underline decoration-1 underline-offset-4"
       >
         {cherry ? t('Solicitar con Cherry') : t('Pregunta por Cherry')}
         <Arrow />
@@ -72,3 +79,122 @@ const cherryHref = cherry || whatsappHref(lang, 'Cherry')
     </li>
   </ul>
 </div>
+
+<style>
+  .pay-tile {
+    background: rgb(24 18 14 / 0.42);
+    border-color: rgb(250 248 245 / 0.16);
+    transition:
+      background-color 0.5s,
+      border-color 0.5s,
+      transform 0.45s var(--ease-glow),
+      box-shadow 0.5s;
+  }
+  .pay-sub {
+    color: var(--color-beige);
+    transition: color 0.5s;
+  }
+  .pay-link {
+    color: var(--color-gold-light);
+    transition: color 0.3s;
+  }
+  .pay-tile[data-active] {
+    background: var(--color-gold);
+    border-color: rgb(250 248 245 / 0.35);
+  }
+  .pay-tile[data-active] .pay-sub,
+  .pay-tile[data-active] .pay-link {
+    color: var(--color-cream);
+  }
+  @media (hover: hover) and (min-width: 1100px) {
+    .pay-tile {
+      cursor: pointer;
+    }
+    .pay-tile:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 32px rgb(24 18 14 / 0.18);
+    }
+    .pay-link:hover {
+      color: var(--color-cream);
+    }
+  }
+</style>
+
+<script>
+  import { prefersReducedMotion } from '../../scripts/gsap'
+
+  const reduce = prefersReducedMotion()
+  const desktop = window.matchMedia('(min-width: 760px)')
+
+  document.querySelectorAll<HTMLElement>('[data-pay]').forEach((box) => {
+    const tiles = Array.from(box.querySelectorAll<HTMLElement>('[data-pay-i]'))
+    if (!tiles.length) return
+    let idx = 0
+    let pausedUntil = 0
+    let visible = false
+    let timer = 0
+
+    const set = (i: number) => {
+      idx = (i + tiles.length) % tiles.length
+      tiles.forEach((el, k) => el.toggleAttribute('data-active', k === idx))
+    }
+    set(0)
+
+    // Pulsar (o enfocar) una forma de pago la destaca y pausa la rotación 4 s
+    tiles.forEach((el, k) => {
+      const pick = () => {
+        pausedUntil = Date.now() + 4000
+        set(k)
+      }
+      el.addEventListener('click', pick)
+      el.addEventListener('focusin', pick)
+    })
+
+    // Escritorio: rota cada 2,5 s solo si se ve y la pestaña está activa
+    const tick = () => {
+      if (Date.now() < pausedUntil) return
+      set(idx + 1)
+    }
+    const sync = () => {
+      const run = !reduce && desktop.matches && visible && !document.hidden
+      if (run && !timer) timer = window.setInterval(tick, 2500)
+      if (!run && timer) {
+        window.clearInterval(timer)
+        timer = 0
+      }
+    }
+    new IntersectionObserver(([e]) => {
+      visible = !!e?.isIntersecting
+      sync()
+    }).observe(box)
+    document.addEventListener('visibilitychange', sync)
+    desktop.addEventListener('change', sync)
+
+    // Móvil: la forma de pago más cercana al centro de la pantalla
+    let raf = 0
+    const nearest = () => {
+      raf = 0
+      if (desktop.matches || !visible) return
+      const mid = window.innerHeight / 2
+      let best = -1
+      let bd = Infinity
+      tiles.forEach((el, k) => {
+        const r = el.getBoundingClientRect()
+        if (r.bottom < 0 || r.top > window.innerHeight) return
+        const d = Math.abs(r.top + r.height / 2 - mid)
+        if (d < bd) {
+          bd = d
+          best = k
+        }
+      })
+      if (best >= 0 && best !== idx) set(best)
+    }
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!raf) raf = requestAnimationFrame(nearest)
+      },
+      { passive: true },
+    )
+  })
+</script>

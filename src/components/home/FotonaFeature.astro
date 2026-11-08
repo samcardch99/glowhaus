@@ -31,7 +31,10 @@ const fotona = treatments[0]!
   <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.55),rgb(24_18_14/0.4)_50%,rgb(24_18_14/0.6))]"></div>
 
   <div class="px-gutter relative grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] items-center gap-[clamp(32px,5vw,80px)] pt-[clamp(130px,17vh,170px)] pb-[clamp(48px,7vh,96px)]">
-    <div class="bg-brown-2 relative aspect-[3/4] h-[min(76vh,760px)] max-w-full justify-self-center overflow-hidden rounded-[14px] max-md:h-auto max-md:w-full max-md:aspect-[4/5]">
+    <div
+      data-fotona-frame
+      class="bg-brown-2 relative aspect-[3/4] h-[min(76vh,760px)] max-w-full justify-self-center overflow-hidden rounded-[14px] max-md:aspect-[4/5] max-md:h-auto max-md:w-full"
+    >
       <video
         id="fotona-video"
         data-autoplay
@@ -43,6 +46,7 @@ const fotona = treatments[0]!
         preload="none"
         aria-label={t('Tratamiento con láser Fotona 4D')}
         class="block size-full object-cover"
+        data-fotona-video
       ></video>
       <div class="glass-chip pointer-events-none absolute bottom-3 left-3 flex max-w-[calc(100%-80px)] items-center gap-2.5 rounded-xl py-2 pr-3.5 pl-2">
         <Image
@@ -64,16 +68,21 @@ const fotona = treatments[0]!
     </div>
 
     <div class="flex flex-col gap-[22px]">
-      <span class="eyebrow text-tan">{t('TECNOLOGÍA INSIGNIA')}</span>
+      <span data-reveal class="eyebrow text-tan">
+        {t('TECNOLOGÍA INSIGNIA')}
+      </span>
       <h2 data-reveal class="font-display m-0 text-[clamp(34px,4.4vw,58px)] leading-[1.05]">
         Fotona 4D
       </h2>
-      <p data-reveal data-delay="200" class="text-body text-cream-3 m-0 max-w-[520px]">
+      <p data-reveal class="text-body text-cream-3 m-0 max-w-[520px]">
         {t(
           'Un tratamiento láser que trabaja el rostro por dentro y por fuera, en cuatro pasos y en una sola sesión. Sin agujas y sin cirugía.',
         )}
       </p>
-      <dl class="m-0 grid grid-flow-col grid-cols-[repeat(3,auto)] grid-rows-[auto_auto] justify-start gap-x-[clamp(18px,3vw,40px)] gap-y-2 py-5">
+      <dl
+        data-reveal
+        class="m-0 grid grid-flow-col grid-cols-[repeat(3,auto)] grid-rows-[auto_auto] justify-start gap-x-[clamp(18px,3vw,40px)] gap-y-2 py-5"
+      >
         {[
           { k: 'SESIÓN', v: '$650', n: 650 },
           { k: 'PAQUETE DE 4', v: '$2,400', n: 2400 },
@@ -92,11 +101,43 @@ const fotona = treatments[0]!
           </div>
         ))}
       </dl>
-      <div data-reveal data-delay="400">
-        <Button href={treatmentPath(lang, fotona.slug[lang])} class="min-w-[min(100%,200px)]">
+      <div data-reveal>
+        <Button
+          href={treatmentPath(lang, fotona.slug[lang])}
+          data-glow
+          class="min-w-[min(100%,200px)]"
+        >
           {t('Conoce Fotona 4D')}
         </Button>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  import { gsap, prefersReducedMotion } from '../../scripts/gsap'
+
+  // El vídeo enmarcado se abre desde el centro y el plano se asienta (1,4 s)
+  const frame = document.querySelector<HTMLElement>('[data-fotona-frame]')
+  const video = frame?.querySelector<HTMLElement>('[data-fotona-video]')
+  if (frame && video && !prefersReducedMotion()) {
+    gsap
+      .timeline({ scrollTrigger: { trigger: frame, start: 'top 82%', once: true } })
+      .fromTo(
+        frame,
+        { clipPath: 'inset(14% 10% 14% 10% round 14px)' },
+        {
+          clipPath: 'inset(0% 0% 0% 0% round 14px)',
+          duration: 1.4,
+          ease: 'wipe',
+          clearProps: 'clipPath',
+        },
+      )
+      .fromTo(
+        video,
+        { scale: 1.18 },
+        { scale: 1, duration: 1.8, ease: 'glow', clearProps: 'transform' },
+        0,
+      )
+  }
+</script>

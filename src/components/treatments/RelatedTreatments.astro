@@ -1,45 +1,143 @@
 ---
 import Button from '../ui/Button.astro'
 import type { Treatment } from '../../data/treatments'
+import { treatments } from '../../data/treatments'
 import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
-import { catNumber, fromLabel, relatedFor } from './helpers'
+import { catNumber, fromLabel } from './helpers'
 
-// «Otros tratamientos»: las 3 categorías siguientes, en bucle.
+// «Otros tratamientos»: cinta continua como en el diseño (gh-marquee, 120 s),
+// con el resto de categorías empezando por la siguiente. Se detiene con el
+// ratón encima o con el foco dentro; con movimiento reducido es una rejilla
+// fija con las 3 siguientes.
 interface Props {
   lang: Lang
   treatment: Treatment
 }
 const { lang, treatment } = Astro.props
 const t = useT(lang)
-const related = relatedFor(treatment)
+const i0 = treatments.indexOf(treatment)
+const others = treatments
+  .map((_, o) => (i0 + 1 + o) % treatments.length)
+  .filter((k) => k !== i0)
+  .map((index) => ({ r: treatments[index]!, index }))
+const STATIC = 3
 ---
 
-<section data-theme="light" class="bg-cream px-gutter flex flex-col gap-9 py-[88px]">
-  <div class="flex flex-wrap items-end justify-between gap-5">
+<section data-theme="light" class="bg-cream flex flex-col gap-9 py-[88px]">
+  <div class="px-gutter flex flex-wrap items-end justify-between gap-5">
     <h2 data-reveal class="font-display text-brown m-0 text-[clamp(30px,3.6vw,48px)] leading-[1.1]">
       {t('Otros tratamientos')}
     </h2>
-    <Button href={pathFor(lang, 'treatments')} tone="dark" class="min-w-[min(100%,200px)]">
+    <Button
+      href={pathFor(lang, 'treatments')}
+      tone="dark"
+      class="min-w-[min(100%,200px)]"
+      data-reveal
+      data-delay="200"
+    >
       {t('Todos los tratamientos')}
     </Button>
   </div>
-  <ul class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-5 p-0">
-    {related.map(({ t: r, index }, k) => (
-      <li data-reveal data-delay={String(150 + k * 120)}>
-        <a
-          href={treatmentPath(lang, r.slug[lang])}
-          class="hover:border-gold flex h-full min-h-[220px] flex-col gap-3 rounded-[14px] border border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)] p-[26px] transition-[transform,border-color] duration-400 ease-(--ease-glow) hover:-translate-y-1.5"
-        >
-          <span class="label-caps text-gold-dark tracking-[0.14em]">
-            {index === 0 ? 'FOTONA' : t('CATEGORÍA ' + catNumber(index))}
-          </span>
-          <span class="text-[22px] leading-[1.15] font-semibold">{t(r.name)}</span>
-          <span class="text-brown flex-1 text-base leading-[1.55]">{t(r.short)}</span>
-          <span class="border-beige border-t pt-3 text-[17.5px] font-semibold">
-            {t(fromLabel(r))}
-          </span>
-        </a>
-      </li>
-    ))}
-  </ul>
+  <div data-reveal="solo" data-delay="250" class="rel-viewport overflow-hidden py-2.5">
+    <div data-rel-track class="rel-track flex w-max">
+      {[0, 1].map((copy) =>
+        others.map(({ r, index }, k) => (
+          <a
+            href={treatmentPath(lang, r.slug[lang])}
+            aria-hidden={copy ? 'true' : undefined}
+            tabindex={copy ? -1 : undefined}
+            data-rel-card
+            class:list={[
+              'rel-card mr-5 flex min-h-[220px] w-[clamp(260px,24vw,340px)] flex-none flex-col gap-3 rounded-[14px] border border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)] p-[26px]',
+              copy && 'rel-copy',
+              k >= STATIC && 'rel-extra',
+            ]}
+          >
+            <span class="label-caps text-gold-dark tracking-[0.14em]">
+              {index === 0 ? 'FOTONA' : t('CATEGORÍA ' + catNumber(index))}
+            </span>
+            <span class="text-[22px] leading-[1.15] font-semibold">{t(r.name)}</span>
+            <span class="text-brown flex-1 text-base leading-[1.55]">{t(r.short)}</span>
+            <span class="border-beige border-t pt-3 text-[17.5px] font-semibold">
+              {t(fromLabel(r))}
+            </span>
+          </a>
+        )),
+      )}
+    </div>
+  </div>
 </section>
+
+<style>
+  .rel-viewport {
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .rel-track {
+    animation: gh-marquee 120s linear infinite;
+  }
+  .rel-track:hover,
+  .rel-track:focus-within,
+  .rel-track.rel-off {
+    animation-play-state: paused;
+  }
+  .rel-card {
+    transition:
+      transform 0.4s var(--ease-glow),
+      border-color 0.3s,
+      box-shadow 0.4s;
+  }
+  @media (hover: hover) {
+    .rel-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--color-gold);
+      box-shadow: 0 14px 32px rgb(24 18 14 / 0.1);
+    }
+  }
+  .rel-card:focus-visible {
+    border-color: var(--color-gold);
+  }
+  /* Movimiento reducido: rejilla fija con las 3 siguientes */
+  @media (prefers-reduced-motion: reduce) {
+    .rel-viewport {
+      mask-image: none;
+      padding-inline: clamp(24px, 1.8vw, 28px);
+    }
+    .rel-track {
+      animation: none;
+      width: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      gap: 20px;
+    }
+    .rel-card {
+      width: auto;
+      margin-right: 0;
+    }
+    .rel-copy,
+    .rel-extra {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Con el teclado: la tarjeta enfocada se trae a la vista antes de pausar
+  document.querySelectorAll<HTMLElement>('[data-rel-track]').forEach((track) => {
+    // Fuera de pantalla, la cinta se detiene
+    new IntersectionObserver(([e]) => {
+      track.classList.toggle('rel-off', !e?.isIntersecting)
+    }).observe(track)
+    track.addEventListener('focusin', (e) => {
+      const card = (e.target as HTMLElement).closest<HTMLElement>('[data-rel-card]')
+      const anim = track.getAnimations()[0]
+      const view = track.parentElement
+      if (!card || !anim || !view) return
+      const vr = view.getBoundingClientRect()
+      const cr = card.getBoundingClientRect()
+      if (cr.left >= vr.left + 24 && cr.right <= vr.right - 24) return
+      const half = track.scrollWidth / 2
+      const x = Math.max(0, card.offsetLeft - 48)
+      anim.currentTime = ((x % half) / half) * 120000
+    })
+  })
+</script>

@@ -28,11 +28,13 @@ const updated =
     class="bg-cream text-ink px-gutter pt-[clamp(130px,18vh,180px)] pb-[clamp(72px,10vh,120px)]"
   >
     <article class="legal mx-auto max-w-[70ch]">
-      <h1 class="font-display m-0 text-[clamp(36px,4.6vw,60px)] leading-[1.05]">{title}</h1>
-      <p class="text-taupe mt-5 mb-0 text-[15px]">
+      <h1 data-legal-in class="font-display m-0 text-[clamp(36px,4.6vw,60px)] leading-[1.05]">
+        {title}
+      </h1>
+      <p data-legal-in class="text-taupe mt-5 mb-0 text-[15px]">
         <time datetime="2026-11-08">{updated}</time>
       </p>
-      <div class="legal-body text-brown mt-10">
+      <div data-legal-in class="legal-body text-brown mt-10">
         <slot />
       </div>
     </article>
@@ -40,6 +42,12 @@ const updated =
 </Layout>
 
 <style>
+  /* Entrada tranquila: título, fecha y texto se funden y suben un poco */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) [data-legal-in] {
+      opacity: 0;
+    }
+  }
   .legal-body {
     font-size: var(--text-body-sm);
     line-height: 1.7;
@@ -78,3 +86,24 @@ const updated =
     font-weight: 600;
   }
 </style>
+
+<script>
+  import { gsap, prefersReducedMotion } from '../../scripts/gsap'
+
+  const items = document.querySelectorAll<HTMLElement>('[data-legal-in]')
+  if (items.length && !prefersReducedMotion()) {
+    gsap.fromTo(
+      items,
+      { opacity: 0, y: 24 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        delay: 0.1,
+        stagger: 0.14,
+        ease: 'glow',
+        clearProps: 'transform',
+      },
+    )
+  }
+</script>

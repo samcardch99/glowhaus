@@ -1,11 +1,15 @@
 ---
-import { Image } from 'astro:assets'
-import wordmark from '../../assets/glowhaus-wordmark-vector.svg'
+import wordmarkUrl from '../../assets/glowhaus-wordmark-vector.svg?url'
 import { useT, type Lang } from '../../i18n'
 
-// Entrada de marca: el logotipo crece hasta abrir la página. No bloquea el scroll
-// ni los clics, sale sola a los dos segundos o al primer gesto, y solo se ve una
-// vez por sesión. Sin JS o con movimiento reducido no aparece.
+// Entrada de marca del diseño v3: el logotipo es un hueco en una capa de tinta
+// sobre el reel del inicio. La rueda, el gesto táctil o las teclas abren el hueco
+// (crece desde el asta de la H) hasta descubrir la pantalla. Al terminar, el vídeo
+// se desenfoca, entra la primera pantalla y la capa se funde.
+// - Botón «Saltar», Esc o Intro la saltan; sin gestos se abre sola a los 6 s.
+// - Una vez por sesión. Nunca con movimiento reducido, con un #ancla, fuera del
+//   principio de la página ni sin JS.
+// - Avisa con «gh:intro-reveal» (empieza la primera pantalla) y «gh:intro-done».
 interface Props {
   lang: Lang
 }
@@ -26,53 +30,274 @@ const t = useT(Astro.props.lang)
 
 <div
   data-intro
-  aria-hidden="true"
-  class="bg-ink text-cream pointer-events-none fixed inset-0 z-[250] hidden flex-col items-center justify-center"
+  class="gh-intro bg-ink fixed inset-0 z-[250] hidden overflow-hidden"
+  style={`--wm:url("${wordmarkUrl}")`}
 >
-  <Image
-    src={wordmark}
-    alt=""
-    width={390}
-    data-intro-mark
-    class="w-[min(64vw,920px)] brightness-0 invert-[0.97]"
-    loading="eager"
-  />
-  <span data-intro-hint class="eyebrow text-beige absolute bottom-[clamp(28px,6vh,56px)]">
+  <video
+    data-intro-video
+    muted
+    loop
+    playsinline
+    preload="none"
+    poster="/media/hero-reel.jpg"
+    aria-hidden="true"
+    tabindex="-1"
+    class="absolute -inset-10 size-[calc(100%+80px)] max-w-none object-cover object-[center_40%]"
+  ></video>
+  <div
+    data-intro-fill
+    aria-hidden="true"
+    class="bg-sand absolute inset-0 will-change-[opacity]"
+  ></div>
+  <div data-intro-ink aria-hidden="true" class="gh-intro-ink bg-ink absolute inset-0"></div>
+  <p
+    data-intro-hint
+    aria-hidden="true"
+    class="gh-intro-hint text-sand absolute bottom-[clamp(84px,12vh,110px)] sm:bottom-[clamp(28px,6vh,56px)] left-1/2 m-0 -translate-x-1/2 text-[14.5px] font-medium tracking-[0.24em] whitespace-nowrap uppercase"
+  >
     {t('Desliza para entrar')}
-  </span>
+  </p>
+  <button
+    type="button"
+    data-intro-skip
+    class="text-sand hover:text-cream focus-visible:text-cream absolute right-[clamp(16px,2vw,28px)] bottom-[clamp(20px,5vh,48px)] rounded-full border border-[rgb(234_224_209/0.35)] bg-[rgb(24_18_14/0.35)] px-4 py-2 text-[13.5px] font-medium tracking-[0.18em] uppercase backdrop-blur-[10px] transition-colors duration-300 hover:border-[rgb(234_224_209/0.7)]"
+  >
+    {t('Saltar intro')}
+  </button>
 </div>
 
 <style is:global>
   .gh-intro-on [data-intro] {
-    display: flex;
+    display: block;
+    touch-action: none;
+  }
+  /* Tinta con el logotipo recortado: el gradiente cubre todo y el SVG se excluye */
+  .gh-intro-ink {
+    -webkit-mask-image: linear-gradient(#000 0 0), var(--wm);
+    mask-image: linear-gradient(#000 0 0), var(--wm);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    -webkit-mask-size:
+      100% 100%,
+      0 0;
+    mask-size:
+      100% 100%,
+      0 0;
+    will-change: opacity;
+  }
+  .gh-intro-hint {
+    animation: gh-intro-hint 2.2s ease-in-out infinite;
+    transition: opacity 0.4s;
+  }
+  @keyframes gh-intro-hint {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .gh-intro-hint[data-off] {
+    animation: none;
+    opacity: 0;
   }
 </style>
 
 <script>
-  import { gsap } from '../../scripts/gsap'
-
-  const el = document.querySelector<HTMLElement>('[data-intro]')
   const root = document.documentElement
+  const el = document.querySelector<HTMLElement>('[data-intro]')
+
   if (el && root.classList.contains('gh-intro-on')) {
     try {
       sessionStorage.setItem('gh-intro', '1')
     } catch {}
-    const mark = el.querySelector('[data-intro-mark]')
-    const hint = el.querySelector('[data-intro-hint]')
-    gsap.from(mark, { opacity: 0, scale: 0.92, duration: 0.8, ease: 'power2.out' })
+    const video = el.querySelector<HTMLVideoElement>('[data-intro-video]')!
+    const fill = el.querySelector<HTMLElement>('[data-intro-fill]')!
+    const ink = el.querySelector<HTMLElement>('[data-intro-ink]')!
+    const hint = el.querySelector<HTMLElement>('[data-intro-hint]')!
+    const skip = el.querySelector<HTMLButtonElement>('[data-intro-skip]')!
+
+    video.src = '/media/hero-reel.mp4'
+    video.muted = true
+    video.play().catch(() => {})
+
+    // Geometría del diseño: el logotipo ocupa el 62 % del ancho (máx. 980 px) y
+    // el hueco crece alrededor del asta de la H (x = 836/1627 del logotipo).
+    const AR = 48 / 390.1
+    const PX = 836 / 1627
+    let W = 0
+    let H = 0
+    let w0 = 0
+    let h0 = 0
+    let mx = 0
+    let my = 0
+    let SMAX = 1
+    const measure = () => {
+      W = window.innerWidth
+      H = window.innerHeight
+      w0 = Math.min(W * 0.62, 980)
+      h0 = w0 * AR
+      mx = W / 2 - PX * w0
+      my = H / 2 - h0 / 2
+      const stemW = (w0 * 20) / 1627
+      SMAX = (Math.max(W, H) / stemW) * 1.35
+    }
+    measure()
+
+    let target = 0
+    let p = 0
+    let k = 0.12
     let done = false
-    const events = ['wheel', 'touchmove', 'keydown', 'scroll', 'pointerdown'] as const
-    const leave = () => {
+    let raf = 0
+    let hintOn = true
+    let lastFill = -1
+
+    const render = () => {
+      const S = Math.pow(SMAX, p)
+      const ms = `100% 100%, ${(w0 * S).toFixed(1)}px ${(h0 * S).toFixed(1)}px`
+      const mp = `0 0, ${(W / 2 + (mx - W / 2) * S).toFixed(1)}px ${(H / 2 + (my - H / 2) * S).toFixed(1)}px`
+      ink.style.setProperty('-webkit-mask-size', ms)
+      ink.style.maskSize = ms
+      ink.style.setProperty('-webkit-mask-position', mp)
+      ink.style.maskPosition = mp
+      ink.style.opacity = p > 0.94 ? String(Math.max(0, 1 - (p - 0.94) / 0.05)) : '1'
+      const f = Math.max(0, 1 - p / 0.1)
+      if (f !== lastFill) {
+        fill.style.opacity = String(f)
+        lastFill = f
+      }
+      if (hintOn && p > 0.02) {
+        hintOn = false
+        hint.setAttribute('data-off', '')
+      }
+    }
+
+    const loop = () => {
+      const prev = p
+      p += (target - p) * k
+      if (Math.abs(target - p) < 0.0008) p = target
+      if (p !== prev) render()
+      if (p >= 0.995) return finish()
+      raf = requestAnimationFrame(loop)
+    }
+
+    // Sin gestos durante 6 s, la entrada se abre sola
+    let idle = 0
+    const armIdle = () => {
+      window.clearTimeout(idle)
+      idle = window.setTimeout(() => open(0.07), 6000)
+    }
+    const push = (d: number) => {
+      if (done) return
+      target = Math.max(0, Math.min(1, target + d))
+      armIdle()
+    }
+    /** Abre del todo, con una curva más rápida (saltar) */
+    const open = (speed = 0.16) => {
+      if (done) return
+      k = speed
+      target = 1
+    }
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      const unit = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? H : 1
+      push((e.deltaY * unit) / 1800)
+    }
+    let ty: number | null = null
+    const onTouchStart = (e: TouchEvent) => {
+      ty = e.touches[0]?.clientY ?? null
+    }
+    const onTouchMove = (e: TouchEvent) => {
+      if ((e.target as Element).closest('[data-intro-skip]')) return
+      e.preventDefault()
+      const y = e.touches[0]?.clientY
+      if (ty === null || y === undefined) return
+      push((ty - y) / 700)
+      ty = y
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || (e.key === 'Enter' && e.target !== skip)) {
+        e.preventDefault()
+        open()
+      } else if (['ArrowDown', 'PageDown', ' ', 'End'].includes(e.key) && e.target !== skip) {
+        e.preventDefault()
+        push(0.25)
+      } else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key)) {
+        e.preventDefault()
+        push(-0.25)
+      }
+    }
+    // Si algo desplaza la página (barra de desplazamiento), se sale enseguida
+    const onScroll = () => {
+      if (window.scrollY > 2) open(0.3)
+    }
+    const onResize = () => {
+      measure()
+      render()
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: false, capture: true })
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('keydown', onKey, true)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
+    skip.addEventListener('click', () => open())
+
+    const cleanup = () => {
+      window.clearTimeout(idle)
+      window.removeEventListener('wheel', onWheel, { capture: true })
+      window.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
+    }
+
+    function finish() {
       if (done) return
       done = true
-      events.forEach((e) => window.removeEventListener(e, leave))
-      gsap
-        .timeline({ onComplete: () => root.classList.remove('gh-intro-on') })
-        .to(hint, { opacity: 0, duration: 0.25 }, 0)
-        .to(mark, { scale: 14, duration: 1.1, ease: 'power3.in' }, 0)
-        .to(el, { opacity: 0, duration: 0.55, ease: 'power1.in' }, 0.5)
+      cancelAnimationFrame(raf)
+      cleanup()
+      ink.remove()
+      hint.remove()
+      fill.remove()
+      skip.remove()
+
+      // En pantallas medianas y grandes el vídeo se desenfoca hasta coincidir con
+      // el fondo difuminado de la primera pantalla; en móvil ya es el mismo plano.
+      const framed = window.matchMedia('(min-width: 768px)').matches
+      const blur = video.animate(
+        [
+          { filter: 'blur(0px) brightness(1)' },
+          { filter: framed ? 'blur(28px) brightness(.7)' : 'blur(0px) brightness(1)' },
+        ],
+        { duration: framed ? 900 : 350, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' },
+      )
+      blur.onfinish = () => {
+        window.dispatchEvent(new Event('gh:intro-reveal'))
+        const out = el!.animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: 700,
+          easing: 'ease',
+          fill: 'forwards',
+        })
+        out.onfinish = () => {
+          video.pause()
+          video.removeAttribute('src')
+          video.load()
+          el!.remove()
+          root.classList.remove('gh-intro-on')
+          window.dispatchEvent(new Event('gh:intro-done'))
+        }
+      }
     }
-    events.forEach((e) => window.addEventListener(e, leave, { passive: true, once: true }))
-    window.setTimeout(leave, 2200)
+
+    armIdle()
+    render()
+    raf = requestAnimationFrame(loop)
+  } else {
+    el?.remove()
   }
 </script>

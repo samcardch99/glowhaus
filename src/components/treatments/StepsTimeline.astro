@@ -2,9 +2,14 @@
 import type { Step } from '../../data/treatments'
 import { useT, type Lang } from '../../i18n'
 
-// Línea de tiempo de 4 pasos. La línea dorada se llena con el scroll (GSAP scrub)
-// y cada paso se enciende al alcanzarlo. Sin JS o con movimiento reducido, todo
-// se ve completo.
+// Línea de tiempo de los pasos, como en el diseño pero sin «atascos»:
+// - Escritorio (≥1024px): la sección se queda fija (sticky) mientras se recorre
+//   un tramo de scroll proporcional al número de pasos; cada tramo enciende un
+//   paso. Con rueda de ratón, cada golpe avanza exactamente un paso; con
+//   teclado, trackpad o barra, el scroll se ajusta al paso más cercano.
+// - Móvil: cada paso tiene su barra superior, que se llena al cruzar el 60% de
+//   la pantalla.
+// Sin JS o con movimiento reducido, todo se ve completo.
 interface Props {
   lang: Lang
   title: string
@@ -19,27 +24,33 @@ const t = useT(lang)
   data-steps
   class="relative z-0 flex items-center lg:sticky lg:top-0 lg:min-h-screen"
 >
-  <div class="px-gutter flex w-full flex-col gap-[clamp(44px,8vh,88px)] pt-[clamp(64px,10vh,120px)] pb-[clamp(140px,22vh,220px)]">
-    <h2 data-reveal class="font-display text-brown m-0 text-[clamp(36px,5vw,72px)] leading-[1.04]">
+  <div class="px-gutter flex w-full flex-col gap-[clamp(44px,8vh,88px)] pt-[clamp(64px,10vh,120px)] pb-[clamp(96px,16vh,200px)]">
+    <h2 data-wipe class="font-display text-brown m-0 text-[clamp(36px,5vw,72px)] leading-[1.04]">
       {t(title)}
     </h2>
-    <div data-tl class="relative">
+    <div data-tl data-reveal="solo" data-delay="250" class="relative">
       <div
         aria-hidden="true"
-        class="bg-beige pointer-events-none absolute top-0 bottom-0 left-[6px] w-0.5 rounded-sm lg:right-0 lg:bottom-auto lg:left-0 lg:h-0.5 lg:w-auto"
+        class="bg-beige pointer-events-none absolute inset-x-0 top-0 hidden h-0.5 rounded-sm lg:block"
       >
         <div data-tl-fill class="tl-fill bg-gold absolute inset-0 rounded-sm"></div>
       </div>
-      <ol class="m-0 grid list-none grid-cols-1 gap-0 p-0 lg:grid-cols-4">
+      <ol class="m-0 grid list-none grid-cols-1 gap-x-0 gap-y-10 p-0 min-[700px]:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">
         {steps.map((s, i) => (
           <li
             data-tl-step
-            class="tl-step relative flex flex-col gap-4 pt-0 pr-7 pb-10 pl-10 lg:pt-[clamp(28px,4vh,44px)] lg:pb-2 lg:pl-0"
+            class="tl-step relative flex flex-col gap-4 pt-[clamp(28px,4vh,44px)] pr-7 pb-2"
           >
+            <span
+              aria-hidden="true"
+              class="tl-bar bg-beige pointer-events-none absolute inset-x-0 top-0 h-0.5 overflow-hidden rounded-sm lg:hidden"
+            >
+              <span class="tl-bar-fill bg-gold absolute inset-0 rounded-sm" />
+            </span>
             <span
               data-tl-dot
               aria-hidden="true"
-              class="tl-dot border-beige bg-sand absolute top-1 left-0 size-3.5 rounded-full border-2 lg:-top-1.5"
+              class="tl-dot border-beige bg-sand absolute -top-1.5 left-0 size-3.5 rounded-full border-2"
             />
             <span
               aria-hidden="true"
@@ -55,21 +66,30 @@ const t = useT(lang)
     </div>
   </div>
 </section>
+<!-- Tramo de scroll durante el que la sección sigue fija (solo escritorio con JS) -->
+<div
+  data-steps-run
+  aria-hidden="true"
+  class="steps-run pointer-events-none hidden"
+  style={`--n:${steps.length}`}
+></div>
 
 <style>
   /* Estado inicial solo con JS: sin él, la línea está llena y los pasos encendidos */
+  .tl-step {
+    transition: opacity 0.45s var(--ease-glow);
+  }
   :global(.js) .tl-step {
     opacity: 0.35;
-    transition: opacity 0.45s;
   }
   :global(.js) .tl-step[data-on] {
     opacity: 1;
   }
   .tl-dot {
     transition:
-      background 0.35s,
+      background-color 0.35s,
       border-color 0.35s,
-      transform 0.35s;
+      transform 0.35s var(--ease-glow);
   }
   :global(.js) .tl-step[data-on] .tl-dot,
   :global(html:not(.js)) .tl-dot {
@@ -77,35 +97,64 @@ const t = useT(lang)
     border-color: var(--color-gold);
     transform: scale(1.15);
   }
+  .tl-fill,
+  .tl-bar-fill {
+    transform-origin: 0 50%;
+  }
   .tl-fill {
-    transform-origin: 0 0;
+    transition: transform 0.55s var(--ease-swift);
   }
   :global(.js) .tl-fill {
-    transform: scaleY(var(--p, 0));
+    transform: scaleX(var(--fill, 0));
+  }
+  .tl-bar-fill {
+    transition: transform 0.7s var(--ease-swift);
+  }
+  :global(.js) .tl-step:not([data-on]) .tl-bar-fill {
+    transform: scaleX(0);
   }
   @media (min-width: 1024px) {
-    :global(.js) .tl-fill {
-      transform: scaleX(var(--p, 0));
+    :global(.js) .steps-run {
+      display: block;
+      height: calc((var(--n) - 1) * 50vh);
     }
   }
   @media (prefers-reduced-motion: reduce) {
     :global(.js) .tl-step {
       opacity: 1;
     }
-    :global(.js) .tl-fill {
+    :global(.js) .tl-step .tl-dot {
+      background: var(--color-gold);
+      border-color: var(--color-gold);
+      transform: scale(1.15);
+    }
+    :global(.js) .tl-fill,
+    :global(.js) .tl-step .tl-bar-fill {
       transform: none;
+    }
+    :global(.js) .steps-run {
+      display: none;
     }
   }
 </style>
 
 <script>
-  import { gsap, ScrollTrigger, prefersReducedMotion } from '../../scripts/gsap'
+  import {
+    gsap,
+    ScrollTrigger,
+    prefersReducedMotion,
+    isDesktopPointer,
+    scrollToY,
+  } from '../../scripts/gsap'
+
+  const reduce = prefersReducedMotion()
 
   document.querySelectorAll<HTMLElement>('[data-steps]').forEach((section) => {
     const tl = section.querySelector<HTMLElement>('[data-tl]')
-    const fill = section.querySelector<HTMLElement>('[data-tl-fill]')
+    const run = section.nextElementSibling
     const steps = Array.from(section.querySelectorAll<HTMLElement>('[data-tl-step]'))
-    if (!tl || !fill) return
+    const N = steps.length
+    if (!tl || !N || !(run instanceof HTMLElement) || !run.hasAttribute('data-steps-run')) return
 
     // Si la sección es más alta que la pantalla, se pega por abajo para que se lea entera
     const fit = () => {
@@ -116,41 +165,146 @@ const t = useT(lang)
     fit()
     window.addEventListener('resize', fit)
 
-    if (prefersReducedMotion()) {
+    if (reduce) {
       steps.forEach((s) => s.setAttribute('data-on', ''))
       return
     }
 
-    const update = (p: number) => {
-      tl.style.setProperty('--p', String(p))
-      steps.forEach((s, i) =>
-        s.toggleAttribute('data-on', p >= i / steps.length + 0.02 || p >= 0.999),
-      )
+    // Enciende los n primeros pasos y lleva la línea dorada al punto del último
+    let lit = -1
+    const paint = (n: number) => {
+      n = Math.max(0, Math.min(N, n))
+      if (n === lit) return
+      lit = n
+      steps.forEach((s, i) => s.toggleAttribute('data-on', i < n))
+      let f = 0
+      if (n >= N) f = 1
+      else if (n > 0) {
+        const r = tl.getBoundingClientRect()
+        const sr = steps[n - 1]!.getBoundingClientRect()
+        f = r.width ? (sr.left - r.left + 7) / r.width : 0
+      }
+      tl.style.setProperty('--fill', f.toFixed(4))
     }
-    update(0)
+    paint(0)
 
     const mm = gsap.matchMedia()
-    // Escritorio: línea horizontal, se llena mientras la sección sube hasta pegarse
+
+    // ---------- Escritorio: tramo fijo, un paso por golpe de rueda ----------
     mm.add('(min-width: 1024px)', () => {
-      ScrollTrigger.create({
+      // Posición de scroll en la que la sección queda fija y largo de cada paso
+      const range = () => {
+        // Se mide desde el tramo (no es sticky): vale aunque la sección esté fija
+        const top = run.getBoundingClientRect().top + window.scrollY - section.offsetHeight
+        const stickTop = parseFloat(section.style.top) || 0
+        const start = Math.round(top - stickTop)
+        const len = run.offsetHeight
+        return { start, len, step: N > 1 ? len / (N - 1) : len }
+      }
+      let R = range()
+      const litAt = (y: number) => {
+        if (y < R.start - window.innerHeight * 0.4) return 0
+        if (y < R.start) return 1
+        return 1 + Math.round((y - R.start) / R.step)
+      }
+
+      const st = ScrollTrigger.create({
         trigger: section,
-        start: 'top 70%',
-        end: 'top top',
-        scrub: 0.4,
-        onUpdate: (st) => update(st.progress),
-        onRefresh: (st) => update(st.progress),
+        start: () => R.start - window.innerHeight * 0.4,
+        end: () => R.start + R.len,
+        onRefreshInit: () => {
+          fit()
+          R = range()
+        },
+        onUpdate: () => paint(litAt(window.scrollY)),
+        onRefresh: () => {
+          lit = -1
+          paint(litAt(window.scrollY))
+        },
+        onLeave: () => paint(N),
+        onLeaveBack: () => paint(0),
       })
+
+      // Teclado, trackpad, barra o arrastre: el scroll se asienta en el paso más cercano
+      const snap = ScrollTrigger.create({
+        trigger: section,
+        start: () => R.start,
+        end: () => R.start + R.len,
+        snap: {
+          snapTo: N > 1 ? 1 / (N - 1) : 1,
+          duration: { min: 0.25, max: 0.55 },
+          delay: 0.12,
+          ease: 'swift',
+          inertia: false,
+        },
+      })
+
+      // Rueda de ratón: cada gesto avanza o retrocede exactamente un paso
+      let animating = false
+      let used = false
+      let acc = 0
+      let lastWheel = 0
+      const onWheel = (e: WheelEvent) => {
+        if (!isDesktopPointer() || e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return
+        if (document.documentElement.style.overflow === 'hidden') return
+        const y = window.scrollY
+        const dir = Math.sign(e.deltaY)
+        if (!dir) return
+        const { start, len, step } = R
+        const end = start + len
+        const approach = dir > 0 && y < start - 4 && y > start - window.innerHeight * 0.35
+        const inside = y >= start - 4 && y <= end + 4
+        if (!approach && !inside) return
+        // Al llegar al primer o al último paso, la rueda sigue de largo con normalidad
+        if (inside && !animating && dir < 0 && y <= start + 4) return
+        if (inside && !animating && dir > 0 && y >= end - 4) return
+        e.preventDefault()
+        const now = Date.now()
+        if (now - lastWheel > 260) {
+          used = false
+          acc = 0
+        }
+        lastWheel = now
+        if (animating || used) return
+        acc += e.deltaY
+        if (Math.abs(acc) < 24) return
+        acc = 0
+        used = true
+        let target: number
+        if (approach) target = start
+        else {
+          const k = (y - start) / step
+          const next = dir > 0 ? Math.floor(k + 0.02) + 1 : Math.ceil(k - 0.02) - 1
+          target = start + Math.max(0, Math.min(N - 1, next)) * step
+        }
+        animating = true
+        void scrollToY(Math.round(target), 560).then(() => (animating = false))
+      }
+      window.addEventListener('wheel', onWheel, { passive: false })
+
+      return () => {
+        st.kill()
+        snap.kill()
+        window.removeEventListener('wheel', onWheel)
+      }
     })
-    // Móvil: línea vertical, avanza con la lista
+
+    // ---------- Móvil y tableta: cada paso se enciende al cruzar el 60% ----------
     mm.add('(max-width: 1023px)', () => {
-      ScrollTrigger.create({
+      const count = () =>
+        steps.filter((s) => s.getBoundingClientRect().top < window.innerHeight * 0.6).length
+      const st = ScrollTrigger.create({
         trigger: tl,
-        start: 'top 75%',
-        end: 'bottom 60%',
-        scrub: 0.4,
-        onUpdate: (st) => update(st.progress),
-        onRefresh: (st) => update(st.progress),
+        start: 'top bottom',
+        end: 'bottom top',
+        onUpdate: () => paint(count()),
+        onToggle: () => paint(count()),
+        onRefresh: () => {
+          lit = -1
+          paint(count())
+        },
       })
+      return () => st.kill()
     })
   })
 </script>

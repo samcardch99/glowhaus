@@ -30,10 +30,10 @@ const t = useT(lang)
   <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] items-stretch gap-5">
     {reviewColumns.map((col, ci) => (
       <div class="flex flex-col gap-5">
-        {col.map((r, k) => (
+        {col.map((r) => (
           <figure
             data-reveal
-            data-delay={String(300 + (ci * 2 + k) * 140)}
+            data-delay={String(ci * 160)}
             class="m-0 flex flex-[1_1_auto] flex-col justify-between gap-7 rounded-[20px] border border-[rgb(250_248_245/0.16)] bg-[rgb(250_248_245/0.07)] px-6 pt-6 pb-3 backdrop-blur-[14px] transition-colors duration-400 hover:bg-[rgb(250_248_245/0.11)]"
           >
             <div class="flex flex-col gap-3.5">
@@ -81,7 +81,7 @@ const t = useT(lang)
           </figure>
         ))}
         {ci === reviewColumns.length - 1 && (
-          <div data-reveal data-delay="1100">
+          <div data-reveal data-delay="420">
             <Button href={site.googleReviews} external class="min-w-[min(100%,200px)]">
               {t('Ver todas en Google')}
             </Button>

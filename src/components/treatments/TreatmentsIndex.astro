@@ -24,13 +24,17 @@ const MOBILE_MAX = 12
     <Button href={pathFor(lang, 'home')} back>
       {t('Atrás')}
     </Button>
-    <h1 data-reveal class="font-display m-0 text-[clamp(40px,5.4vw,80px)] leading-[1.04]">
+    <h1
+      data-words
+      data-wstep="28"
+      class="font-display m-0 text-[clamp(40px,5.4vw,80px)] leading-[1.04] text-balance"
+    >
       {t('Encuentra el tratamiento para ti')}
     </h1>
   </div>
   <p
-    data-reveal
-    data-delay="200"
+    data-reveal="solo"
+    data-delay="350"
     class="text-cream-3 m-0 max-w-[440px] justify-self-end text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.65] max-[899px]:justify-self-start"
   >
     {t(
@@ -58,6 +62,7 @@ const MOBILE_MAX = 12
         <>
           <article
             data-stack
+            data-slide
             data-theme="overlay"
             aria-labelledby={`tx-slide-${i}`}
             class="bg-ink text-cream sticky top-0 h-[calc(100vh+28px)] origin-top overflow-hidden will-change-[transform,filter] max-[759px]:h-auto max-[759px]:min-h-[calc(100svh+28px)]"
@@ -73,6 +78,7 @@ const MOBILE_MAX = 12
                 playsinline
                 preload="none"
                 aria-hidden="true"
+                data-slide-media
                 class="absolute inset-0 size-full object-cover"
               />
             ) : (
@@ -81,6 +87,7 @@ const MOBILE_MAX = 12
                 alt=""
                 widths={[640, 1024, 1600, 2200]}
                 sizes="100vw"
+                data-slide-media
                 class="absolute inset-0 size-full object-cover"
                 style={c.imgPos ? `object-position:${c.imgPos}` : undefined}
               />
@@ -92,9 +99,12 @@ const MOBILE_MAX = 12
 
             <div class="px-gutter relative flex h-full flex-col justify-between gap-[clamp(32px,6vh,64px)] pt-[clamp(120px,16vh,150px)] pb-[clamp(80px,9vh,104px)]">
               <div class="flex flex-1 flex-col items-start justify-center gap-3.5">
-                <span class="eyebrow text-beige">{t('CATEGORÍA ' + catNumber(i))}</span>
+                <span data-slide-part class="eyebrow text-beige">
+                  {t('CATEGORÍA ' + catNumber(i))}
+                </span>
                 <h2
                   id={`tx-slide-${i}`}
+                  data-slide-part
                   class="font-display m-0 max-w-[832px] text-[clamp(30px,4vw,60px)] leading-[1.05]"
                 >
                   {t(c.name)}
@@ -102,13 +112,17 @@ const MOBILE_MAX = 12
                 <Button
                   href={treatmentPath(lang, c.slug[lang])}
                   class="mt-1.5 min-w-[min(100%,200px)]"
+                  data-slide-part
                 >
                   {t('Ver y reservar')}
                   <span class="sr-only">: {t(c.name)}</span>
                 </Button>
               </div>
 
-              <div class="grid grid-cols-1 gap-x-12 gap-y-6 rounded-[14px] min-[760px]:grid-cols-[minmax(0,1fr)_auto] min-[1200px]:grid-cols-[minmax(0,0.85fr)_auto_minmax(0,2.6fr)] border border-[rgb(250_248_245/0.18)] bg-[rgb(24_18_14/0.28)] p-[clamp(18px,2.4vw,32px)] backdrop-blur-[16px]">
+              <div
+                data-slide-part
+                class="grid grid-cols-1 gap-x-12 gap-y-6 rounded-[14px] min-[760px]:grid-cols-[minmax(0,1fr)_auto] min-[1200px]:grid-cols-[minmax(0,0.85fr)_auto_minmax(0,2.6fr)] border border-[rgb(250_248_245/0.18)] bg-[rgb(24_18_14/0.28)] p-[clamp(18px,2.4vw,32px)] backdrop-blur-[16px]"
+              >
                 <div class="flex flex-col gap-2 max-[759px]:hidden">
                   <span class="label-caps text-beige text-[14px] tracking-[0.2em]">
                     {t('DESCRIPCIÓN')}
@@ -187,7 +201,7 @@ const MOBILE_MAX = 12
     class="bg-sand text-ink px-gutter grid grid-cols-[repeat(auto-fill,minmax(min(100%,360px),1fr))] gap-6 pt-16 pb-[120px]"
   >
     {treatments.map((c, i) => (
-      <article class="flex flex-col gap-1.5">
+      <article data-list-card class="flex flex-col gap-1.5">
         <div class="flex items-baseline justify-between gap-3 rounded-xl border border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)] px-4 py-3 text-[17.5px] font-medium">
           <span>{t('Categoría ' + catNumber(i))}</span>
           <span class="text-gold-dark">{t(countLabel(c))}</span>
@@ -238,19 +252,24 @@ const MOBILE_MAX = 12
     role="group"
     aria-label={t('Vista de los tratamientos')}
     data-view-switch
-    class="fixed bottom-5 left-1/2 z-[28] hidden -translate-x-1/2 gap-1 rounded-[14px] bg-[rgb(24_18_14/0.82)] p-1 backdrop-blur-[10px] [.js_&]:flex"
+    class="view-switch fixed bottom-5 left-1/2 z-[28] hidden -translate-x-1/2 gap-1 rounded-[14px] bg-[rgb(24_18_14/0.82)] p-1 backdrop-blur-[10px] [.js_&]:flex"
   >
+    <span
+      data-view-thumb
+      aria-hidden="true"
+      class="bg-cream pointer-events-none absolute top-1 bottom-1 left-0 rounded-[10px]"
+    ></span>
     <button
       type="button"
       data-view-btn="scroll"
-      class="rounded-[14px] px-4 py-[9px] text-[14.5px] font-semibold max-[759px]:rounded-lg"
+      class="relative rounded-[10px] px-4 py-[9px] text-[14.5px] font-semibold"
     >
       {t('Desplazar')}
     </button>
     <button
       type="button"
       data-view-btn="list"
-      class="rounded-[14px] px-4 py-[9px] text-[14.5px] font-semibold max-[759px]:rounded-lg"
+      class="relative rounded-[10px] px-4 py-[9px] text-[14.5px] font-semibold"
     >
       {t('Lista')}
     </button>
@@ -264,44 +283,187 @@ const MOBILE_MAX = 12
   }
   [data-view-btn] {
     color: var(--color-cream);
-    background: transparent;
-    transition:
-      background 0.3s,
-      color 0.3s;
+    transition: color 0.35s var(--ease-glow);
   }
   [data-view-btn][aria-pressed='true'] {
-    background: var(--color-cream);
     color: var(--color-ink);
+  }
+  [data-view-thumb] {
+    transition:
+      transform 0.45s var(--ease-swift),
+      width 0.45s var(--ease-swift);
+  }
+  /* Contenido de cada diapositiva: oculto hasta que llega (solo con JS) */
+  :global(.js) [data-slide-part] {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) [data-slide-part] {
+      opacity: 1;
+    }
   }
 </style>
 
 <script>
-  import { ScrollTrigger } from '../../scripts/gsap'
+  import { gsap, ScrollTrigger, prefersReducedMotion } from '../../scripts/gsap'
 
+  const reduce = prefersReducedMotion()
   const root = document.getElementById('tx-views')
-  const btns = document.querySelectorAll<HTMLButtonElement>('[data-view-btn]')
-  const sync = () =>
+  const btns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-view-btn]'))
+  const thumb = document.querySelector<HTMLElement>('[data-view-thumb]')
+  const pane = (v: string) => root?.querySelector<HTMLElement>(`[data-view-pane="${v}"]`)
+
+  // ---------- Conmutador: el fondo claro se desliza hasta la vista activa ----------
+  const sync = () => {
     btns.forEach((b) =>
       b.setAttribute('aria-pressed', String(b.dataset.viewBtn === root?.dataset.view)),
     )
+    const on = btns.find((b) => b.dataset.viewBtn === root?.dataset.view)
+    if (on && thumb) {
+      thumb.style.width = on.offsetWidth + 'px'
+      thumb.style.transform = `translateX(${on.offsetLeft}px)`
+    }
+  }
+  if (thumb) thumb.style.transition = 'none'
   sync()
-  // Las animaciones apiladas se midieron con la vista visible en la carga
-  if (root?.dataset.view === 'list') requestAnimationFrame(() => ScrollTrigger.refresh())
+  void document.fonts.ready.then(() => {
+    sync()
+    requestAnimationFrame(() => thumb?.style.removeProperty('transition'))
+  })
+  window.addEventListener('resize', sync)
 
+  // ---------- Diapositivas: el contenido entra al llegar y el fondo se asienta ----------
+  const slides = gsap.utils.toArray<HTMLElement>('[data-slide]')
+  if (!reduce)
+    slides.forEach((slide) => {
+      const parts = Array.from(slide.querySelectorAll<HTMLElement>('[data-slide-part]'))
+      const media = slide.querySelector<HTMLElement>('[data-slide-media]')
+      let tl: gsap.core.Timeline | null = null
+      const play = () => {
+        tl?.kill()
+        tl = gsap.timeline()
+        if (media)
+          tl.fromTo(
+            media,
+            { scale: 1.06 },
+            { scale: 1, duration: 1.6, ease: 'glow', clearProps: 'transform' },
+            0,
+          )
+        tl.fromTo(
+          parts,
+          { opacity: 0, y: 56, scale: 0.96 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            ease: 'glow',
+            stagger: 0.22,
+            clearProps: 'transform',
+          },
+          0.1,
+        )
+      }
+      const hide = () => {
+        tl?.kill()
+        tl = null
+        gsap.set(parts, { opacity: 0 })
+      }
+      ScrollTrigger.create({
+        trigger: slide,
+        start: 'top 70%',
+        onEnter: play,
+        // Al volver a subir por encima, se prepara para entrar otra vez
+        onLeaveBack: hide,
+      })
+    })
+
+  // ---------- Vista de lista: tarjetas en cascada al aparecer ----------
+  let listReady = false
+  const initList = () => {
+    if (listReady || reduce) return
+    listReady = true
+    const cards = gsap.utils.toArray<HTMLElement>('[data-list-card]')
+    gsap.set(cards, { opacity: 0, y: 48 })
+    ScrollTrigger.batch(cards, {
+      start: 'top 92%',
+      once: true,
+      onEnter: (batch) =>
+        gsap.to(batch, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'glow',
+          stagger: 0.1,
+          clearProps: 'transform',
+        }),
+    })
+  }
+  if (root?.dataset.view === 'list') {
+    initList()
+    requestAnimationFrame(() => ScrollTrigger.refresh())
+  }
+
+  // ---------- Cambio de vista: fundido, salto de scroll y entrada escalonada ----------
+  let switching = false
   btns.forEach((b) =>
     b.addEventListener('click', () => {
-      if (!root || root.dataset.view === b.dataset.viewBtn) return
       const view = b.dataset.viewBtn ?? 'scroll'
-      root.dataset.view = view
+      if (!root || switching || root.dataset.view === view) return
       try {
         localStorage.setItem('gh-tx-view', view)
       } catch {
         /* sin almacenamiento: la elección dura lo que la visita */
       }
-      sync()
-      const top = root.getBoundingClientRect().top + window.scrollY
-      if (window.scrollY > top) window.scrollTo({ top: Math.max(0, top - 96) })
-      ScrollTrigger.refresh()
+      const outPane = pane(root.dataset.view ?? 'scroll')
+      const inPane = pane(view)
+      const swap = () => {
+        root.dataset.view = view
+        sync()
+        // Si estaba más abajo del comienzo de las vistas, se vuelve a él
+        // (la lista, con sus tarjetas por debajo de la cabecera, que reaparece al subir)
+        const top = root.getBoundingClientRect().top + window.scrollY
+        const headerH = document.getElementById('gh-header')?.offsetHeight ?? 90
+        const dest = view === 'list' ? Math.max(0, top + 40 - headerH) : top
+        if (window.scrollY > dest) window.scrollTo(0, dest)
+        if (view === 'list') initList()
+        ScrollTrigger.refresh()
+      }
+      if (reduce || !outPane || !inPane) {
+        swap()
+        return
+      }
+      switching = true
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+      if (thumb) {
+        thumb.style.width = b.offsetWidth + 'px'
+        thumb.style.transform = `translateX(${b.offsetLeft}px)`
+      }
+      gsap.to(outPane, {
+        opacity: 0,
+        y: -16,
+        filter: 'blur(4px)',
+        duration: 0.35,
+        ease: 'swift',
+        onComplete: () => {
+          gsap.set(outPane, { clearProps: 'opacity,transform,filter' })
+          swap()
+          gsap.fromTo(
+            inPane,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: 'glow',
+              clearProps: 'opacity,transform',
+              onComplete: () => {
+                switching = false
+              },
+            },
+          )
+        },
+      })
     }),
   )
 </script>

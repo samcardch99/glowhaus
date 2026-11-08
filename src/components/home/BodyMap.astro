@@ -9,6 +9,10 @@ import { treatmentPath, useT, type Lang } from '../../i18n'
 
 // «Dónde actúa cada tratamiento»: once botones y un maniquí con puntos dorados.
 // Las categorías de rostro amplían la cara. Sin JS se ve la categoría inicial.
+// En escritorio (≥1100 px), al entrar la sección los paneles de texto del
+// carrusel de arriba vuelan hasta su hueco (ligado al scroll y reversible) y
+// al posarse se convierten en los botones reales. En pantallas menores los
+// botones suben escalonados con el scroll.
 interface Props {
   lang: Lang
 }
@@ -39,9 +43,10 @@ const items = treatments.map((c, i) => ({
 
   <div class="order-3 flex flex-col gap-5 lg:order-none lg:col-start-1 lg:row-span-2 lg:row-start-1">
     <div
+      data-body-grid
       role="group"
       aria-label={t('Categorías de tratamientos')}
-      class="grid grid-cols-2 gap-2.5 sm:gap-3"
+      class="grid grid-cols-2 items-start gap-2.5 sm:gap-3"
     >
       {treatments.map((c, i) => (
         <button
@@ -49,12 +54,12 @@ const items = treatments.map((c, i) => ({
           data-body-btn={i}
           aria-pressed={i === START ? 'true' : 'false'}
           aria-controls="body-figure"
-          class="group aria-pressed:bg-gold-dark text-cream hover:bg-brown flex flex-col items-start gap-0 rounded-[10px] bg-[rgb(24_18_14/0.74)] px-4 py-3 sm:px-6 sm:py-4 text-left backdrop-blur-[16px] transition-colors duration-300"
+          class="body-slot text-cream flex flex-col items-start gap-0 rounded-lg border border-[rgb(250_248_245/0.16)] bg-[rgb(24_18_14/0.74)] px-4 pt-3.5 pb-4 text-left"
         >
-          <span class="text-[clamp(16px,1.6vw,23.5px)] leading-[1.2] font-semibold">
+          <span class="text-[clamp(16px,1.9vw,20px)] leading-[1.15] font-semibold min-[1100px]:text-[clamp(20px,1.7vw,23.5px)]">
             {t(c.name)}
           </span>
-          <span class="grid grid-rows-[0fr] opacity-0 max-sm:hidden transition-[grid-template-rows,opacity] duration-500 ease-(--ease-glow) group-aria-pressed:grid-rows-[1fr] group-aria-pressed:opacity-100">
+          <span class="slot-desc grid max-sm:hidden">
             <span class="overflow-hidden">
               <span class="text-cream-2 block pt-2 text-[17px] leading-[1.55] text-pretty">
                 {t(c.short)}
@@ -81,7 +86,7 @@ const items = treatments.map((c, i) => ({
     data-reveal
     data-delay="200"
     data-face={startFace ? '' : undefined}
-    class="body-fig relative order-2 aspect-[2/3] h-[min(52vh,520px)] w-auto max-w-full lg:order-none justify-self-center overflow-hidden lg:col-start-2 lg:h-[min(78vh,780px)] lg:w-auto lg:max-w-full"
+    class="body-fig relative order-2 aspect-[2/3] h-[min(52vh,520px)] w-auto max-w-full justify-self-center overflow-hidden lg:order-none lg:col-start-2 lg:h-[min(78vh,780px)] lg:w-auto lg:max-w-full"
   >
     <div class="body-stage absolute inset-0">
       <Image
@@ -150,12 +155,52 @@ const items = treatments.map((c, i) => ({
       transform: translate(-50%, -50%) scale(1);
     }
   }
+
+  /* Botones: el activo se tiñe de dorado (.45 s, como en el diseño) y despliega
+     su descripción, pero solo cuando los paneles ya se han posado. */
+  .body-slot {
+    transition: background-color 0.45s ease;
+  }
+  .body-slot[aria-pressed='true'] {
+    background-color: var(--color-gold-dark);
+  }
+  .slot-desc {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.6s var(--ease-glow) 0.1s,
+      opacity 0.5s 0.15s;
+  }
+  [aria-pressed='true'] > .slot-desc {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  @media (hover: hover) and (min-width: 1100px) {
+    .body-slot:hover {
+      background-color: var(--color-gold-dark);
+    }
+  }
+  /* Mientras vuelan: todos iguales y sin transiciones que muevan los huecos */
+  [data-flying] .body-slot,
+  [data-flying] .body-slot:hover {
+    background-color: rgb(24 18 14 / 0.74);
+    transition: none;
+  }
+  [data-flying] .slot-desc {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: none;
+  }
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-body]').forEach((root) => {
+  import { gsap, ScrollTrigger, prefersReducedMotion, easeInOutCubic } from '../../scripts/gsap'
+
+  const root = document.querySelector<HTMLElement>('[data-body]')
+  if (root) {
     const fig = root.querySelector<HTMLElement>('.body-fig')
-    const btns = root.querySelectorAll<HTMLButtonElement>('[data-body-btn]')
+    const grid = root.querySelector<HTMLElement>('[data-body-grid]')!
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-body-btn]')]
     const groups = root.querySelectorAll<HTMLElement>('[data-body-dots]')
     const link = root.querySelector<HTMLAnchorElement>('[data-body-link]')
     const name = root.querySelector<HTMLElement>('[data-body-name]')
@@ -165,16 +210,267 @@ const items = treatments.map((c, i) => ({
       name: string
       face: boolean
     }[]
-    btns.forEach((b, i) =>
-      b.addEventListener('click', () => {
-        btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)))
-        groups.forEach((g, k) => (g.hidden = k !== i))
-        const d = data[i]
-        if (!d) return
-        fig?.toggleAttribute('data-face', d.face)
-        if (link) link.href = d.href
-        if (name) name.textContent = d.name
-      }),
-    )
-  })
+
+    // ---------- Selección y vista previa ----------
+    let picked = btns.findIndex((b) => b.getAttribute('aria-pressed') === 'true')
+    let shown = picked
+    const showFigure = (i: number) => {
+      if (i === shown) return
+      shown = i
+      groups.forEach((g, k) => (g.hidden = k !== i))
+      fig?.toggleAttribute('data-face', data[i]?.face ?? false)
+    }
+    const pick = (i: number) => {
+      picked = i
+      btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)))
+      showFigure(i)
+      const d = data[i]
+      if (!d) return
+      if (link) link.href = d.href
+      if (name) name.textContent = d.name
+    }
+    btns.forEach((b, i) => {
+      b.addEventListener('click', () => pick(i))
+      // Escritorio: pasar el ratón enseña sus zonas sin cambiar la selección
+      b.addEventListener('pointerenter', (e) => {
+        if (
+          e.pointerType === 'mouse' &&
+          window.innerWidth >= 1100 &&
+          !root.hasAttribute('data-flying')
+        )
+          showFigure(i)
+      })
+    })
+    grid.addEventListener('pointerleave', () => showFigure(picked))
+
+    if (!prefersReducedMotion()) {
+      const mm = gsap.matchMedia()
+      mm.add('(min-width: 1100px)', () => flight(root, grid, btns))
+      mm.add('(max-width: 1099.98px)', () => {
+        const tw = gsap.fromTo(
+          btns,
+          { y: 56, opacity: 0, scale: 0.94 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            ease: 'none',
+            stagger: 0.06,
+            scrollTrigger: { trigger: grid, start: 'top 98%', end: 'top 40%', scrub: 0.6 },
+          },
+        )
+        return () => {
+          tw.scrollTrigger?.kill()
+          tw.kill()
+          gsap.set(btns, { clearProps: 'transform,opacity' })
+        }
+      })
+    }
+  }
+
+  // ---------- Vuelo de los paneles del carrusel a los huecos (escritorio) ----------
+  // Progreso del diseño: p = (vh·.7 − top) / (vh·.58), con un escalonado de
+  // .025 por panel y easeInOutCubic. Las posiciones de origen y destino se miden
+  // una sola vez (las dos secciones van en el flujo, así que su distancia no
+  // cambia con el scroll); en cada fotograma solo se escriben estilos.
+  function flight(sec: HTMLElement, grid: HTMLElement, btns: HTMLButtonElement[]) {
+    const track = document.querySelector<HTMLElement>('[data-cat-track]')
+    if (!track) return
+    interface Item {
+      btn: HTMLButtonElement
+      caps: HTMLElement[]
+      clone: HTMLElement
+      fades: HTMLElement[]
+      under: HTMLElement
+      x0: number
+      y0: number
+      w0: number
+      h0: number
+      s0: number
+      x1: number
+      y1: number
+      w1: number
+      h1: number
+      state: number
+    }
+    const n = btns.length
+    const layer = document.createElement('div')
+    layer.setAttribute('aria-hidden', 'true')
+    layer.style.cssText =
+      'position:absolute;left:0;top:0;width:0;height:0;z-index:5;pointer-events:none'
+    sec.append(layer)
+
+    let items: Item[] | null = null
+    let dirty = true
+    let secTop = 0
+    let vh = window.innerHeight
+    let forced = false
+    let raf = 0
+    let lastP = -1
+
+    const capsFor = (i: number) => [
+      ...track.querySelectorAll<HTMLElement>(`[data-car="${i}"] [data-car-cap]`),
+    ]
+
+    const measure = () => {
+      // Huecos medidos con todos los botones plegados
+      const wasFlying = sec.hasAttribute('data-flying')
+      sec.setAttribute('data-flying', '')
+      vh = window.innerHeight
+      const sr = sec.getBoundingClientRect()
+      secTop = sr.top + window.scrollY
+      const mid = window.innerWidth / 2
+      const geo = btns.map((btn, i) => {
+        const caps = capsFor(i)
+        let cap = caps[0]!
+        let rect = cap.getBoundingClientRect()
+        let bd = Infinity
+        caps.forEach((c) => {
+          const r = c.getBoundingClientRect()
+          const d = Math.abs(r.left + r.width / 2 - mid)
+          if (d < bd) {
+            bd = d
+            cap = c
+            rect = r
+          }
+        })
+        const b = btn.getBoundingClientRect()
+        const desc = cap.querySelector<HTMLElement>('.car-desc')
+        const dcs = desc ? getComputedStyle(desc) : null
+        return {
+          btn,
+          caps,
+          cap,
+          desc: dcs ? { rows: dcs.gridTemplateRows, op: dcs.opacity } : null,
+          x0: rect.left - sr.left,
+          y0: rect.top - sr.top,
+          w0: cap.offsetWidth,
+          h0: cap.offsetHeight,
+          s0: rect.width / (cap.offsetWidth || 1),
+          x1: b.left - sr.left,
+          y1: b.top - sr.top,
+          w1: b.width,
+          h1: b.height,
+        }
+      })
+      if (!wasFlying) sec.removeAttribute('data-flying')
+      // Escrituras: clones nuevos
+      items?.forEach((it) => it.clone.remove())
+      items = geo.map((g) => {
+        const clone = g.cap.cloneNode(true) as HTMLElement
+        clone.removeAttribute('data-car-cap')
+        clone.style.cssText =
+          'position:absolute;left:0;top:0;right:auto;bottom:auto;margin:0;box-sizing:border-box;' +
+          'overflow:hidden;transform-origin:0 0;visibility:hidden;will-change:transform;isolation:isolate;' +
+          'color:var(--color-cream)'
+        const d = clone.querySelector<HTMLElement>('.car-desc')
+        if (d && g.desc) {
+          d.style.transition = 'none'
+          d.style.gridTemplateRows = g.desc.rows
+          d.style.opacity = g.desc.op
+        }
+        const under = document.createElement('span')
+        under.style.cssText =
+          'position:absolute;inset:0;z-index:-1;background:rgb(24 18 14 / .55);opacity:0'
+        clone.prepend(under)
+        layer.append(clone)
+        const fades = [...clone.children].slice(2) as HTMLElement[]
+        return { ...g, clone, fades, under, state: -1 }
+      })
+      dirty = false
+    }
+
+    const setState = (it: Item, s: number) => {
+      if (it.state === s) return
+      it.state = s
+      it.clone.style.visibility = s === 1 ? 'visible' : 'hidden'
+      it.caps.forEach((c) => (c.style.visibility = s === 0 ? '' : 'hidden'))
+      it.btn.style.opacity = s === 2 ? '' : '0'
+    }
+
+    const tick = () => {
+      raf = 0
+      const top = secTop - window.scrollY
+      // Cerca de la sección el carrusel deja de avanzar solo (como en el diseño)
+      const near = top < vh * 0.92 && top > -sec.offsetHeight
+      if (near) {
+        if (track.dataset.hold === undefined) track.dataset.hold = ''
+      } else if (track.dataset.hold !== undefined) {
+        delete track.dataset.hold
+        dirty = true
+      }
+      let p = Math.max(0, Math.min(1, (vh * 0.7 - top) / (vh * 0.58)))
+      if (forced) p = 1
+      if (!near && p === 0 && lastP === 0 && items) return
+      if (dirty || !items) measure()
+      lastP = p
+      sec.toggleAttribute('data-flying', p < 1)
+      const span = 1 - 0.025 * (n - 1)
+      items!.forEach((it, i) => {
+        const pi = Math.max(0, Math.min(1, (p - i * 0.025) / span))
+        if (pi <= 0) return setState(it, 0)
+        if (pi >= 1) return setState(it, 2)
+        setState(it, 1)
+        const k = easeInOutCubic(pi)
+        const x = it.x0 + (it.x1 - it.x0) * k
+        const y = it.y0 + (it.y1 - it.y0) * k
+        const s = it.s0 + (1 - it.s0) * k
+        const st = it.clone.style
+        st.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${s.toFixed(4)})`
+        st.width = `${(it.w0 + (it.w1 - it.w0) * k).toFixed(1)}px`
+        st.height = `${(it.h0 + (it.h1 - it.h0) * k).toFixed(1)}px`
+        // Las filas secundarias se van en el primer tramo del vuelo; el panel se oscurece pronto
+        const f = String(Math.max(0, 1 - pi * 5))
+        it.fades.forEach((el) => (el.style.opacity = f))
+        it.under.style.opacity = Math.min(1, pi * 3).toFixed(3)
+      })
+    }
+    const req = () => {
+      if (!raf) raf = requestAnimationFrame(tick)
+    }
+    const invalidate = () => {
+      dirty = true
+      req()
+    }
+
+    // Con el teclado los botones se posan al momento
+    const onFocusIn = () => {
+      forced = true
+      req()
+    }
+    const onFocusOut = (e: FocusEvent) => {
+      if (grid.contains(e.relatedTarget as Node | null)) return
+      forced = false
+      req()
+    }
+    const onTrackScroll = () => {
+      if (track.dataset.hold !== undefined) invalidate()
+    }
+
+    window.addEventListener('scroll', req, { passive: true })
+    window.addEventListener('resize', invalidate)
+    track.addEventListener('scroll', onTrackScroll, { passive: true })
+    grid.addEventListener('focusin', onFocusIn)
+    grid.addEventListener('focusout', onFocusOut)
+    ScrollTrigger.addEventListener('refresh', invalidate)
+    void document.fonts.ready.then(invalidate)
+    req()
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', req)
+      window.removeEventListener('resize', invalidate)
+      track.removeEventListener('scroll', onTrackScroll)
+      grid.removeEventListener('focusin', onFocusIn)
+      grid.removeEventListener('focusout', onFocusOut)
+      ScrollTrigger.removeEventListener('refresh', invalidate)
+      items?.forEach((it) => {
+        it.caps.forEach((c) => (c.style.visibility = ''))
+        it.btn.style.opacity = ''
+      })
+      delete track.dataset.hold
+      sec.removeAttribute('data-flying')
+      layer.remove()
+    }
+  }
 </script>

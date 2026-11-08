@@ -48,29 +48,43 @@ const credentials = [
 </section>
 
 <section
+  data-about-intro
   data-theme="dark"
   class="bg-ink text-cream relative flex flex-col gap-9 overflow-hidden px-gutter pt-[clamp(40px,6vh,64px)] pb-[clamp(72px,11vh,120px)]"
 >
-  <!-- Arco dorado de la «G» del isotipo, solo decorativo -->
+  <!-- Isotipo dorado (G + H) en trazo: se dibuja al entrar y deriva con el scroll -->
   <div
     aria-hidden="true"
+    data-arc
     class="pointer-events-none absolute top-[clamp(40px,6vh,64px)] bottom-[clamp(72px,11vh,120px)] left-[68%] z-0 hidden lg:block"
   >
-    <svg viewBox="0 0 420 520" class="text-gold block h-full w-auto max-w-none opacity-[0.32]">
+    <svg
+      viewBox="0 0 640 412"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="butt"
+      class="text-gold block h-full w-auto max-w-none overflow-visible opacity-[0.32]"
+    >
       <path
-        fill="currentColor"
-        fill-rule="evenodd"
-        d="M10 260a250 255 0 1 0 500 0a250 255 0 1 0 -500 0ZM68 262a217 234 0 1 0 434 0a217 234 0 1 0 -434 0Z"
+        data-arc-path
+        pathLength="1"
+        stroke-width="26"
+        d="M347 50C302 20 258 10 214 10 98 10 24 100 24 206s74 196 190 196c48 0 92-16 128-44"
       ></path>
-      <rect x="330" y="252" width="90" height="17" fill="currentColor"></rect>
+      <path data-arc-path pathLength="1" stroke-width="20" d="M350 108v254"></path>
+      <path data-arc-path pathLength="1" stroke-width="9" d="M226 210h390"></path>
+      <path data-arc-path pathLength="1" stroke-width="20" d="M620 0v412"></path>
     </svg>
   </div>
 
   <div class="relative z-[1] flex max-w-[780px] flex-col gap-[18px] pt-12">
-    <span class="eyebrow text-beige">{t('CÓMO EMPEZÓ')}</span>
+    <span data-reveal class="eyebrow text-beige">
+      {t('CÓMO EMPEZÓ')}
+    </span>
     <h1
-      data-reveal
-      class="font-display text-gold m-0 max-w-[919px] text-[clamp(30px,3.6vw,50px)] leading-[1.1]"
+      data-words
+      data-wdelay="120"
+      class="font-display text-gold m-0 max-w-[919px] text-[clamp(30px,3.6vw,50px)] leading-[1.1] text-balance"
     >
       {t('Una idea que esperó su momento')}
     </h1>
@@ -79,13 +93,18 @@ const credentials = [
     {story.map((p) => (
       <p
         data-reveal
-        data-delay="200"
+        data-delay="150"
         class="text-cream-2 m-0 text-[length:var(--text-body)] leading-[1.75] text-pretty"
       >
         {t(p)}
       </p>
     ))}
-    <Button href={pathFor(lang, 'contact')} class="mt-2 min-w-[min(100%,200px)] self-start">
+    <Button
+      href={pathFor(lang, 'contact')}
+      data-reveal
+      data-delay="150"
+      class="mt-2 min-w-[min(100%,200px)] self-start"
+    >
       {t('Contáctanos')}
     </Button>
   </div>
@@ -94,26 +113,36 @@ const credentials = [
 <section data-theme="dark" class="bg-ink text-cream relative">
   <div class="px-gutter pt-[clamp(24px,4vh,48px)] pb-[120px]">
     <h2 class="sr-only">{t('Cómo trabajamos')}</h2>
-    <div data-tl class="relative grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]">
+    <div
+      data-tl
+      data-reveal="solo"
+      data-delay="200"
+      class="relative grid grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]"
+    >
+      <!-- Línea común (escritorio): se llena hasta el punto del último valor encendido -->
       <div
         aria-hidden="true"
-        class="pointer-events-none absolute inset-x-0 top-0 hidden h-0.5 rounded-sm bg-[rgb(250_248_245/0.2)] md:block"
+        class="pointer-events-none absolute inset-x-0 top-0 hidden h-0.5 rounded-sm bg-[rgb(250_248_245/0.2)] min-[1100px]:block"
       >
-        <div
-          data-tl-fill
-          class="bg-gold absolute inset-y-0 left-0 w-full origin-left rounded-sm"
-        ></div>
+        <div data-tl-fill class="tl-fill bg-gold absolute inset-0 origin-left rounded-sm"></div>
       </div>
       {values.map((v) => (
         <div
           data-tl-step
-          class="relative flex flex-col gap-4 border-t-2 border-[rgb(250_248_245/0.2)] pt-[clamp(28px,4vh,44px)] pr-7 pb-2 max-md:mb-6 md:border-t-0"
+          class="tl-step relative flex flex-col gap-4 pt-[clamp(28px,4vh,44px)] pr-7 pb-2 max-[1099px]:mb-6"
         >
+          <!-- Barra propia de cada valor (pantallas estrechas) -->
+          <span
+            aria-hidden="true"
+            class="pointer-events-none absolute inset-x-0 top-0 h-0.5 rounded-sm bg-[rgb(250_248_245/0.2)] min-[1100px]:hidden"
+          >
+            <span class="tl-bar bg-gold absolute inset-0 origin-left rounded-sm"></span>
+          </span>
           <span
             data-tl-dot
             aria-hidden="true"
-            class="border-beige bg-gold absolute -top-[8px] left-0 size-3.5 rounded-full border-2 transition-[background,transform] duration-300 md:-top-1.5"
-          />
+            class="tl-dot absolute -top-1.5 left-0 size-3.5 rounded-full border-2"
+          ></span>
           <span class="text-gold text-[clamp(44px,5vw,72px)] leading-none font-semibold">
             {v.n}
           </span>
@@ -126,21 +155,32 @@ const credentials = [
 </section>
 
 <section
+  data-founder
   data-theme="light"
   class="bg-cream text-ink grid min-h-screen grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] items-center gap-[clamp(40px,6vw,96px)] px-gutter pt-[clamp(110px,14vh,150px)] pb-[clamp(56px,8vh,90px)]"
 >
   <div class="flex flex-col gap-3 lg:hidden">
-    <span class="eyebrow text-gold-dark">{t('FUNDADOR Y DIRECCIÓN MÉDICA')}</span>
-    <h2 class="font-display m-0 text-[clamp(30px,3.6vw,50px)] leading-[1.1]">Alain Castellat</h2>
-    <p class="m-0 text-[17px] font-semibold">{t('APRN, FNP-C · Nurse Practitioner en Florida')}</p>
+    <span data-reveal class="eyebrow text-gold-dark">
+      {t('FUNDADOR Y DIRECCIÓN MÉDICA')}
+    </span>
+    <h2 data-reveal class="font-display m-0 text-[clamp(30px,3.6vw,50px)] leading-[1.1]">
+      Alain Castellat
+    </h2>
+    <p data-reveal class="m-0 text-[17px] font-semibold">
+      {t('APRN, FNP-C · Nurse Practitioner en Florida')}
+    </p>
   </div>
-  <div class="bg-sand relative h-[min(calc(100vh-clamp(110px,14vh,150px)-clamp(56px,8vh,90px)),900px)] min-h-[420px] overflow-hidden rounded-[14px]">
+  <div
+    data-founder-photo
+    class="bg-sand relative h-[min(calc(100vh-clamp(110px,14vh,150px)-clamp(56px,8vh,90px)),900px)] min-h-[420px] overflow-hidden rounded-[14px]"
+  >
     <Image
       src={alain}
       alt="Alain Castellat, APRN, FNP-C"
       widths={[480, 720, 960, 1216]}
       sizes="(min-width: 900px) 50vw, 100vw"
-      class="absolute inset-0 size-full object-cover object-[center_30%]"
+      data-founder-img
+      class="absolute inset-x-0 -top-[6%] h-[112%] w-full object-cover object-[center_30%]"
     />
   </div>
   <div class="flex max-w-[560px] flex-col gap-[22px]">
@@ -148,29 +188,30 @@ const credentials = [
       <span data-reveal class="eyebrow text-gold-dark">
         {t('FUNDADOR Y DIRECCIÓN MÉDICA')}
       </span>
-      <h2
-        data-reveal
-        data-delay="140"
-        class="font-display m-0 text-[clamp(30px,3.6vw,50px)] leading-[1.1]"
-      >
+      <h2 data-reveal class="font-display m-0 text-[clamp(30px,3.6vw,50px)] leading-[1.1]">
         Alain Castellat
       </h2>
-      <p data-reveal data-delay="280" class="m-0 text-[18.5px] font-semibold">
+      <p data-reveal class="m-0 text-[18.5px] font-semibold">
         {t('APRN, FNP-C · Nurse Practitioner en Florida')}
       </p>
     </div>
     <p
       data-reveal
-      data-delay="420"
+      data-delay="300"
       class="text-brown m-0 text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.7] text-pretty"
     >
       {t(
         'Alain estudió medicina y hace 25 años lo dejó todo para venir a Estados Unidos buscando un futuro mejor para su familia. Aquí volvió a estudiar desde cero.',
       )}
     </p>
-    <ol data-reveal data-delay="560" class="border-beige m-0 flex list-none flex-col border-t p-0">
+    <ol class="border-beige m-0 flex list-none flex-col border-t p-0">
       {credentials.map((c, i) => (
-        <li class="border-beige flex gap-4 border-b py-3 text-[17.5px] leading-normal">
+        <li
+          data-reveal
+          data-mark
+          data-delay="450"
+          class="border-beige flex gap-4 border-b py-3 text-[17.5px] leading-normal"
+        >
           <span class="text-gold-dark min-w-5 font-semibold">{String(i + 1).padStart(2, '0')}</span>
           <span>{t(c)}</span>
         </li>
@@ -178,15 +219,19 @@ const credentials = [
     </ol>
     <p
       data-reveal
-      data-delay="700"
+      data-delay="300"
       class="text-brown m-0 text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.7] text-pretty"
     >
       {t(
         'La medicina estética siempre lo llamó. Cuando por fin coincidieron el espacio, la oportunidad y la visión, nació GlowHaus.',
       )}
     </p>
-    <blockquote data-reveal data-delay="840" class="m-0 mt-2">
-      <p class="text-ink m-0 text-[clamp(20px,1.8vw,26px)] leading-[1.35] font-semibold text-balance">
+    <blockquote class="m-0 mt-2 flex flex-col gap-4">
+      <span data-quote-rule aria-hidden="true" class="bg-gold block h-0.5 w-12 origin-left"></span>
+      <p
+        data-wipe
+        class="text-ink m-0 text-[clamp(20px,1.8vw,26px)] leading-[1.35] font-semibold text-balance"
+      >
         “{t('La estética no debería ser rápida. Debería ser toda una experiencia.')}”
       </p>
     </blockquote>
@@ -194,72 +239,136 @@ const credentials = [
 </section>
 
 <style>
-  /* Sin JS o con movimiento reducido, los valores se ven completos */
-  :global(.js) [data-tl-step] {
+  /* Valores: sin JS o con movimiento reducido se ven completos y encendidos */
+  .tl-dot {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    transition:
+      background 0.35s,
+      border-color 0.35s,
+      transform 0.35s;
+  }
+  .tl-fill {
+    transition: transform 0.55s var(--ease-swift);
+  }
+  .tl-bar {
+    transition: transform 0.7s var(--ease-swift);
+  }
+  :global(.js) .tl-step {
     opacity: 0.35;
     transition: opacity 0.45s;
   }
-  :global(.js) [data-tl-step][data-on] {
+  :global(.js) .tl-step[data-on] {
     opacity: 1;
   }
-  :global(.js) [data-tl-step]:not([data-on]) [data-tl-dot] {
+  :global(.js) .tl-step:not([data-on]) .tl-dot {
     background: var(--color-sand);
+    border-color: var(--color-beige);
   }
-  :global(.js) [data-tl-step][data-on] [data-tl-dot] {
+  :global(.js) .tl-step[data-on] .tl-dot {
     transform: scale(1.15);
   }
-  @media (prefers-reduced-motion: reduce) {
-    :global(.js) [data-tl-step] {
-      opacity: 1;
+  :global(.js) .tl-fill,
+  :global(.js) .tl-step:not([data-on]) .tl-bar {
+    transform: scaleX(0);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) [data-arc-path] {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    :global(.js) [data-quote-rule] {
+      transform: scaleX(0);
     }
   }
 </style>
 
 <script>
   import { gsap, ScrollTrigger, prefersReducedMotion } from '../../scripts/gsap'
+  import { introDone } from '../../scripts/intro-state'
+  import { parallax, revealImage } from './page-motion'
 
-  // Línea dorada que se llena al bajar y enciende cada valor al pasar por él
-  const wrap = document.querySelector<HTMLElement>('[data-tl]')
-  const fill = wrap?.querySelector<HTMLElement>('[data-tl-fill]')
-  const steps = wrap ? [...wrap.querySelectorAll<HTMLElement>('[data-tl-step]')] : []
+  const reduce = prefersReducedMotion()
 
-  if (wrap && fill) {
-    if (prefersReducedMotion()) {
-      steps.forEach((s) => s.setAttribute('data-on', ''))
-    } else {
-      const mm = gsap.matchMedia()
-      mm.add('(min-width: 768px)', () => {
-        gsap.fromTo(
-          fill,
-          { scaleX: 0 },
-          {
-            scaleX: 1,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: wrap,
-              start: 'top 85%',
-              end: 'top 35%',
-              scrub: true,
-              onUpdate: (st) => {
-                steps.forEach((s, i) =>
-                  s.toggleAttribute('data-on', st.progress >= (i + 0.3) / steps.length),
-                )
-              },
-            },
-          },
-        )
+  // ---- Isotipo dorado: se dibuja trazo a trazo y deriva con el scroll ----
+  const intro = document.querySelector<HTMLElement>('[data-about-intro]')
+  const arc = intro?.querySelector<HTMLElement>('[data-arc]')
+  if (intro && arc && !reduce) {
+    const paths = arc.querySelectorAll<SVGPathElement>('[data-arc-path]')
+    void introDone.then(() => {
+      gsap.to(paths, {
+        strokeDashoffset: 0,
+        duration: (i: number) => [2.2, 0.9, 1.1, 1][i] ?? 1,
+        delay: (i: number) => 0.35 + ([0, 1.2, 1.5, 1.9][i] ?? 0),
+        ease: 'wipe',
       })
-      mm.add('(max-width: 767px)', () => {
-        const triggers = steps.map((s) =>
-          ScrollTrigger.create({
-            trigger: s,
-            start: 'top 80%',
-            onEnter: () => s.setAttribute('data-on', ''),
-            onLeaveBack: () => s.removeAttribute('data-on'),
-          }),
-        )
-        return () => triggers.forEach((tr) => tr.kill())
+    })
+    parallax(arc, intro, 7)
+  }
+
+  // ---- Valores: la línea dorada se llena con el scroll y enciende cada valor ----
+  // Como en el diseño: en escritorio (≥1100) la línea común llega hasta el punto
+  // del último valor encendido (0,55 s, curva swift); en pantallas estrechas cada
+  // valor tiene su barra. En móvil (<700) un valor se enciende al pasar el 60 %
+  // de la pantalla; en el resto, según avanza la sección por la pantalla.
+  const tl = document.querySelector<HTMLElement>('[data-tl]')
+  const fill = tl?.querySelector<HTMLElement>('[data-tl-fill]')
+  const steps = tl ? [...tl.querySelectorAll<HTMLElement>('[data-tl-step]')] : []
+
+  if (tl && fill) {
+    if (reduce) {
+      steps.forEach((s) => s.setAttribute('data-on', ''))
+      fill.style.transform = 'scaleX(1)'
+    } else {
+      let shown = -1
+      const paint = () => {
+        const vh = window.innerHeight
+        const r = tl.getBoundingClientRect()
+        let n: number
+        if (window.innerWidth < 700) {
+          n = steps.filter((s) => s.getBoundingClientRect().top < vh * 0.6).length
+        } else {
+          const p = Math.max(0, Math.min(1, (vh * 0.8 - r.top) / (vh * 0.45)))
+          n = Math.min(steps.length, Math.floor(p * (steps.length + 0.6)))
+        }
+        if (n === shown) return
+        shown = n
+        steps.forEach((s, i) => s.toggleAttribute('data-on', i < n))
+        // Medidas sin transformaciones (la aparición escala el bloque)
+        const full = tl.offsetWidth
+        let w = 0
+        if (n >= steps.length) w = full
+        else if (n > 0) w = steps[n - 1]!.offsetLeft + 7
+        fill.style.transform = `scaleX(${full ? w / full : 0})`
+      }
+      ScrollTrigger.create({
+        trigger: tl,
+        start: 'top bottom',
+        end: 'bottom top',
+        onUpdate: paint,
+        onRefresh: () => {
+          shown = -1
+          paint()
+        },
       })
     }
+  }
+
+  // ---- Fundador: foto que se descubre con paralaje suave y filete de la cita ----
+  const founder = document.querySelector<HTMLElement>('[data-founder]')
+  const frame = founder?.querySelector<HTMLElement>('[data-founder-photo]')
+  const img = founder?.querySelector<HTMLElement>('[data-founder-img]')
+  if (founder && frame) {
+    revealImage(frame, img ?? null, 'top 80%')
+    if (img) parallax(img, frame, 4)
+  }
+  const rule = founder?.querySelector<HTMLElement>('[data-quote-rule]')
+  if (rule && !reduce) {
+    gsap.to(rule, {
+      scaleX: 1,
+      duration: 0.9,
+      ease: 'glow',
+      scrollTrigger: { trigger: rule, start: 'top 85%', once: true },
+    })
   }
 </script>

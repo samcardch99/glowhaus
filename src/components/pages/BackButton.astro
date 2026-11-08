@@ -16,6 +16,22 @@ const t = useT(lang)
   {t('Atrás')}
 </Button>
 
+<style>
+  /* La flecha se adelanta hacia atrás al pasar (escritorio). «translate» no
+     choca con el giro de la flecha, que va en «transform». */
+  :global(a[data-back] svg) {
+    transition: translate 0.4s var(--ease-glow);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :global(a[data-back]:hover svg) {
+      translate: -4px -4px;
+    }
+  }
+  :global(a[data-back]:focus-visible svg) {
+    translate: -4px -4px;
+  }
+</style>
+
 <script>
   document.querySelectorAll<HTMLAnchorElement>('a[data-back]').forEach((a) => {
     a.addEventListener('click', (e) => {

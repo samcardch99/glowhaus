@@ -15,6 +15,7 @@ import { introDone } from './intro-state'
 // diferidos. Todo respeta «reducir movimiento» y funciona sin JS.
 
 const reduce = prefersReducedMotion()
+;(window as unknown as { __ghMotion?: boolean }).__ghMotion = true
 const root = document.documentElement
 
 // ---------- Cabecera ----------
@@ -43,12 +44,15 @@ function updateHeader() {
     else if (dy > 4) header.setAttribute('data-hidden', '')
   }
   const probeY = Math.min(header.offsetHeight * 0.55, 60)
-  const below = document.elementsFromPoint(window.innerWidth / 2, probeY).filter((el) => !header.contains(el))
+  const below = document
+    .elementsFromPoint(window.innerWidth / 2, probeY)
+    .filter((el) => !header.contains(el))
   const host = below.find((el) => el.closest('[data-theme]'))?.closest<HTMLElement>('[data-theme]')
   if (!host) return
   const theme = host.dataset.theme ?? 'light'
   if (header.dataset.theme !== theme) header.dataset.theme = theme
-  const bg = opaqueBg(below[0] ?? host)
+  // El color es el de la sección (no el de una foto o tarjeta que pase por debajo)
+  const bg = opaqueBg(host)
   if (bg) header.style.setProperty('--hdr-bg', bg)
 }
 
@@ -181,6 +185,11 @@ if (reduce) {
   })
   void introDone.then(() => {
     groups.forEach((group) => {
+      // Grupos ocultos (variantes solo móvil o solo escritorio): se muestran sin animar
+      if (group.every((el) => el.offsetParent === null)) {
+        gsap.set(group, { opacity: 1 })
+        return
+      }
       ScrollTrigger.create({
         trigger: group[0],
         start: 'top 82%',
@@ -418,16 +427,18 @@ if (!reduce) {
     if (r.parentElement) boxes.add(r.parentElement)
   })
   boxes.forEach((box) => {
-    const items = [...box.querySelectorAll<HTMLElement>(':scope > [data-typerow]')].flatMap((row) => {
-      const tx = row.querySelector<HTMLElement>('[data-type]')
-      if (!tx) return []
-      const dot = row.querySelector<HTMLElement>('[data-dot]')
-      const full = tx.textContent?.trim() ?? ''
-      tx.setAttribute('aria-label', full)
-      tx.textContent = ' '
-      if (dot) gsap.set(dot, { opacity: 0, scale: 0 })
-      return [{ tx, dot, full }]
-    })
+    const items = [...box.querySelectorAll<HTMLElement>(':scope > [data-typerow]')].flatMap(
+      (row) => {
+        const tx = row.querySelector<HTMLElement>('[data-type]')
+        if (!tx) return []
+        const dot = row.querySelector<HTMLElement>('[data-dot]')
+        const full = tx.textContent?.trim() ?? ''
+        tx.setAttribute('aria-label', full)
+        tx.textContent = ' '
+        if (dot) gsap.set(dot, { opacity: 0, scale: 0 })
+        return [{ tx, dot, full }]
+      },
+    )
     ScrollTrigger.create({
       trigger: box,
       start: 'top 75%',

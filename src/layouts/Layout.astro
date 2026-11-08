@@ -92,6 +92,10 @@ const fullTitle = title.includes('GlowHaus') ? title : `${title} · GlowHaus Aes
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <script is:inline>
       document.documentElement.classList.replace('no-js', 'js')
+      // Si el JS de animación no llega a cargar, se muestra todo igualmente
+      setTimeout(function () {
+        if (!window.__ghMotion) document.documentElement.classList.remove('js', 'gh-intro-on')
+      }, 4000)
     </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />

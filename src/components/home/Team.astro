@@ -4,7 +4,10 @@ import { team } from '../../data/home'
 import { useT, type Lang } from '../../i18n'
 
 // «Las manos detrás de cada tratamiento». En escritorio, cada foto abre su
-// ficha a la derecha (una a la vez); en móvil, la ficha va siempre debajo.
+// ficha a la derecha (una a la vez, anchura en .7 s con la curva glow) y las
+// fichas se turnan solas cada 3,8 s mientras la sección se ve (≥1100 px; 6 s de
+// pausa tras pasar el ratón o pulsar). En móvil la ficha va siempre debajo y
+// foto y ficha entran juntas.
 interface Props {
   lang: Lang
 }
@@ -32,6 +35,7 @@ const t = useT(lang)
     <ul role="list" class="m-0 flex list-none flex-col gap-10 p-0 lg:flex-row lg:gap-5">
       {team.map((p, i) => (
         <li
+          data-reveal="solo"
           data-team-item={i}
           data-open={i === 0 ? '' : undefined}
           class="team-item flex flex-col gap-5 lg:flex-row lg:gap-0"
@@ -96,17 +100,52 @@ const t = useT(lang)
 </style>
 
 <script>
+  import { prefersReducedMotion } from '../../scripts/gsap'
+
   document.querySelectorAll<HTMLElement>('[data-team]').forEach((root) => {
-    const items = root.querySelectorAll<HTMLElement>('[data-team-item]')
-    const open = (i: number) =>
+    const items = [...root.querySelectorAll<HTMLElement>('[data-team-item]')]
+    let cur = 0
+    let touched = 0
+    const open = (i: number) => {
+      cur = i
       items.forEach((it, k) => {
         it.toggleAttribute('data-open', k === i)
         it.querySelector('[data-team-btn]')?.setAttribute('aria-expanded', String(k === i))
       })
+    }
     items.forEach((it, i) => {
       const btn = it.querySelector<HTMLButtonElement>('[data-team-btn]')
-      btn?.addEventListener('click', () => open(i))
-      btn?.addEventListener('mouseenter', () => open(i))
+      const pick = () => {
+        touched = Date.now()
+        if (cur !== i) open(i)
+      }
+      btn?.addEventListener('click', pick)
+      btn?.addEventListener('mouseenter', pick)
     })
+
+    if (prefersReducedMotion() || items.length < 2) return
+    // Turno automático del diseño: primer paso 0,8 s después de entrar en vista
+    let seen = false
+    let next = 0
+    window.setInterval(() => {
+      const r = root.getBoundingClientRect()
+      const vis =
+        !document.hidden &&
+        r.top < window.innerHeight * 0.6 &&
+        r.bottom > window.innerHeight * 0.4 &&
+        window.innerWidth >= 1100
+      const now = Date.now()
+      if (!vis) {
+        seen = false
+        return
+      }
+      if (!seen) {
+        seen = true
+        next = now + 800
+      }
+      if (now < next || now - touched < 6000 || root.querySelector(':focus-visible')) return
+      next = now + 3800
+      open((cur + 1) % items.length)
+    }, 200)
   })
 </script>

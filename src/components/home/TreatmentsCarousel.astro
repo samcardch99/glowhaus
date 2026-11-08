@@ -5,13 +5,18 @@ import Arrow from '../ui/Arrow.astro'
 import { treatments, fromLabel, countLabel } from '../../data/treatments'
 import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
 
-// «Medicina estética avanzada»: carrusel horizontal de las 11 categorías.
-// Es una lista de enlaces que se recorre con Tab; con ratón se puede arrastrar.
+// «Medicina estética avanzada»: carrusel infinito de las 11 categorías, como en
+// el diseño: tres copias de la lista, la tarjeta del centro destacada (con su
+// descripción), avance solo cada 4 s mientras se ve, arrastre con inercia y
+// ajuste al centro. Con teclado: Tab recorre las tarjetas y las flechas avanzan.
+// Sin JS es una fila desplazable con una sola copia.
+// BodyMap toma de aquí los paneles de texto ([data-car-cap]) para su vuelo.
 interface Props {
   lang: Lang
 }
 const { lang } = Astro.props
 const t = useT(lang)
+const copies = [0, 1, 2] as const
 ---
 
 <section
@@ -44,88 +49,248 @@ const t = useT(lang)
     </div>
   </div>
 
-  <ul
-    data-cat-track
-    role="list"
-    aria-label={t('Categorías de tratamientos')}
-    class="no-scrollbar px-gutter m-0 flex cursor-grab list-none snap-x snap-mandatory scroll-px-(--gutter) gap-5 overflow-x-auto pt-3 pb-4 [--gutter:clamp(24px,1.8vw,28px)] active:cursor-grabbing"
-  >
-    {treatments.map((c, i) => (
-      <li class="w-[clamp(270px,24vw,360px)] flex-none snap-start">
-        <a
-          href={treatmentPath(lang, c.slug[lang])}
-          draggable="false"
-          class="group text-cream relative block aspect-[4/5.4] overflow-hidden rounded-[20px] bg-brown"
-        >
-          <Image
-            src={c.img}
-            alt=""
-            draggable="false"
-            widths={[320, 480, 720]}
-            sizes="(min-width: 1100px) 360px, 280px"
-            style={`object-position:${c.imgPos ?? 'center'}`}
-            class="absolute inset-0 size-full object-cover transition-transform duration-800 ease-(--ease-glow) group-hover:scale-[1.06]"
-          />
-          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.25),transparent_30%,transparent_50%,rgb(24_18_14/0.55))]" />
-          <div class="glass-chip absolute top-3 left-3 flex max-w-[calc(100%-24px)] gap-2.5 rounded-lg px-3 py-[7px] text-[15px] font-medium">
-            <span class="whitespace-nowrap">
-              {t(`Categoría ${String(i + 1).padStart(2, '0')}`)}
-            </span>
-            <span class="text-sand-2 whitespace-nowrap">{t(countLabel(c))}</span>
-          </div>
-          <div class="glass-chip absolute right-3 bottom-3 left-3 flex flex-col gap-2 rounded-lg px-4 pt-3.5 pb-4">
-            <h3 class="m-0 text-[clamp(20px,1.7vw,23.5px)] leading-[1.15] font-semibold">
-              {t(c.name)}
-            </h3>
-            <span class="text-sand-2 text-base font-medium">{t(fromLabel(c))}</span>
-            <p class="m-0 line-clamp-2 text-[17px] leading-[1.5] text-pretty">{t(c.short)}</p>
-            <span class="group-hover:bg-gold group-hover:border-gold mt-1 inline-flex items-center gap-3 self-start rounded-[14px] border border-[rgb(250_248_245/0.55)] bg-[rgb(250_248_245/0.14)] px-[18px] py-2.5 text-base font-semibold tracking-[0.03em] backdrop-blur-[10px] transition-colors duration-300">
-              <Arrow />
-              {t('Ver tratamiento')}
-            </span>
-          </div>
-        </a>
-      </li>
-    ))}
-  </ul>
+  <div data-reveal="solo" data-delay="300">
+    <ul
+      id="cat-track"
+      data-cat-track
+      role="list"
+      aria-label={t('Categorías de tratamientos')}
+      aria-roledescription={t('carrusel')}
+      class="cat-track no-scrollbar px-gutter m-0 flex list-none gap-5 overflow-x-auto pt-3 pb-4 select-none"
+    >
+      {copies.map((copy) =>
+        treatments.map((c, i) => (
+          <li
+            data-car={i}
+            data-copy={copy}
+            data-active={copy === 1 && i === 0 ? '' : undefined}
+            aria-hidden={copy !== 1 ? 'true' : undefined}
+            inert={copy !== 1}
+            class="car-item w-[clamp(270px,25vw,350px)] flex-none"
+          >
+            <a
+              href={treatmentPath(lang, c.slug[lang])}
+              draggable="false"
+              class="group text-cream bg-brown relative block aspect-[4/5.4] overflow-hidden rounded-[20px] focus-visible:outline-offset-4"
+            >
+              <Image
+                src={c.img}
+                alt=""
+                draggable="false"
+                widths={[320, 480, 720]}
+                sizes="(min-width: 1100px) 350px, 280px"
+                style={`object-position:${c.imgPos ?? 'center'}`}
+                class="absolute inset-0 size-full object-cover transition-transform duration-800 ease-(--ease-glow) group-hover:scale-[1.06]"
+              />
+              <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.25),transparent_30%,transparent_50%,rgb(24_18_14/0.55))]" />
+              <div class="glass-chip absolute top-3 left-3 flex max-w-[calc(100%-24px)] gap-2.5 rounded-lg px-3 py-[7px] text-[15px] font-medium">
+                <span class="whitespace-nowrap">
+                  {t(`Categoría ${String(i + 1).padStart(2, '0')}`)}
+                </span>
+                <span class="text-sand-2 whitespace-nowrap">{t(countLabel(c))}</span>
+              </div>
+              <div
+                data-car-cap
+                class="glass-chip absolute right-3 bottom-3 left-3 flex flex-col gap-2 rounded-lg px-4 pt-3.5 pb-4"
+              >
+                <h3 class="m-0 text-[clamp(20px,1.7vw,23.5px)] leading-[1.15] font-semibold">
+                  {t(c.name)}
+                </h3>
+                <span class="text-sand-2 text-base font-medium">{t(fromLabel(c))}</span>
+                <div class="car-desc grid">
+                  <div class="overflow-hidden">
+                    <p class="m-0 pb-1 text-[clamp(17px,calc(12px+0.8vw),18px)] leading-[1.55] text-pretty">
+                      {t(c.short)}
+                    </p>
+                  </div>
+                </div>
+                <span class="group-hover:bg-gold group-hover:border-gold inline-flex items-center gap-3 self-start rounded-[14px] border border-[rgb(250_248_245/0.55)] bg-[rgb(250_248_245/0.14)] px-[18px] py-2.5 text-base font-semibold tracking-[0.03em] backdrop-blur-[10px] transition-colors duration-300">
+                  <Arrow />
+                  {t('Ver tratamiento')}
+                </span>
+              </div>
+            </a>
+          </li>
+        )),
+      )}
+    </ul>
+  </div>
 </section>
 
+<style>
+  /* Sin JS: una sola copia, sin efecto de foco */
+  :global(html:not(.js)) .car-item:not([data-copy='1']) {
+    display: none;
+  }
+  :global(.js) .cat-track {
+    cursor: grab;
+  }
+  :global(.js) .car-item {
+    opacity: 0.55;
+    transform: scale(0.97);
+    transition:
+      transform 0.6s var(--ease-glow),
+      opacity 0.6s;
+  }
+  :global(.js) .car-item[data-active] {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.03);
+  }
+  .car-desc {
+    grid-template-rows: 1fr;
+  }
+  :global(.js) .car-desc {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.6s var(--ease-glow),
+      opacity 0.5s;
+  }
+  :global(.js) .car-item[data-active] .car-desc {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .car-item {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
 <script>
-  // Arrastrar con el ratón (el táctil y el trackpad ya desplazan solos)
-  document.querySelectorAll<HTMLElement>('[data-cat-track]').forEach((track) => {
-    let startX = 0
-    let startScroll = 0
-    let dragging = false
-    let moved = false
-    track.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'mouse' || e.button !== 0) return
-      dragging = true
-      moved = false
-      startX = e.clientX
-      startScroll = track.scrollLeft
-      track.style.scrollSnapType = 'none'
-    })
-    window.addEventListener('pointermove', (e) => {
-      if (!dragging) return
-      const dx = e.clientX - startX
-      if (Math.abs(dx) > 5) moved = true
-      track.scrollLeft = startScroll - dx
-    })
-    window.addEventListener('pointerup', () => {
-      if (!dragging) return
-      dragging = false
-      track.style.scrollSnapType = ''
-    })
-    // Un arrastre no debe abrir la tarjeta
+  import { prefersReducedMotion } from '../../scripts/gsap'
+  import { dragScroll, nearestIndex, onScrollEnd } from './scroller'
+
+  const track = document.querySelector<HTMLElement>('[data-cat-track]')
+  if (track) {
+    const reduce = prefersReducedMotion()
+    const items = [...track.querySelectorAll<HTMLElement>('[data-car]')]
+    const n = items.length / 3
+    let centers: number[] = []
+    let active = n
+    let programmatic = false
+
+    const layout = () => {
+      // Relleno lateral para que cualquier tarjeta pueda quedar centrada
+      const w = items[0]?.offsetWidth ?? 0
+      const pad = Math.max(0, (track.clientWidth - w) / 2)
+      track.style.paddingInline = `${pad}px`
+      centers = items.map((el) => el.offsetLeft + el.offsetWidth / 2)
+    }
+    const centerOf = (i: number) => (centers[i] ?? 0) - track.clientWidth / 2
+    const mark = (i: number) => {
+      if (i === active) return
+      items[active]?.removeAttribute('data-active')
+      items[i]?.setAttribute('data-active', '')
+      active = i
+    }
+    const go = (i: number, smooth = true) => {
+      const k = Math.max(0, Math.min(items.length - 1, i))
+      track.scrollTo({ left: centerOf(k), behavior: smooth && !reduce ? 'smooth' : 'auto' })
+    }
+    // Si el centro sale de la copia del medio, salta una vuelta entera sin que se note
+    const wrap = () => {
+      const W = (centers[n] ?? 0) - (centers[0] ?? 0)
+      const shift = active < n ? W : active >= 2 * n ? -W : 0
+      if (!shift) return
+      track.scrollTo({ left: track.scrollLeft + shift, behavior: 'auto' })
+      mark(active + (shift > 0 ? n : -n))
+    }
+
+    layout()
+    track.scrollLeft = centerOf(n)
+    mark(n)
+
+    let raf = 0
     track.addEventListener(
-      'click',
-      (e) => {
-        if (moved) {
-          e.preventDefault()
-          moved = false
-        }
+      'scroll',
+      () => {
+        cancelAnimationFrame(raf)
+        raf = requestAnimationFrame(() => mark(nearestIndex(track, centers).index))
       },
-      true,
+      { passive: true },
     )
-  })
+
+    const drag = dragScroll(track)
+    let last = Date.now()
+    onScrollEnd(track, () => {
+      if (drag.busy()) return
+      last = Date.now()
+      wrap()
+      const { index, distance } = nearestIndex(track, centers)
+      if (distance > 2) go(index)
+    })
+
+    // Avance automático cada 4 s mientras se ve, sin ratón encima, sin arrastre
+    // ni foco dentro, con la pestaña visible y mientras el mapa del cuerpo no
+    // está tomando los paneles (data-hold).
+    let hover = false
+    let focusIn = false
+    track.addEventListener('pointerenter', (e) => (hover = e.pointerType === 'mouse'))
+    track.addEventListener('pointerleave', () => (hover = false))
+    if (!reduce)
+      window.setInterval(() => {
+        const r = track.getBoundingClientRect()
+        const inView = r.bottom > window.innerHeight * 0.2 && r.top < window.innerHeight * 0.8
+        if (
+          hover ||
+          focusIn ||
+          drag.busy() ||
+          document.hidden ||
+          !inView ||
+          track.dataset.hold !== undefined
+        ) {
+          last = Date.now()
+          return
+        }
+        if (Date.now() - last < 4000) return
+        last = Date.now()
+        go(active + 1)
+      }, 200)
+
+    // Teclado: las flechas mueven el carrusel; el foco va a la tarjeta centrada
+    const focusCard = (i: number) => {
+      const k = n + (((i % n) + n) % n)
+      programmatic = true
+      items[k]?.querySelector('a')?.focus({ preventScroll: true })
+      programmatic = false
+    }
+    track.addEventListener('keydown', (e) => {
+      const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
+      if (!dir) return
+      e.preventDefault()
+      const to = active + dir
+      go(to)
+      focusCard(to)
+    })
+    track.addEventListener('focusin', (e) => {
+      focusIn = true
+      if (programmatic) return
+      const li = (e.target as Element).closest<HTMLElement>('[data-car]')
+      const i = li ? items.indexOf(li) : -1
+      if (i >= 0 && i !== active) go(i)
+    })
+    track.addEventListener('focusout', () => (focusIn = false))
+
+    // Un clic en una tarjeta lateral la centra en vez de abrirla
+    track.addEventListener('click', (e) => {
+      if (e.defaultPrevented) return
+      const li = (e.target as Element).closest<HTMLElement>('[data-car]')
+      const i = li ? items.indexOf(li) : -1
+      if (i < 0 || i === active || window.matchMedia('(pointer: coarse)').matches) return
+      e.preventDefault()
+      last = Date.now()
+      go(i)
+    })
+
+    let rt = 0
+    window.addEventListener('resize', () => {
+      window.clearTimeout(rt)
+      rt = window.setTimeout(() => {
+        layout()
+        track.scrollLeft = centerOf(active)
+      }, 120)
+    })
+  }
 </script>

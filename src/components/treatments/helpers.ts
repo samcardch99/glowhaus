@@ -37,15 +37,6 @@ export function baSetsFor(t: Treatment): BASet[] {
   return tabs.map((tab) => baSets.find((s) => s.tab === tab)).filter((s): s is BASet => !!s)
 }
 
-/** Las 3 categorías siguientes, en bucle */
-export function relatedFor(t: Treatment) {
-  const i = treatments.indexOf(t)
-  return [1, 2, 3].map((o) => {
-    const k = (i + o) % treatments.length
-    return { t: treatments[k]!, index: k }
-  })
-}
-
 /** Importes de un texto de precio: «$1,999» → 1999; «$299 / mes» → 299 */
 const amount = (p: string) => {
   const m = p.match(/\$([\d,]+)/)

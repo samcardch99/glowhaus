@@ -19,21 +19,28 @@ import { pathFor } from '../i18n'
   >
     <p
       aria-hidden="true"
-      class="font-display text-gold m-0 text-[clamp(120px,22vw,320px)] leading-[0.9]"
+      data-404
+      class="font-display text-gold m-0 flex text-[clamp(120px,22vw,320px)] leading-[0.9]"
     >
-      404
+      <span class="nf-digit inline-block">4</span>
+      <span class="nf-digit inline-block">0</span>
+      <span class="nf-digit inline-block">4</span>
     </p>
-    <h1 class="font-display m-0 text-[clamp(32px,4vw,56px)] leading-[1.08]">
+    <h1
+      data-words
+      data-wdelay="350"
+      class="font-display m-0 text-[clamp(32px,4vw,56px)] leading-[1.08]"
+    >
       Esta página no existe
     </h1>
-    <p class="text-body text-cream-3 m-0 max-w-[520px]">
+    <p data-reveal data-delay="700" class="text-body text-cream-3 m-0 max-w-[520px]">
       Puede que el enlace haya cambiado o que la dirección tenga un error. Te llevamos de vuelta.
     </p>
-    <div class="flex flex-wrap gap-3">
+    <div data-reveal data-delay="700" class="flex flex-wrap gap-3">
       <Button href={pathFor('es', 'home')}>Ir al inicio</Button>
       <Button href={pathFor('es', 'treatments')}>Ver tratamientos</Button>
     </div>
-    <p lang="en" class="text-body-sm text-beige m-0 mt-4">
+    <p data-reveal data-delay="700" lang="en" class="text-body-sm text-beige m-0 mt-4">
       Page not found ·{' '}
       <a
         href={pathFor('en', 'home')}
@@ -44,3 +51,57 @@ import { pathFor } from '../i18n'
     </p>
   </section>
 </Layout>
+
+<style>
+  /* Destello dorado lento que recorre el número (solo decorativo) */
+  @media (prefers-reduced-motion: no-preference) {
+    .nf-digit {
+      background: linear-gradient(
+          100deg,
+          var(--color-gold) 40%,
+          var(--color-gold-light) 50%,
+          var(--color-gold) 60%
+        )
+        0 0 / 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: nf-sheen 7s 1.6s ease-in-out infinite;
+    }
+  }
+  @keyframes nf-sheen {
+    from {
+      background-position: 100% 0;
+    }
+    55%,
+    to {
+      background-position: 0 0;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, prefersReducedMotion } from '../scripts/gsap'
+
+  // Las cifras suben una tras otra y la del centro flota apenas
+  const digits = document.querySelectorAll<HTMLElement>('[data-404] .nf-digit')
+  if (digits.length && !prefersReducedMotion()) {
+    gsap.from(digits, {
+      yPercent: 60,
+      opacity: 0,
+      filter: 'blur(10px)',
+      duration: 1.2,
+      stagger: 0.12,
+      ease: 'glow',
+      clearProps: 'filter',
+    })
+    gsap.to(digits[1] ?? digits[0]!, {
+      yPercent: -4,
+      duration: 3.2,
+      delay: 1.4,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1,
+    })
+  }
+</script>

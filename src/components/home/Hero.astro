@@ -54,6 +54,7 @@ const stats = [
     ></video>
     <video
       id="hero-video"
+      data-hero-corner
       data-autoplay
       data-src="/media/hero-reel.mp4"
       poster="/media/hero-reel.jpg"
@@ -67,7 +68,10 @@ const stats = [
     <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.55)_0%,rgb(24_18_14/0.1)_30%,rgb(24_18_14/0.25)_55%,rgb(24_18_14/0.8)_100%)]"></div>
   </div>
 
-  <div class="px-gutter relative flex flex-1 flex-col justify-end pt-[clamp(120px,16vh,150px)] pb-[clamp(28px,6vh,64px)] md:pr-[calc(min(62vh,38vw)+48px)]">
+  <div
+    data-hero-copy
+    class="px-gutter relative flex flex-1 flex-col justify-end pt-[clamp(120px,16vh,150px)] pb-[clamp(28px,6vh,64px)] md:pr-[calc(min(62vh,38vw)+48px)]"
+  >
     <div class="flex flex-col gap-[18px]">
       <h1
         data-hero-h1
@@ -77,7 +81,7 @@ const stats = [
       </h1>
       <div class="flex flex-wrap items-end gap-x-8 gap-y-5">
         <p
-          data-reveal
+          data-hero-in
           data-delay="200"
           class="text-body text-cream-2 m-0 max-w-[520px] text-pretty"
         >
@@ -85,7 +89,7 @@ const stats = [
             'Láser Fotona, inyectables, rellenos, depilación láser y faciales médicos en Miami. Cada tratamiento empieza con una valoración y un plan pensado para tu piel.',
           )}
         </p>
-        <div data-reveal data-delay="320">
+        <div data-hero-in data-delay="320">
           <Button href={whatsappHref(lang)} external>
             {t('Reservar cita')}
           </Button>
@@ -97,7 +101,7 @@ const stats = [
       >
         {stats.map((s, i) => (
           <li
-            data-reveal
+            data-hero-in
             data-delay={String(420 + i * 160)}
             class="relative flex min-w-0 flex-1 flex-col gap-2 rounded-[14px] border border-[rgb(250_248_245/0.18)] bg-[rgb(250_248_245/0.08)] px-[clamp(10px,1.6vw,22px)] py-[clamp(12px,1.4vw,18px)]"
           >
@@ -126,6 +130,20 @@ const stats = [
   />
 </section>
 
+<style>
+  /* La primera pantalla entra con su propia coreografía (tras la entrada de marca) */
+  :global(.js) [data-hero-in],
+  :global(.js) [data-hero-h1] {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) [data-hero-in],
+    :global(.js) [data-hero-h1] {
+      opacity: 1;
+    }
+  }
+</style>
+
 <script>
   import { gsap, SplitText, prefersReducedMotion } from '../../scripts/gsap'
 
@@ -145,29 +163,85 @@ const stats = [
     })
   }
 
-  // Título: las líneas suben desde una máscara
   const h1 = document.querySelector<HTMLElement>('[data-hero-h1]')
-  if (h1 && !prefersReducedMotion()) {
-    document.fonts.ready.then(() => {
+  const items = gsap.utils.toArray<HTMLElement>('[data-hero-in]')
+  const corner = document.querySelector<HTMLElement>('[data-hero-corner]')
+  const copy = document.querySelector<HTMLElement>('[data-hero-copy]')
+
+  function enter() {
+    // Titular: cada línea sube desde su máscara y las palabras llegan escalonadas
+    if (h1) {
       SplitText.create(h1, {
-        type: 'lines',
+        type: 'lines,words',
         mask: 'lines',
-        autoSplit: true,
+        aria: 'auto',
         onSplit: (self) => {
           // La máscara no debe cortar las colas de las letras (Q, comas)
           self.masks.forEach((m) => {
             m.style.paddingBottom = '0.14em'
             m.style.marginBottom = '-0.14em'
           })
-          return gsap.from(self.lines, {
-            yPercent: 105,
-            duration: 1.1,
-            stagger: 0.09,
+          gsap.set(h1, { opacity: 1 })
+          return gsap.from(self.words, {
+            yPercent: 115,
+            rotate: 2.5,
+            duration: 1.15,
             ease: 'power4.out',
-            delay: document.documentElement.classList.contains('gh-intro-on') ? 1.6 : 0.1,
+            stagger: { each: 0.045, from: 'start' },
+            delay: 0.05,
           })
         },
       })
+    }
+    // Texto, botón y cifras: los parámetros de aparición del diseño
+    items.forEach((el) => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 56, scale: 0.96 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          delay: 0.15 + Number(el.dataset.delay ?? 0) / 1000,
+          ease: 'glow',
+          clearProps: 'transform',
+        },
+      )
     })
+    // El vídeo enmarcado se descubre de derecha a izquierda (solo cuando está enmarcado)
+    if (corner && window.matchMedia('(min-width: 768px)').matches)
+      corner.animate([{ clipPath: 'inset(0 0 0 100%)' }, { clipPath: 'inset(0 0 0 0)' }], {
+        duration: 1100,
+        delay: 250,
+        easing: 'cubic-bezier(.7,0,.2,1)',
+        fill: 'backwards',
+      })
+  }
+
+  if (prefersReducedMotion()) {
+    gsap.set([h1, ...items], { opacity: 1 })
+  } else {
+    let started = false
+    const start = () => {
+      if (started) return
+      started = true
+      void document.fonts.ready.then(enter)
+    }
+    if (document.documentElement.classList.contains('gh-intro-on')) {
+      window.addEventListener('gh:intro-reveal', start, { once: true })
+      window.addEventListener('gh:intro-done', start, { once: true })
+    } else start()
+
+    // Mientras «Nosotros» tapa la primera pantalla, el texto sube y se apaga
+    // (el vídeo lo encoge y oscurece data-cover, en site.ts)
+    const next = copy?.closest('section')?.nextElementSibling
+    if (copy && next)
+      gsap.to(copy, {
+        yPercent: -14,
+        opacity: 0.25,
+        ease: 'none',
+        scrollTrigger: { trigger: next, start: 'top bottom', end: 'top top', scrub: true },
+      })
   }
 </script>

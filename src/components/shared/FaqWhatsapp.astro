@@ -4,7 +4,10 @@ import type { Faq } from '../../data/treatments'
 import { whatsappHref } from '../../data/site'
 import { useT, type Lang } from '../../i18n'
 
-// Bloque de preguntas frecuentes: tarjeta de WhatsApp + acordeón (<details>).
+// Bloque de preguntas frecuentes: tarjeta de WhatsApp + acordeón.
+// Cada pregunta es un <details> (funciona sin JS). Con JS, abrir y cerrar se
+// anima como en el diseño (alto con grid-template-rows .6 s «glow» y opacidad
+// .5 s; el «+» gira) y solo queda abierta una a la vez.
 interface Props {
   lang: Lang
   faqs: Faq[]
@@ -36,6 +39,7 @@ const dark = tone === 'dark'
       {t(title)}
     </H>
     <div
+      data-reveal
       class:list={[
         'mt-4 flex max-w-[460px] flex-col gap-4 rounded-[14px] border p-7',
         dark
@@ -53,6 +57,9 @@ const dark = tone === 'dark'
     </div>
   </div>
   <div
+    data-faq
+    data-reveal="solo"
+    data-delay="200"
     class:list={[
       'border-t',
       dark ? 'border-[rgb(250_248_245/0.2)]' : 'border-[rgb(24_18_14/0.15)]',
@@ -61,25 +68,129 @@ const dark = tone === 'dark'
     {faqs.map((f) => (
       <details
         class:list={[
-          'group border-b',
+          'faq-item border-b',
           dark ? 'border-[rgb(250_248_245/0.2)]' : 'border-[rgb(24_18_14/0.15)]',
         ]}
       >
-        <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-[clamp(18px,1.5vw,22px)] font-semibold [&::-webkit-details-marker]:hidden">
-          <span>{t(f.q)}</span>
-          <span
-            aria-hidden="true"
-            class="text-gold text-2xl leading-none transition-transform group-open:rotate-45"
-          >
+        <summary
+          class:list={[
+            'faq-q flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-[clamp(18px,1.5vw,22px)] font-semibold [&::-webkit-details-marker]:hidden',
+            dark ? 'faq-q-dark' : 'faq-q-light',
+          ]}
+        >
+          <span class="faq-q-text">{t(f.q)}</span>
+          <span aria-hidden="true" class="faq-sign text-gold text-2xl leading-none">
             +
           </span>
         </summary>
-        <p
-          class:list={['text-body-sm m-0 max-w-[640px] pb-6', dark ? 'text-cream-3' : 'text-taupe']}
-        >
-          {t(f.a)}
-        </p>
+        <div class="faq-body">
+          <div class="min-h-0 overflow-hidden">
+            <p
+              class:list={[
+                'text-body-sm m-0 max-w-[640px] pr-12 pb-6 max-[759px]:pr-0',
+                dark ? 'text-cream-3' : 'text-taupe',
+              ]}
+            >
+              {t(f.a)}
+            </p>
+          </div>
+        </div>
       </details>
     ))}
   </div>
 </div>
+
+<style>
+  .faq-body {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+  .faq-sign {
+    transition: transform 0.5s var(--ease-glow);
+  }
+  .faq-item[open] .faq-sign {
+    transform: rotate(45deg);
+  }
+  /* Con JS el estado visual lo marca data-state, para poder animar el cierre */
+  :global(.js) .faq-body {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.6s var(--ease-glow),
+      opacity 0.5s var(--ease-glow);
+  }
+  :global(.js) .faq-item[data-state='open'] .faq-body {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  :global(.js) .faq-item[open]:not([data-state='open']) .faq-sign {
+    transform: none;
+  }
+  :global(.js) .faq-item[data-state='open'] .faq-sign {
+    transform: rotate(45deg);
+  }
+  .faq-q-text {
+    transition:
+      color 0.25s,
+      transform 0.3s var(--ease-glow);
+  }
+  @media (hover: hover) {
+    .faq-q-light:hover .faq-q-text {
+      color: var(--color-gold-dark);
+      transform: translateX(8px);
+    }
+    .faq-q-dark:hover .faq-q-text {
+      color: var(--color-gold-light);
+      transform: translateX(8px);
+    }
+  }
+</style>
+
+<script>
+  // Abre y cierra con animación sin perder el comportamiento nativo de <details>
+  document.querySelectorAll<HTMLElement>('[data-faq]').forEach((list) => {
+    const items = Array.from(list.querySelectorAll<HTMLDetailsElement>('details.faq-item'))
+    const timers = new WeakMap<HTMLDetailsElement, number>()
+
+    const open = (d: HTMLDetailsElement) => {
+      window.clearTimeout(timers.get(d))
+      d.dataset.pending = ''
+      d.open = true
+      // Un fotograma con 0fr antes de pasar a 1fr para que la transición arranque
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          delete d.dataset.pending
+          d.dataset.state = 'open'
+        }),
+      )
+    }
+    const close = (d: HTMLDetailsElement) => {
+      if (!d.open) return
+      delete d.dataset.state
+      window.clearTimeout(timers.get(d))
+      timers.set(
+        d,
+        window.setTimeout(() => {
+          if (d.dataset.state !== 'open') d.open = false
+        }, 620),
+      )
+    }
+
+    items.forEach((d) => {
+      if (d.open) d.dataset.state = 'open'
+      d.querySelector('summary')?.addEventListener('click', (e) => {
+        e.preventDefault()
+        if (d.dataset.state === 'open') close(d)
+        else {
+          items.forEach((o) => o !== d && close(o))
+          open(d)
+        }
+      })
+      // Apertura por otras vías (buscar en la página, enlaces): se muestra al momento
+      d.addEventListener('toggle', () => {
+        if (d.open && d.dataset.state !== 'open' && d.dataset.pending === undefined)
+          d.dataset.state = 'open'
+      })
+    })
+  })
+</script>

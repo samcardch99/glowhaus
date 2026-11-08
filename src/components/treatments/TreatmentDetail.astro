@@ -28,10 +28,11 @@ const videoId = `tx-video-${tx.slug.es}`
 const book = whatsappHref(lang, name)
 ---
 
-<div class="relative isolate overflow-clip">
+<div class="relative isolate overflow-clip" data-tx-page>
   <!-- Fondo desenfocado -->
   <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
     <Image
+      data-hero-bg
       src={tx.detailImg ?? tx.img}
       alt=""
       widths={[480, 800]}
@@ -45,10 +46,10 @@ const book = whatsappHref(lang, name)
     data-theme="light"
     class="px-gutter flex flex-col gap-9 pt-[clamp(120px,15vh,150px)] pb-[88px]"
   >
-    <Button href={pathFor(lang, 'treatments')} tone="dark" back class="self-start">
+    <Button href={pathFor(lang, 'treatments')} tone="dark" back class="self-start" data-hero-part>
       {t('Atrás')}
     </Button>
-    <nav aria-label={t('Migas de pan')}>
+    <nav aria-label={t('Migas de pan')} data-hero-part>
       <ol class="text-taupe m-0 flex list-none flex-wrap gap-2 p-0 text-[14.5px] font-medium">
         <li>
           <a href={pathFor(lang, 'home')} class="hover:text-ink underline-offset-4 hover:underline">
@@ -74,29 +75,32 @@ const book = whatsappHref(lang, name)
     <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] items-start gap-14">
       <div class="flex flex-col gap-[30px]">
         <div class="flex flex-col gap-3.5">
-          <span class="eyebrow text-gold-dark">{t(tx.tag)}</span>
-          <h1 data-reveal class="font-display m-0 text-[clamp(44px,6vw,84px)] leading-none">
+          <span class="eyebrow text-gold-dark" data-hero-part>
+            {t(tx.tag)}
+          </span>
+          <h1
+            data-words
+            data-wstep="26"
+            data-wdelay="380"
+            class="font-display m-0 text-[clamp(44px,6vw,84px)] leading-none text-balance"
+          >
             {name}
           </h1>
         </div>
-        <div class="border-beige flex flex-col gap-2.5 border-t pt-[22px]">
+        <div class="border-beige flex flex-col gap-2.5 border-t pt-[22px]" data-hero-part>
           <h2 class="label-caps text-brown m-0 tracking-[0.18em]">{t('EN QUÉ CONSISTE')}</h2>
-          <p
-            data-reveal
-            data-delay="200"
-            class="text-brown m-0 text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.6] text-pretty"
-          >
+          <p class="text-brown m-0 text-[clamp(17px,calc(12px+0.8vw),20px)] leading-[1.6] text-pretty">
             {t(tx.what)}
           </p>
         </div>
-        <dl class="m-0 grid grid-cols-3 gap-3 py-[22px] min-[760px]:gap-5">
+        <dl class="m-0 grid grid-cols-[repeat(3,minmax(0,1fr))] gap-3 py-[22px] min-[760px]:gap-5">
           {[
             ['SESIONES', tx.sessions],
             ['DURACIÓN', tx.duration],
             ['RECUPERACIÓN', tx.recovery],
           ].map(([k, v]) => (
-            <div class="flex flex-col gap-1.5">
-              <dt class="label-caps text-gold-dark max-[759px]:text-[11.5px] max-[759px]:tracking-[0.08em]">
+            <div class="flex flex-col gap-1.5" data-hero-fact>
+              <dt class="label-caps text-gold-dark max-[759px]:text-[10.5px] max-[759px]:tracking-[0.04em] max-[759px]:break-words">
                 {t(k!)}
               </dt>
               <dd class="m-0 text-[clamp(19px,2vw,24px)] leading-tight font-semibold">{t(v!)}</dd>
@@ -104,17 +108,24 @@ const book = whatsappHref(lang, name)
           ))}
         </dl>
         <div class="flex flex-col gap-3">
-          <h2 class="label-caps text-brown m-0 tracking-[0.18em]">{t('RECOMENDADO PARA')}</h2>
+          <h2 class="label-caps text-brown m-0 tracking-[0.18em]" data-hero-part>
+            {t('RECOMENDADO PARA')}
+          </h2>
           <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
             {tx.forWho.map((w) => (
-              <li class="bg-sand rounded-[14px] px-4 py-[9px] text-base font-medium">{t(w)}</li>
+              <li data-hero-chip class="bg-sand rounded-[14px] px-4 py-[9px] text-base font-medium">
+                {t(w)}
+              </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <figure class="relative m-0 aspect-[4/5] overflow-hidden rounded-[14px] max-[759px]:aspect-[4/4.4]">
-        <div class="bg-sand size-full overflow-hidden">
+      <figure
+        data-hero-media
+        class="relative m-0 aspect-[4/5] overflow-hidden rounded-[14px] max-[759px]:aspect-[4/4.4]"
+      >
+        <div class="bg-sand size-full overflow-hidden" data-hero-media-inner>
           {still ? (
             <Image
               src={still}
@@ -141,7 +152,10 @@ const book = whatsappHref(lang, name)
             />
           )}
         </div>
-        <figcaption class="glass-chip pointer-events-none absolute inset-x-4 bottom-4 flex flex-col gap-px rounded-[14px] px-[18px] py-3.5 max-[759px]:rounded-lg">
+        <figcaption
+          data-hero-cap
+          class="glass-chip pointer-events-none absolute inset-x-4 bottom-4 flex flex-col gap-px rounded-[14px] px-[18px] py-3.5 max-[759px]:rounded-lg"
+        >
           <span class="text-cream text-[clamp(17px,1.4vw,20px)] leading-[1.2] font-semibold">
             {name}
           </span>
@@ -161,19 +175,19 @@ const book = whatsappHref(lang, name)
     class="bg-cream stack-shadow px-gutter relative z-[2] grid grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] gap-14 pt-[clamp(96px,17vh,170px)] pb-24"
   >
     <div class="flex flex-col gap-[22px]">
-      <h2 data-reveal class="font-display m-0 text-[clamp(30px,3.6vw,48px)] leading-[1.1]">
+      <h2
+        data-reveal="solo"
+        data-delay="100"
+        class="font-display m-0 text-[clamp(30px,3.6vw,48px)] leading-[1.1]"
+      >
         {t('Precios de cada tratamiento')}
       </h2>
-      <table
-        data-reveal
-        data-delay="200"
-        class="w-full border-collapse border-t border-ink text-left"
-      >
+      <table data-price-table class="w-full border-collapse border-t border-ink text-left">
         <caption class="sr-only">
           {t('Precios de cada tratamiento')}:{t(tx.name)}
         </caption>
         <thead>
-          <tr class="border-beige border-b">
+          <tr data-price-row class="border-beige border-b">
             <th
               scope="col"
               class="label-caps text-taupe w-[62%] py-3.5 pr-3 font-semibold tracking-[0.14em]"
@@ -187,7 +201,7 @@ const book = whatsappHref(lang, name)
         </thead>
         <tbody>
           {tx.items.map((it) => (
-            <tr class="border-beige border-b align-baseline">
+            <tr data-price-row class="border-beige border-b align-baseline">
               <th
                 scope="row"
                 class="py-[18px] pr-3 text-[clamp(16.5px,1.3vw,18.5px)] font-semibold"
@@ -199,15 +213,28 @@ const book = whatsappHref(lang, name)
           ))}
         </tbody>
       </table>
-      <p class="text-gold-dark m-0 text-[20px] leading-[1.55] font-medium">{t(tx.desc)}</p>
-      <p class="text-body-sm text-gold-dark m-0">
+      <p
+        data-reveal="solo"
+        data-delay="450"
+        class="text-gold-dark m-0 text-[20px] leading-[1.55] font-medium"
+      >
+        {t(tx.desc)}
+      </p>
+      <p data-reveal="solo" data-delay="550" class="text-body-sm text-gold-dark m-0">
         {t('Precios sujetos a cambios. El plan final se confirma en tu valoración.')}
       </p>
-      <Button href={book} external tone="dark" class="mt-2 self-start">
+      <Button
+        href={book}
+        external
+        tone="dark"
+        class="tx-sheen relative mt-2 self-start overflow-hidden"
+        data-reveal="solo"
+        data-delay="650"
+      >
         {t('Reservar cita')}
       </Button>
     </div>
-    <PaymentMethods lang={lang} class="self-end" />
+    <PaymentMethods lang={lang} class="self-end" data-reveal="solo" data-delay="650" />
   </section>
 </div>
 
@@ -248,3 +275,152 @@ const book = whatsappHref(lang, name)
 </section>
 
 <RelatedTreatments lang={lang} treatment={tx} />
+
+<style>
+  /* Estado inicial de la entrada (solo con JS y sin movimiento reducido) */
+  :global(.js) [data-hero-part],
+  :global(.js) [data-hero-fact],
+  :global(.js) [data-hero-chip],
+  :global(.js) [data-hero-cap],
+  :global(.js) [data-price-row] {
+    opacity: 0;
+  }
+  :global(.js) [data-hero-media] {
+    clip-path: inset(0 0 0 100%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) [data-hero-part],
+    :global(.js) [data-hero-fact],
+    :global(.js) [data-hero-chip],
+    :global(.js) [data-hero-cap],
+    :global(.js) [data-price-row] {
+      opacity: 1;
+    }
+    :global(.js) [data-hero-media] {
+      clip-path: none;
+    }
+  }
+
+  /* «Reservar cita»: destello dorado al pasar el ratón (escritorio) */
+  :global(.tx-sheen)::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgb(232 196 130 / 0.55) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+  @media (hover: hover) and (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+    :global(.tx-sheen):hover::after {
+      transform: translateX(120%);
+      transition: transform 0.9s var(--ease-swift);
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from '../../scripts/gsap'
+
+  // Entrada de la ficha, al estilo de las páginas del diseño: el fondo
+  // desenfocado se asienta, y migas → etiqueta → titular (data-words, global)
+  // → texto → datos → chips aparecen en cascada; la foto se descubre con un
+  // barrido. Después, las filas de precios entran escalonadas.
+  const page = document.querySelector<HTMLElement>('[data-tx-page]')
+  if (page && !prefersReducedMotion()) {
+    const q = <T extends Element = HTMLElement>(sel: string) =>
+      Array.from(page.querySelectorAll<T>(sel))
+    const from = { opacity: 0, y: 36, filter: 'blur(6px)' }
+    const to = {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      ease: 'glow',
+      clearProps: 'transform,filter',
+    }
+
+    const tl = gsap.timeline({ delay: 0.05 })
+    const bg = page.querySelector('[data-hero-bg]')
+    if (bg)
+      tl.fromTo(
+        bg,
+        { scale: 1.18, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 1.8, ease: 'glow', clearProps: 'transform' },
+        0,
+      )
+    const parts = q('[data-hero-part]')
+    // Botón y migas, etiqueta; el resto tras el titular
+    tl.fromTo(parts.slice(0, 3), from, { ...to, duration: 0.9, stagger: 0.12 }, 0.1)
+    tl.fromTo(parts.slice(3), from, { ...to, duration: 0.9, stagger: 0.14 }, 0.75)
+    tl.fromTo(q('[data-hero-fact]'), from, { ...to, duration: 0.8, stagger: 0.1 }, 0.9)
+    tl.fromTo(
+      q('[data-hero-chip]'),
+      { opacity: 0, y: 14, scale: 0.94 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: 'glow',
+        stagger: 0.05,
+        clearProps: 'transform',
+      },
+      1.15,
+    )
+    const media = page.querySelector('[data-hero-media]')
+    const inner = page.querySelector('[data-hero-media-inner]')
+    if (media)
+      tl.fromTo(
+        media,
+        { clipPath: 'inset(0 0 0 100%)' },
+        {
+          clipPath: 'inset(0 0 0 0%)',
+          duration: 1.1,
+          ease: 'wipe',
+          onComplete: () => gsap.set(media, { clipPath: 'none' }),
+        },
+        0.25,
+      )
+    if (inner)
+      tl.fromTo(
+        inner,
+        { scale: 1.14 },
+        { scale: 1, duration: 1.6, ease: 'glow', clearProps: 'transform' },
+        0.25,
+      )
+    tl.fromTo(
+      q('[data-hero-cap]'),
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: 0.7, ease: 'glow', clearProps: 'transform' },
+      1.05,
+    )
+
+    // Filas de precios: entran una tras otra al llegar la tabla
+    const table = page.querySelector('[data-price-table]')
+    const rows = q('[data-price-row]')
+    if (table && rows.length)
+      ScrollTrigger.create({
+        trigger: table,
+        start: 'top 85%',
+        once: true,
+        onEnter: () =>
+          gsap.fromTo(
+            rows,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: 'glow',
+              stagger: 0.08,
+              delay: 0.25,
+              clearProps: 'transform',
+            },
+          ),
+      })
+  }
+</script>

@@ -8,8 +8,10 @@ import b3 from '../../assets/about/b3.jpg'
 import b4 from '../../assets/about/b4.jpg'
 import { pathFor, useT, type Lang } from '../../i18n'
 
-// «Una casa moderna de estética»: texto y galería de cuatro fotos que rota cada
-// 4 s (se detiene con el ratón encima o el foco dentro; las miniaturas eligen).
+// «Una casa moderna de estética»: texto y galería de cuatro fotos. La foto grande
+// cambia cada 4 s con un fundido y un leve acercamiento; la miniatura activa
+// muestra el avance en una barra dorada. Se para con el ratón encima, el foco
+// dentro, fuera de pantalla o con la pestaña oculta, y 6 s tras elegir una foto.
 interface Props {
   lang: Lang
 }
@@ -68,10 +70,8 @@ const photos = [
           widths={[420, 640, 900]}
           sizes="(min-width: 760px) 534px, 100vw"
           style={`object-position:${p.pos}`}
-          class:list={[
-            'absolute inset-0 size-full object-cover transition-opacity duration-[1100ms]',
-            i === 0 ? 'opacity-100' : 'opacity-0',
-          ]}
+          data-on={i === 0 ? '' : undefined}
+          class="about-img absolute inset-0 size-full object-cover"
         />
       ))}
       <div class="glass-chip pointer-events-none absolute bottom-3 left-3 flex max-w-[calc(100%-24px)] items-center gap-2.5 rounded-xl py-2 pr-3.5 pl-2">
@@ -117,36 +117,133 @@ const photos = [
             aria-hidden="true"
             class="group-aria-pressed:border-gold pointer-events-none absolute inset-y-0 -inset-x-1.5 rounded-[18px] border-x-2 border-transparent transition-colors duration-400"
           />
+          <span
+            aria-hidden="true"
+            class="about-track pointer-events-none absolute inset-x-2.5 bottom-2 h-0.5 overflow-hidden rounded-full bg-[rgb(250_248_245/0.35)] opacity-0 transition-opacity duration-300"
+          >
+            <span data-about-bar class="about-bar bg-gold block h-full w-full"></span>
+          </span>
         </button>
       ))}
     </div>
   </div>
 </section>
 
+<style>
+  .about-img {
+    opacity: 0;
+    transform: scale(1.08);
+    transition:
+      opacity 1.1s ease,
+      transform 0s linear 1.1s;
+  }
+  .about-img[data-on] {
+    opacity: 1;
+    transform: scale(1);
+    transition:
+      opacity 1.1s ease,
+      transform 5.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  :global(html:not(.js)) .about-img[data-on] {
+    transform: none;
+  }
+  /* Barra de avance de la miniatura activa (solo mientras rota) */
+  [data-rotating] [aria-pressed='true'] .about-track {
+    opacity: 1;
+  }
+  .about-bar {
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+  }
+  [data-rotating] [aria-pressed='true'] .about-bar {
+    animation: about-fill 4s linear both;
+  }
+  [data-rotating][data-paused] .about-bar {
+    animation-play-state: paused;
+  }
+  @keyframes about-fill {
+    to {
+      transform: scaleX(1);
+    }
+  }
+</style>
+
 <script>
+  import { prefersReducedMotion } from '../../scripts/gsap'
+
   const gal = document.querySelector<HTMLElement>('[data-about-gal]')
   if (gal) {
     const imgs = gal.querySelectorAll<HTMLElement>('[data-about-img]')
     const thumbs = gal.querySelectorAll<HTMLButtonElement>('[data-about-thumb]')
     let idx = 0
-    let paused = false
     const show = (i: number) => {
       idx = i
-      imgs.forEach((im, k) => {
-        im.classList.toggle('opacity-100', k === i)
-        im.classList.toggle('opacity-0', k !== i)
-      })
+      imgs.forEach((im, k) => im.toggleAttribute('data-on', k === i))
       thumbs.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)))
     }
-    thumbs.forEach((b, i) => b.addEventListener('click', () => show(i)))
-    gal.addEventListener('mouseenter', () => (paused = true))
-    gal.addEventListener('mouseleave', () => (paused = false))
-    gal.addEventListener('focusin', () => (paused = true))
-    gal.addEventListener('focusout', () => (paused = false))
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      window.setInterval(() => {
-        if (!paused && !document.hidden) show((idx + 1) % imgs.length)
-      }, 4000)
+
+    if (prefersReducedMotion()) {
+      thumbs.forEach((b, i) => b.addEventListener('click', () => show(i)))
+    } else {
+      // El reloj es la propia barra: al terminar su animación de 4 s pasa a la
+      // siguiente foto. Pausar la barra pausa la rotación.
+      gal.setAttribute('data-rotating', '')
+      const holds = { hover: false, focus: false, offscreen: true, hidden: document.hidden }
+      let holdUntil = 0
+      let holdT = 0
+      const sync = () => {
+        const paused =
+          holds.hover || holds.focus || holds.offscreen || holds.hidden || Date.now() < holdUntil
+        gal.toggleAttribute('data-paused', paused)
+      }
+      const restartBar = () => {
+        const bar = thumbs[idx]?.querySelector<HTMLElement>('[data-about-bar]')
+        if (!bar) return
+        bar.style.animation = 'none'
+        void bar.offsetWidth
+        bar.style.animation = ''
+      }
+      gal.addEventListener('animationend', (e) => {
+        if (!(e.target as Element).hasAttribute('data-about-bar')) return
+        show((idx + 1) % imgs.length)
+      })
+      thumbs.forEach((b, i) =>
+        b.addEventListener('click', () => {
+          show(i)
+          restartBar()
+          holdUntil = Date.now() + 6000
+          window.clearTimeout(holdT)
+          holdT = window.setTimeout(sync, 6000)
+          sync()
+        }),
+      )
+      gal.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'mouse') {
+          holds.hover = true
+          sync()
+        }
+      })
+      gal.addEventListener('pointerleave', () => {
+        holds.hover = false
+        sync()
+      })
+      gal.addEventListener('focusin', () => {
+        holds.focus = true
+        sync()
+      })
+      gal.addEventListener('focusout', () => {
+        holds.focus = false
+        sync()
+      })
+      document.addEventListener('visibilitychange', () => {
+        holds.hidden = document.hidden
+        sync()
+      })
+      new IntersectionObserver(([en]) => {
+        holds.offscreen = !en?.isIntersecting
+        sync()
+      }).observe(gal)
+      sync()
     }
   }
 </script>

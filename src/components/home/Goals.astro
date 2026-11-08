@@ -6,7 +6,10 @@ import { treatments } from '../../data/treatments'
 import { treatmentPath, useT, type Lang } from '../../i18n'
 
 // «¿Qué desearías mejorar?»: ocho objetivos y, para el elegido, dos tratamientos
-// sugeridos sobre una foto. Sin JS se ve el primero.
+// sugeridos sobre una foto. Sin JS se ve el primero. En pantallas de 760 px o
+// más los objetivos avanzan solos cada 3,6 s mientras se ven (7 s de pausa
+// tras elegir uno); la foto se funde con un leve acercamiento y las
+// sugerencias vuelven a entrar.
 interface Props {
   lang: Lang
 }
@@ -61,7 +64,6 @@ const t = useT(lang)
 
     <div
       id="goal-panel"
-      aria-live="polite"
       class="bg-ink relative aspect-[4/5] min-h-[580px] w-full max-w-[560px] justify-self-center overflow-hidden rounded-[14px] lg:aspect-[20/21] lg:h-[min(72vh,640px)] lg:min-h-[540px] lg:w-auto lg:max-w-full"
     >
       {goals.map((g, i) => (
@@ -83,7 +85,10 @@ const t = useT(lang)
         {goals.map((g, i) => (
           <div data-goal-sugs={i} hidden={i !== 0} class="flex flex-col gap-3">
             {g.s.map((s) => (
-              <div class="grid grid-cols-1 items-center gap-x-5 gap-y-3 rounded-[14px] border border-[rgb(250_248_245/0.2)] bg-[rgb(24_18_14/0.32)] p-[clamp(16px,1.6vw,22px)] backdrop-blur-[16px] lg:grid-cols-[minmax(0,1fr)_auto]">
+              <div
+                data-goal-card
+                class="grid grid-cols-1 items-center gap-x-5 gap-y-3 rounded-[14px] border border-[rgb(250_248_245/0.2)] bg-[rgb(24_18_14/0.32)] p-[clamp(16px,1.6vw,22px)] backdrop-blur-[16px] lg:grid-cols-[minmax(0,1fr)_auto]"
+              >
                 <div class="flex min-w-0 flex-col gap-[5px]">
                   <span class="text-gold-light text-xs font-semibold tracking-[0.16em]">
                     {t(s.tag)}
@@ -118,22 +123,68 @@ const t = useT(lang)
 </section>
 
 <script>
+  import { gsap, prefersReducedMotion } from '../../scripts/gsap'
+
   document.querySelectorAll<HTMLElement>('[data-goals]').forEach((root) => {
-    const btns = root.querySelectorAll<HTMLButtonElement>('[data-goal]')
+    const reduce = prefersReducedMotion()
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-goal]')]
     const imgs = root.querySelectorAll<HTMLElement>('[data-goal-img]')
     const sugs = root.querySelectorAll<HTMLElement>('[data-goal-sugs]')
+    const panel = root.querySelector<HTMLElement>('#goal-panel')
+    let cur = 0
+
+    const show = (i: number, user: boolean) => {
+      if (i === cur) return
+      cur = i
+      btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)))
+      imgs.forEach((im, k) => {
+        const on = k === i
+        im.classList.toggle('opacity-100', on)
+        im.classList.toggle('scale-100', on)
+        im.classList.toggle('opacity-0', !on)
+        im.classList.toggle('scale-[1.08]', !on)
+      })
+      // Solo se anuncia lo que elige la persona, no la rotación automática
+      if (user) panel?.setAttribute('aria-live', 'polite')
+      else panel?.removeAttribute('aria-live')
+      sugs.forEach((s, k) => (s.hidden = k !== i))
+      const cards = sugs[i]?.querySelectorAll('[data-goal-card]')
+      if (cards && !reduce)
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 28, scale: 0.97 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.7,
+            ease: 'glow',
+            stagger: 0.1,
+            clearProps: 'all',
+          },
+        )
+    }
+
+    let touched = 0
     btns.forEach((b, i) =>
       b.addEventListener('click', () => {
-        btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)))
-        imgs.forEach((im, k) => {
-          const on = k === i
-          im.classList.toggle('opacity-100', on)
-          im.classList.toggle('scale-100', on)
-          im.classList.toggle('opacity-0', !on)
-          im.classList.toggle('scale-[1.08]', !on)
-        })
-        sugs.forEach((s, k) => (s.hidden = k !== i))
+        touched = Date.now()
+        show(i, true)
       }),
     )
+
+    if (reduce) return
+    let visible = false
+    new IntersectionObserver(([en]) => (visible = !!en?.isIntersecting), {
+      threshold: 0.35,
+    }).observe(panel ?? root)
+    let focusIn = false
+    root.addEventListener('focusin', () => (focusIn = true))
+    root.addEventListener('focusout', () => (focusIn = false))
+    window.setInterval(() => {
+      if (window.innerWidth < 760 || !visible || document.hidden || focusIn) return
+      if (Date.now() - touched < 7000) return
+      show((cur + 1) % btns.length, false)
+    }, 3600)
   })
 </script>
