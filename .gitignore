@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 # Diseño de Claude Design (referencia local, pesa ~380 MB)
 design/
+site.zip
