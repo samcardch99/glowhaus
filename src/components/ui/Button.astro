@@ -1,0 +1,46 @@
+---
+import Arrow from './Arrow.astro'
+
+// Botón de cristal con flecha. `tone="light"` para fondos oscuros (cristal claro)
+// y `tone="dark"` para fondos claros.
+interface Props {
+  href?: string
+  tone?: 'light' | 'dark'
+  back?: boolean
+  external?: boolean
+  type?: 'button' | 'submit'
+  class?: string
+  [key: string]: unknown
+}
+const {
+  href,
+  tone = 'light',
+  back = false,
+  external = false,
+  type = 'button',
+  class: cls = '',
+  ...rest
+} = Astro.props
+const classes = [tone === 'light' ? 'btn-glass' : 'btn-glass-dark', cls]
+const ext = external ? { target: '_blank', rel: 'noopener' } : {}
+---
+
+{
+  href ? (
+    <a href={href} class:list={classes} {...ext} {...rest}>
+      {back && <Arrow back />}
+      <span>
+        <slot />
+      </span>
+      {!back && <Arrow />}
+    </a>
+  ) : (
+    <button type={type} class:list={classes} {...rest}>
+      {back && <Arrow back />}
+      <span>
+        <slot />
+      </span>
+      {!back && <Arrow />}
+    </button>
+  )
+}

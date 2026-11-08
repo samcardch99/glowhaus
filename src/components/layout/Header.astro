@@ -1,0 +1,234 @@
+---
+import { Image } from 'astro:assets'
+import wordmark from '../../assets/glowhaus-wordmark.png'
+import logoBlanco from '../../assets/glowhaus-logo-blanco.png'
+import Arrow from '../ui/Arrow.astro'
+import SocialIcon from '../ui/SocialIcon.astro'
+import { menuItems, site, whatsappHref } from '../../data/site'
+import { treatments } from '../../data/treatments'
+import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
+
+interface Props {
+  lang: Lang
+  /** Ruta de esta misma página en el otro idioma */
+  altPath: string
+  /** Tema inicial de la cabecera: overlay (transparente sobre foto/vídeo), light o dark */
+  theme?: 'overlay' | 'light' | 'dark'
+}
+
+const { lang, altPath, theme = 'light' } = Astro.props
+const t = useT(lang)
+const homeHref = pathFor(lang, 'home')
+const esHref = lang === 'es' ? Astro.url.pathname : altPath
+const enHref = lang === 'en' ? Astro.url.pathname : altPath
+const book = whatsappHref(lang)
+const fotona = treatments[0]!
+
+const items = menuItems.map((m, i) => ({
+  n: String(i + 1).padStart(2, '0'),
+  label: t(m.label),
+  href: m.fotona
+    ? treatmentPath(lang, fotona.slug[lang])
+    : m.page
+      ? pathFor(lang, m.page) + (m.hash ? `#${m.hash}` : '')
+      : homeHref,
+}))
+---
+
+<header
+  id="gh-header"
+  data-theme={theme}
+  class="group/h fixed inset-x-0 top-0 z-30 transition-[background,transform] duration-500 ease-(--ease-glow)"
+>
+  <!-- Desenfoque que aparece al bajar, con degradado hacia abajo -->
+  <div
+    aria-hidden="true"
+    class="hdr-blur pointer-events-none absolute inset-x-0 top-0 -bottom-7 -z-10 opacity-0 backdrop-blur-[14px] transition-opacity duration-400"
+  >
+  </div>
+  <div
+    class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[clamp(20px,2.4vw,36px)] px-gutter pt-[clamp(18px,calc(120px-14vw),56px)] pb-[18px]"
+  >
+    <a href={homeHref} class="flex justify-self-start" aria-label="GlowHaus, inicio">
+      <Image
+        src={wordmark}
+        alt="GlowHaus"
+        width={340}
+        class="hdr-logo block h-auto w-[clamp(108px,10vw,170px)] transition-[filter] duration-500"
+        loading="eager"
+      />
+    </a>
+
+    <!-- En móvil el botón del menú va centrado -->
+    <button
+      type="button"
+      data-menu-open
+      aria-label={t('Menú')}
+      aria-controls="gh-menu"
+      aria-expanded="false"
+      class="hdr-burger flex items-center justify-center justify-self-center px-1 py-2.5 min-[760px]:hidden"
+    >
+      <span class="flex w-7 flex-col gap-1">
+        <span class="block h-0.5 bg-current"></span>
+        <span class="block h-0.5 bg-current"></span>
+        <span class="block h-0.5 w-[19px] bg-current"></span>
+      </span>
+    </button>
+    <span class="max-[759px]:hidden"></span>
+
+    <div class="flex items-center gap-[clamp(18px,2vw,32px)] justify-self-end">
+      <button
+        type="button"
+        data-menu-open
+        aria-label={t('Menú')}
+        aria-controls="gh-menu"
+        aria-expanded="false"
+        class="hdr-burger hover:text-gold flex items-center justify-center px-1 py-2.5 transition-colors max-[759px]:hidden"
+      >
+        <span class="flex w-7 flex-col gap-1">
+          <span class="block h-0.5 bg-current"></span>
+          <span class="block h-0.5 bg-current"></span>
+          <span class="block h-0.5 w-[19px] bg-current"></span>
+        </span>
+      </button>
+      <span
+        class="hdr-fg text-[clamp(11px,calc(1.6vw-7px),15.5px)] font-semibold tracking-[.08em] whitespace-nowrap max-[759px]:hidden"
+      >
+        <a href={esHref} hreflang="es" lang="es" class:list={[lang !== 'es' && 'opacity-50']} aria-current={lang === 'es' ? 'true' : undefined}>ES</a><span class="opacity-50"> / </span><a href={enHref} hreflang="en" lang="en" class:list={[lang !== 'en' && 'opacity-50']} aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+      </span>
+      <a
+        href={book}
+        target="_blank"
+        rel="noopener"
+        data-book
+        class="hdr-btn hover:!bg-gold hover:!border-gold hover:!text-cream inline-flex items-center gap-[clamp(8px,1vw,14px)] rounded-[14px] border px-[clamp(16px,1.6vw,22px)] py-[clamp(9px,.8vw,11px)] text-[clamp(15.5px,calc(10px+0.8vw),20.5px)] whitespace-nowrap backdrop-blur-[10px] transition-colors duration-300 max-[759px]:rounded-lg max-[759px]:px-3 max-[759px]:py-2 max-[759px]:text-[12px] max-[759px]:font-semibold max-[759px]:tracking-[.03em]"
+      >
+        <span class="max-[759px]:hidden">{t('Reserve su cita')}</span>
+        <span class="min-[760px]:hidden">{t('Reservar')}</span>
+        <Arrow />
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Menú a pantalla completa -->
+<dialog
+  id="gh-menu"
+  aria-label={t('Menú')}
+  class="text-cream m-0 h-dvh max-h-none w-screen max-w-none overflow-y-auto bg-[rgb(24_18_14/0.62)] p-0 opacity-0 backdrop-blur-[28px] backdrop-saturate-[1.1] backdrop:bg-transparent"
+>
+  <div
+    class="flex min-h-full flex-col px-gutter pt-[clamp(22px,calc(120px-14vw),56px)] pb-10"
+  >
+    <div class="flex items-center justify-between gap-5">
+      <Image src={wordmark} alt="GlowHaus" width={340} class="block h-auto w-[clamp(108px,10vw,170px)]" />
+      <button
+        type="button"
+        data-menu-close
+        class="btn-glass !gap-2.5 !px-[clamp(12px,calc(5px+1.3vw),18px)] !py-[clamp(8px,calc(4px+0.6vw),10px)] !text-[clamp(13.5px,calc(11px+0.6vw),16px)] !font-semibold !tracking-[.03em]"
+      >
+        <span class="text-[1.1em] leading-none" aria-hidden="true">✕</span><span>{t('Cerrar')}</span>
+      </button>
+    </div>
+
+    <div
+      class="grid flex-1 grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] items-center gap-10 py-10"
+    >
+      <nav aria-label={t('Menú')} class="flex flex-col justify-center gap-[clamp(4px,1vh,10px)]">
+        {
+          items.map((m) => (
+            <a
+              href={m.href}
+              data-menu-item
+              class="hover:text-gold flex items-baseline gap-[clamp(14px,2vw,28px)] transition-[color,padding] duration-300 hover:pl-3.5"
+            >
+              <span class="text-gold min-w-[22px] text-[clamp(12px,calc(9px+0.7vw),14.5px)] font-medium tracking-[.16em]">
+                {m.n}
+              </span>
+              <span class="text-[clamp(18px,calc(12px+1.6vw),40px)] leading-[1.12] font-semibold">
+                {m.label}
+              </span>
+            </a>
+          ))
+        }
+        <span class="mt-4 text-[15px] font-semibold tracking-[.08em] min-[760px]:hidden">
+          <a href={esHref} hreflang="es" class:list={[lang !== 'es' && 'opacity-50']}>ES</a><span class="opacity-50"> / </span><a href={enHref} hreflang="en" class:list={[lang !== 'en' && 'opacity-50']}>EN</a>
+        </span>
+      </nav>
+      <div class="flex flex-col items-center justify-center max-[759px]:hidden">
+        <Image src={logoBlanco} alt="" width={760} class="block h-auto w-[clamp(200px,26vw,380px)]" />
+        <div class="mt-7 flex justify-center gap-2.5">
+          <SocialIcon name="instagram" href={site.instagram} label="Instagram" />
+          <SocialIcon name="facebook" href={site.facebook} label="Facebook" />
+          <SocialIcon name="tiktok" href={site.tiktok} label="TikTok" />
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="text-silver flex flex-wrap items-center justify-between gap-4 border-t border-[rgb(250_248_245/0.16)] pt-[22px] text-base font-medium"
+    >
+      <span>11890 SW 8th St Ste 211, Miami, FL 33184</span>
+      <a
+        href={book}
+        target="_blank"
+        rel="noopener"
+        class="btn-glass !px-[clamp(12px,calc(5px+1.3vw),18px)] !py-[clamp(8px,calc(4px+0.6vw),10px)] !text-[clamp(13.5px,calc(11px+0.6vw),16px)] !font-semibold !tracking-[.03em]"
+      >
+        <span>{t('Reserve su cita')}</span><Arrow />
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<style is:global>
+  /* Colores de la cabecera según lo que hay debajo (lo cambia src/scripts/header.ts) */
+  #gh-header {
+    --hdr-fg: var(--color-ink);
+    color: var(--hdr-fg);
+    background: linear-gradient(
+      180deg,
+      rgb(var(--hdr-bg, 250 248 245) / 1) 0%,
+      rgb(var(--hdr-bg, 250 248 245) / 0.92) 70%,
+      rgb(var(--hdr-bg, 250 248 245) / 0) 100%
+    );
+  }
+  #gh-header .hdr-logo {
+    filter: brightness(0) opacity(0.88);
+  }
+  #gh-header .hdr-btn {
+    background: rgb(24 18 14 / 0.06);
+    border-color: rgb(24 18 14 / 0.55);
+    color: var(--color-ink);
+  }
+  #gh-header[data-theme='overlay'],
+  #gh-header[data-theme='dark'] {
+    --hdr-fg: var(--color-cream);
+    background: transparent;
+  }
+  #gh-header[data-theme='overlay'] .hdr-logo,
+  #gh-header[data-theme='dark'] .hdr-logo {
+    filter: none;
+  }
+  #gh-header[data-theme='overlay'] .hdr-btn,
+  #gh-header[data-theme='dark'] .hdr-btn {
+    background: rgb(250 248 245 / 0.14);
+    border-color: rgb(250 248 245 / 0.55);
+    color: var(--color-cream);
+  }
+  #gh-header[data-scrolled]:not([data-theme='overlay']) .hdr-blur {
+    opacity: 1;
+  }
+  #gh-header .hdr-blur {
+    mask-image: linear-gradient(180deg, #000 55%, transparent);
+  }
+  #gh-header[data-hidden] {
+    transform: translateY(-100%);
+  }
+  dialog#gh-menu[open] {
+    display: block;
+  }
+  dialog#gh-menu::backdrop {
+    background: transparent;
+  }
+</style>

@@ -1,0 +1,24 @@
+---
+// Flecha diagonal del diseño (↗). `back` la gira para «Atrás» (↖).
+interface Props {
+  back?: boolean
+  class?: string
+}
+const { back = false, class: cls = '' } = Astro.props
+---
+
+<svg
+  viewBox="0 0 20 20"
+  width="1.45em"
+  height="1.45em"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  aria-hidden="true"
+  class:list={['flex-none', back && '-scale-x-100', cls]}
+>
+  <path d="M5 15 15 5"></path>
+  <path d="M5 5h10v10"></path>
+</svg>

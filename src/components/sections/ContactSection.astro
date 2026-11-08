@@ -1,0 +1,185 @@
+---
+import Arrow from '../ui/Arrow.astro'
+import Button from '../ui/Button.astro'
+import { site } from '../../data/site'
+import { treatments } from '../../data/treatments'
+import { useT, type Lang } from '../../i18n'
+
+// Sección «Tu cita empieza aquí»: formulario (EmailJS) + dirección, horario y mapa.
+interface Props {
+  lang: Lang
+  /** En la página de Contacto ocupa al menos la pantalla y hace de cabecera */
+  standalone?: boolean
+  id?: string
+}
+const { lang, standalone = false, id = 'contacto' } = Astro.props
+const t = useT(lang)
+const motives = ['Consulta inicial', 'Reserva de cita', 'Tratamiento específico', 'Seguimiento']
+const field =
+  'text-cream placeholder:text-cream/45 focus:border-gold w-full border-0 border-b border-[rgb(250_248_245/0.35)] bg-transparent py-2.5 text-[clamp(17px,calc(12px+0.8vw),20px)] outline-none transition-colors focus-visible:outline-none'
+const Heading = standalone ? 'h1' : 'h2'
+---
+
+<section
+  id={id}
+  data-theme="dark"
+  class:list={[
+    'bg-brown text-cream relative z-[11] scroll-mt-[90px] overflow-hidden',
+    standalone ? 'min-h-screen' : 'min-h-screen',
+  ]}
+>
+  <div class="pointer-events-none absolute inset-0 bg-[rgb(24_18_14/0.74)]"></div>
+  <div
+    class="relative flex w-full flex-col gap-[clamp(32px,5vh,56px)] px-gutter pt-[clamp(110px,14vh,140px)] pb-[clamp(48px,7vh,80px)]"
+  >
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] items-end gap-x-16 gap-y-5">
+      <div class="flex flex-col gap-[18px]">
+        <span class="eyebrow text-tan">{t('CONTACTO')}</span>
+        <Heading data-reveal class="font-display m-0 text-[clamp(34px,4.4vw,60px)] leading-[1.05]">
+          {t('Tu cita empieza aquí')}
+        </Heading>
+      </div>
+      <p data-reveal data-delay="200" class="text-body text-cream-3 m-0 max-w-[440px] justify-self-end">
+        {t('Déjanos tus datos y te contactamos, o visítanos en la clínica.')}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] items-stretch gap-4">
+      <form
+        data-contact-form
+        data-lang={lang}
+        data-msg-name={t('Escribe tu nombre.')}
+        data-msg-contact={t('Déjanos un teléfono o un correo para contactarte.')}
+        data-msg-email={t('Revisa el correo: parece incompleto.')}
+        data-msg-error={t('No pudimos enviar el mensaje. Escríbenos por WhatsApp o llámanos al (786) 918-2997.')}
+        data-msg-sending={t('Enviando…')}
+        novalidate
+        class="glass-panel flex flex-col gap-6 self-stretch p-[clamp(28px,3.4vw,48px)]"
+      >
+        <div class="flex flex-col gap-2.5">
+          <span class="eyebrow text-beige">{t('ESCRÍBENOS')}</span>
+          <h3 class="text-gold m-0 text-[clamp(24px,2.4vw,34px)] leading-[1.1] font-semibold">
+            {t('Te contactamos para agendar')}
+          </h3>
+        </div>
+
+        <p data-form-sent hidden class="text-body-sm text-cream-2 m-0" role="status">
+          {t('Gracias. Te escribiremos pronto para confirmar tu cita.')}
+        </p>
+
+        <div data-form-fields class="flex flex-col gap-6">
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-x-7 gap-y-[22px]">
+            <label class="flex flex-col gap-2">
+              <span class="label-caps text-beige">{t('NOMBRE')}</span>
+              <input name="name" type="text" autocomplete="name" required placeholder={t('Tu nombre')} class={field} />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="label-caps text-beige">{t('TELÉFONO')}</span>
+              <input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(786) 000-0000" class={field} />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="label-caps text-beige">{t('CORREO')}</span>
+              <input name="email" type="email" autocomplete="email" placeholder={t('tu@correo.com')} class={field} />
+            </label>
+            <label class="flex flex-col gap-2">
+              <span class="label-caps text-beige">{t('MOTIVO DE CONTACTO')}</span>
+              <select name="reason" data-reason class={field}>
+                {motives.map((m) => <option value={t(m)} class="text-ink">{t(m)}</option>)}
+              </select>
+            </label>
+            <label data-treatment-field hidden class="col-span-full flex flex-col gap-2">
+              <span class="label-caps text-beige">{t('¿QUÉ TRATAMIENTO?')}</span>
+              <select name="treatment" class={field}>
+                {treatments.map((c) => <option value={t(c.name)} class="text-ink">{t(c.name)}</option>)}
+              </select>
+            </label>
+          </div>
+          <label class="flex flex-col gap-2">
+            <span class="label-caps text-beige">{t('MENSAJE')}</span>
+            <textarea
+              name="message"
+              rows="3"
+              placeholder={t('Cuéntanos qué te gustaría mejorar')}
+              class:list={[field, 'resize-y leading-normal']}></textarea>
+          </label>
+          <!-- Trampa para bots: un humano no la ve ni la rellena -->
+          <label class="sr-only" aria-hidden="true">
+            Website
+            <input name="website" type="text" tabindex="-1" autocomplete="off" />
+          </label>
+          <p data-form-error hidden role="alert" class="text-gold-light m-0 text-[15px]"></p>
+          <Button type="submit" class="mt-1 self-start min-w-[min(100%,200px)]">{t('Enviar')}</Button>
+        </div>
+      </form>
+
+      <div class="flex min-w-0 flex-col gap-4">
+        <div class="glass-panel px-[clamp(24px,2.6vw,36px)] pt-[clamp(24px,2.6vw,36px)] pb-2">
+          <dl class="mt-2">
+            <div class="grid grid-cols-[110px_minmax(0,1fr)] gap-4 border-b border-[rgb(250_248_245/0.14)] py-4">
+              <dt class="label-caps text-tan pt-[3px]">{t('DIRECCIÓN')}</dt>
+              <dd class="text-body-sm text-cream-2 m-0">11890 SW 8th St, Suite 211<br />Miami, FL 33184</dd>
+            </div>
+            <div class="grid grid-cols-[110px_minmax(0,1fr)] gap-4 border-b border-[rgb(250_248_245/0.14)] py-4">
+              <dt class="label-caps text-tan pt-[3px]">{t('HORARIO')}</dt>
+              <dd class="text-body-sm text-cream-2 m-0">{t('Lunes a viernes')}<br />{t('9:00 a. m. a 6:00 p. m.')}</dd>
+            </div>
+            <div class="grid grid-cols-[110px_minmax(0,1fr)] gap-4 py-4">
+              <dt class="label-caps text-tan pt-[3px]">{t('CÓMO LLEGAR')}</dt>
+              <dd class="m-0">
+                <a href={site.mapsLink} target="_blank" rel="noopener" class="btn-glass max-w-full !whitespace-normal">
+                  <span>{t('Abrir en Google Maps')}</span><Arrow />
+                </a>
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <!-- El mapa de Google se carga al pedirlo, para no frenar la página -->
+        <div
+          data-map
+          class="bg-brown-2 relative min-h-[260px] flex-1 overflow-hidden rounded-[14px] border border-[rgb(250_248_245/0.55)]"
+        >
+          <button
+            type="button"
+            data-map-load
+            data-src={site.mapsEmbed}
+            data-title={t('Mapa de GlowHaus Aesthetics')}
+            class="text-cream hover:text-gold absolute inset-0 flex flex-col items-center justify-center gap-3 transition-colors"
+          >
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+            <span class="label-caps">{t('Ver mapa')}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { sendContact } from '../../scripts/contact'
+
+  // Formulario: muestra «¿Qué tratamiento?» si hace falta y envía con EmailJS
+  document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+    const reason = form.querySelector<HTMLSelectElement>('[data-reason]')
+    const txField = form.querySelector<HTMLElement>('[data-treatment-field]')
+    reason?.addEventListener('change', () => {
+      if (txField) txField.hidden = reason.selectedIndex !== 2
+    })
+    form.addEventListener('submit', (e) => {
+      e.preventDefault()
+      void sendContact(form)
+    })
+  })
+
+  // Mapa bajo demanda
+  document.querySelectorAll<HTMLButtonElement>('[data-map-load]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const frame = document.createElement('iframe')
+      frame.src = btn.dataset.src ?? ''
+      frame.title = btn.dataset.title ?? ''
+      frame.loading = 'lazy'
+      frame.referrerPolicy = 'no-referrer-when-downgrade'
+      frame.className = 'absolute inset-0 block size-full border-0 [filter:sepia(.25)_saturate(.8)]'
+      btn.replaceWith(frame)
+    })
+  })
+</script>

@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets'
+import isotipo from '../../assets/glowhaus-isotipo-transp.png'
+import wordmarkGold from '../../assets/glowhaus-wordmark-gold.png'
+import SocialIcon from '../ui/SocialIcon.astro'
+import { site } from '../../data/site'
+import { treatments } from '../../data/treatments'
+import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
+
+interface Props {
+  lang: Lang
+  altPath: string
+}
+const { lang, altPath } = Astro.props
+const t = useT(lang)
+const esHref = lang === 'es' ? Astro.url.pathname : altPath
+const enHref = lang === 'en' ? Astro.url.pathname : altPath
+const fotona = treatments[0]!
+
+const glowhausLinks = [
+  { label: 'Sobre nosotros', href: pathFor(lang, 'about') },
+  { label: 'Tu primera visita', href: pathFor(lang, 'visit') },
+  { label: 'Todos los tratamientos', href: pathFor(lang, 'treatments') },
+  { label: 'Fotona 4D', href: treatmentPath(lang, fotona.slug[lang]) },
+  { label: 'Resultados', href: pathFor(lang, 'home') + '#resultados' },
+  { label: 'Equipo', href: pathFor(lang, 'home') + '#equipo' },
+  { label: 'Contacto', href: pathFor(lang, 'contact') },
+]
+const year = new Date().getFullYear()
+---
+
+<footer
+  data-theme="dark"
+  class="bg-ink text-silver relative z-[11] flex min-h-screen flex-col"
+>
+  <div
+    class="flex min-h-0 flex-1 flex-col justify-between gap-12 px-gutter pt-[clamp(110px,18vh,200px)] pb-[clamp(20px,3vh,32px)]"
+  >
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,190px),1fr))] gap-9">
+      <div class="flex w-max flex-col gap-1.5">
+        <Image src={isotipo} alt="GlowHaus" width={144} class="block h-auto w-[72px] self-center" />
+        <div class="mt-[18px] flex gap-2.5">
+          <SocialIcon name="whatsapp" href={`https://wa.me/${site.whatsapp}`} label="WhatsApp" />
+          <SocialIcon name="instagram" href={site.instagram} label="Instagram" />
+          <SocialIcon name="facebook" href={site.facebook} label="Facebook" />
+          <SocialIcon name="tiktok" href={site.tiktok} label="TikTok" />
+        </div>
+      </div>
+
+      <nav aria-label={t('Tratamientos')} class="flex flex-col gap-2.5 text-base">
+        <span class="label-caps text-tan">{t('TRATAMIENTOS')}</span>
+        {
+          treatments.map((c) => (
+            <a href={treatmentPath(lang, c.slug[lang])} class="hover:text-gold transition-colors">
+              {t(c.name)}
+            </a>
+          ))
+        }
+      </nav>
+
+      <nav aria-label="GlowHaus" class="flex flex-col gap-2.5 text-base">
+        <span class="label-caps text-tan">GLOWHAUS</span>
+        {
+          glowhausLinks.map((l) => (
+            <a href={l.href} class="hover:text-gold transition-colors">
+              {t(l.label)}
+            </a>
+          ))
+        }
+      </nav>
+
+      <div class="flex flex-col gap-2.5 text-base">
+        <span class="label-caps text-tan">{t('CONTACTO')}</span>
+        <a href={site.mapsLink} target="_blank" rel="noopener" class="hover:text-gold transition-colors">{site.address.short}</a>
+        <a href={site.phoneHref} class="hover:text-gold transition-colors">{site.phone}</a>
+        <a href={`mailto:${site.email}`} class="hover:text-gold transition-colors">{site.email}</a>
+        <a href={site.instagram} target="_blank" rel="noopener" class="hover:text-gold transition-colors">{site.instagramHandle}</a>
+      </div>
+    </div>
+
+    <div
+      class="text-ash flex flex-wrap justify-between gap-3 border-t border-brown-2 pt-6 text-[14.5px]"
+    >
+      <span>© {year} GlowHaus Aesthetics</span>
+      <span>
+        <a href={pathFor(lang, 'privacy')} class="hover:text-gold transition-colors">{t('Privacidad')}</a>
+        ·
+        <a href={pathFor(lang, 'terms')} class="hover:text-gold transition-colors">{t('Términos')}</a>
+        ·
+        <a href={esHref} hreflang="es" lang="es" class="hover:text-gold transition-colors">Español</a>
+        /
+        <a href={enHref} hreflang="en" lang="en" class="hover:text-gold transition-colors">English</a>
+      </span>
+    </div>
+
+    <Image
+      src={wordmarkGold}
+      alt="GLOWHAUS™"
+      width={1600}
+      class="block h-auto max-h-[22vh] w-full object-contain object-[left_bottom]"
+      data-foot-mark
+    />
+  </div>
+</footer>

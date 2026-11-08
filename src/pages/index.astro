@@ -2,23 +2,8 @@
 import Layout from '../layouts/Layout.astro'
 ---
 
-<Layout
-  title="GlowHaus · Medicina estética en Miami"
-  description="Láser Fotona, inyectables, rellenos, depilación láser y faciales médicos en Miami."
->
-  <main class="bg-brown text-cream grid min-h-screen place-content-center gap-4 px-6">
-    <h1 data-hero class="font-display text-center text-5xl tracking-wide md:text-7xl">
-      GlowHaus
-    </h1>
-    <p class="text-gold text-center">Proyecto base: Astro, Tailwind y GSAP</p>
-  </main>
+<Layout lang="es" title="GlowHaus Aesthetics · Medicina estética en Miami" description="Láser Fotona, inyectables, rellenos, depilación láser y faciales médicos en Miami." altPath="/en/" headerTheme="dark">
+  <section data-theme="dark" class="bg-brown text-cream grid min-h-screen place-content-center">
+    <h1 class="font-display text-6xl">GlowHaus</h1>
+  </section>
 </Layout>
-
-<script>
-  import { gsap, SplitText, prefersReducedMotion } from '../scripts/gsap'
-
-  if (!prefersReducedMotion()) {
-    const split = SplitText.create('[data-hero]', { type: 'chars' })
-    gsap.from(split.chars, { yPercent: 100, opacity: 0, stagger: 0.04, ease: 'power3.out' })
-  }
-</script>

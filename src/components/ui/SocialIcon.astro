@@ -1,0 +1,22 @@
+---
+import { socialPaths } from '../../data/icons'
+
+interface Props {
+  name: keyof typeof socialPaths
+  href: string
+  label: string
+}
+const { name, href, label } = Astro.props
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener"
+  aria-label={label}
+  class="text-cream hover:bg-gold hover:border-gold flex size-[42px] items-center justify-center rounded-[14px] border border-[rgb(250_248_245/0.55)] bg-[rgb(250_248_245/0.14)] backdrop-blur-[10px] transition-colors duration-300 max-[759px]:rounded-lg"
+>
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d={socialPaths[name]}></path>
+  </svg>
+</a>
