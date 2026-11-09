@@ -144,6 +144,7 @@ const t = useT(lang)
     ScrollTrigger,
     prefersReducedMotion,
     isDesktopPointer,
+    isTrackpadWheel,
     scrollToY,
   } from '../../scripts/gsap'
 
@@ -247,6 +248,8 @@ const t = useT(lang)
       const onWheel = (e: WheelEvent) => {
         if (!isDesktopPointer() || e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return
         if (document.documentElement.style.overflow === 'hidden') return
+        // Trackpad: scroll nativo; el snap de ScrollTrigger lo asienta en un paso
+        if (isTrackpadWheel(e) && !animating) return
         const y = window.scrollY
         const dir = Math.sign(e.deltaY)
         if (!dir) return

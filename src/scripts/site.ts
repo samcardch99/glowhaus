@@ -4,6 +4,7 @@ import {
   SplitText,
   prefersReducedMotion,
   isDesktopPointer,
+  isTrackpadWheel,
   scrollToY,
 } from './gsap'
 import { introDone } from './intro-state'
@@ -293,6 +294,11 @@ if (!reduce) {
     (e) => {
       if (!isDesktopPointer() || e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return
       if (menu?.open || root.classList.contains('gh-intro-on')) return
+      // Trackpad: scroll nativo con inercia; el snap suave de abajo lo asienta
+      if (isTrackpadWheel(e) && !animating) {
+        acc = 0
+        return
+      }
       const now = Date.now()
       if (!cache || now - cacheT > 1500) {
         cache = stackSnaps()
@@ -330,6 +336,35 @@ if (!reduce) {
       void scrollToY(target, 620).then(() => (animating = false))
     },
     { passive: false },
+  )
+}
+
+// Trackpad, teclado o barra: al soltar, el scroll se asienta en la tarjeta más
+// cercana (solo dentro de un apilado y solo si queda a medias).
+if (!reduce) {
+  let settleT = 0
+  let settling = false
+  const settle = () => {
+    if (settling || !isDesktopPointer() || menu?.open || root.classList.contains('gh-intro-on'))
+      return
+    const y = window.scrollY
+    for (const s of stackSnaps()) {
+      if (y <= s[0]! + 2 || y >= s[s.length - 1]! - 2) continue
+      const near = s.reduce((a, b) => (Math.abs(b - y) < Math.abs(a - y) ? b : a))
+      if (Math.abs(near - y) < 3) return
+      settling = true
+      void scrollToY(near, 520).then(() => (settling = false))
+      return
+    }
+  }
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (settling) return
+      clearTimeout(settleT)
+      settleT = window.setTimeout(settle, 160)
+    },
+    { passive: true },
   )
 }
 

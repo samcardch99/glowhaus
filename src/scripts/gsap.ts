@@ -18,6 +18,25 @@ export const prefersReducedMotion = () =>
 export const isDesktopPointer = () =>
   window.matchMedia('(min-width: 1100px) and (hover: hover) and (pointer: fine)').matches
 
+/**
+ * ¿Este evento de rueda viene de un trackpad (o de un ratón de desplazamiento
+ * continuo)? Esos dispositivos mandan una ráfaga de eventos pequeños con
+ * inercia, así que no se puede «un paso por gesto»: se les deja el scroll
+ * nativo y se asienta después con un snap suave. La decisión se mantiene
+ * mientras dure la ráfaga, para que la cola de la inercia no cambie de bando.
+ */
+let padUntil = 0
+export function isTrackpadWheel(e: WheelEvent): boolean {
+  const now = performance.now()
+  if (e.deltaMode !== 0) return false // líneas o páginas: rueda clásica
+  const looksPad = e.deltaX !== 0 || !Number.isInteger(e.deltaY) || Math.abs(e.deltaY) < 40
+  if (looksPad || now < padUntil) {
+    padUntil = now + 350
+    return true
+  }
+  return false
+}
+
 /** easeInOutCubic, la curva de los desplazamientos automáticos del diseño */
 export const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
