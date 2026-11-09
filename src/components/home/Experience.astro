@@ -4,7 +4,8 @@ import Button from '../ui/Button.astro'
 import { steps } from '../../data/home'
 import { pathFor, useT, type Lang } from '../../i18n'
 
-// «Una experiencia que se siente desde el principio»: intro sticky y tres
+// «Una experiencia que se siente desde el principio»: intro que se desplaza normal (la
+// primera tarjeta no la tapa) y tres
 // tarjetas a pantalla completa que se apilan (data-stack-wrap, en site.ts).
 // El contenido de cada tarjeta entra cuando la tarjeta se posa (y vuelve a
 // entrar si se sube y se baja de nuevo).
@@ -18,7 +19,7 @@ const t = useT(lang)
 <div class="bg-sand text-ink border-ink relative z-[2] -mt-7 border-t">
   <section
     data-theme="light"
-    class="bg-sand px-gutter sticky top-0 z-0 grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] items-end gap-x-16 gap-y-6 pt-[clamp(120px,18vh,180px)] pb-[clamp(56px,8vh,88px)]"
+    class="bg-sand px-gutter relative grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] items-end gap-x-16 gap-y-6 pt-[clamp(120px,18vh,180px)] pb-[clamp(56px,8vh,88px)]"
   >
     <h2
       data-reveal
