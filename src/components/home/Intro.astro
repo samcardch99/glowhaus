@@ -4,9 +4,10 @@ import { useT, type Lang } from '../../i18n'
 
 // Entrada de marca del diseño v3: el logotipo es un hueco en una capa de tinta
 // sobre el reel del inicio. La rueda, el gesto táctil o las teclas abren el hueco
-// (crece desde el asta de la H) hasta descubrir la pantalla. Al terminar, el vídeo
-// se desenfoca, entra la primera pantalla y la capa se funde.
-// - Botón «Saltar», Esc o Intro la saltan; sin gestos se abre sola a los 6 s.
+// (crece desde el asta de la H). Basta un gesto corto: la apertura se completa sola.
+// En cuanto la vista entra por el logotipo, la portada (cabecera incluida) aparece a
+// la vez que la capa se funde: nada espera a que termine la entrada.
+// - Botón «Saltar», Esc o Intro la saltan; sin gestos se abre sola a los 4 s.
 // - Una vez por sesión. Nunca con movimiento reducido, con un #ancla, fuera del
 //   principio de la página ni sin JS.
 // - Avisa con «gh:intro-reveal» (empieza la primera pantalla) y «gh:intro-done».
@@ -163,7 +164,7 @@ const t = useT(Astro.props.lang)
       ink.style.maskSize = ms
       ink.style.setProperty('-webkit-mask-position', mp)
       ink.style.maskPosition = mp
-      ink.style.opacity = p > 0.94 ? String(Math.max(0, 1 - (p - 0.94) / 0.05)) : '1'
+      ink.style.opacity = p > 0.78 ? String(Math.max(0, 1 - (p - 0.78) / 0.1)) : '1'
       const f = Math.max(0, 1 - p / 0.1)
       if (f !== lastFill) {
         fill.style.opacity = String(f)
@@ -180,7 +181,8 @@ const t = useT(Astro.props.lang)
       p += (target - p) * k
       if (Math.abs(target - p) < 0.0008) p = target
       if (p !== prev) render()
-      if (p >= 0.995) return finish()
+      // Ya se está dentro del logotipo: entra la portada sin esperar al final del zoom
+      if (p >= 0.86) return finish()
       raf = requestAnimationFrame(loop)
     }
 
@@ -188,11 +190,13 @@ const t = useT(Astro.props.lang)
     let idle = 0
     const armIdle = () => {
       window.clearTimeout(idle)
-      idle = window.setTimeout(() => open(0.07), 6000)
+      idle = window.setTimeout(() => open(0.08), 4000)
     }
     const push = (d: number) => {
       if (done) return
       target = Math.max(0, Math.min(1, target + d))
+      // Un gesto corto basta: a partir de aquí la apertura sigue sola
+      if (target >= 0.12) return open(0.09)
       armIdle()
     }
     /** Abre del todo, con una curva más rápida (saltar) */
@@ -266,31 +270,31 @@ const t = useT(Astro.props.lang)
       fill.remove()
       skip.remove()
 
-      // En pantallas medianas y grandes el vídeo se desenfoca hasta coincidir con
-      // el fondo difuminado de la primera pantalla; en móvil ya es el mismo plano.
+      // La portada entra ya, a la vez que la capa se funde (sin esperas encadenadas)
+      root.classList.add('gh-intro-out')
+      el!.style.pointerEvents = 'none'
+      window.dispatchEvent(new Event('gh:intro-reveal'))
+
+      // En pantallas medianas y grandes el vídeo se desenfoca hacia el fondo
+      // difuminado de la primera pantalla mientras desaparece
       const framed = window.matchMedia('(min-width: 768px)').matches
-      const blur = video.animate(
-        [
-          { filter: 'blur(0px) brightness(1)' },
-          { filter: framed ? 'blur(28px) brightness(.7)' : 'blur(0px) brightness(1)' },
-        ],
-        { duration: framed ? 900 : 350, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' },
-      )
-      blur.onfinish = () => {
-        window.dispatchEvent(new Event('gh:intro-reveal'))
-        const out = el!.animate([{ opacity: 1 }, { opacity: 0 }], {
-          duration: 700,
-          easing: 'ease',
-          fill: 'forwards',
-        })
-        out.onfinish = () => {
-          video.pause()
-          video.removeAttribute('src')
-          video.load()
-          el!.remove()
-          root.classList.remove('gh-intro-on')
-          window.dispatchEvent(new Event('gh:intro-done'))
-        }
+      if (framed)
+        video.animate(
+          [{ filter: 'blur(0px) brightness(1)' }, { filter: 'blur(24px) brightness(.75)' }],
+          { duration: 500, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' },
+        )
+      const out = el!.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 500,
+        easing: 'cubic-bezier(.4,0,.2,1)',
+        fill: 'forwards',
+      })
+      out.onfinish = () => {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+        el!.remove()
+        root.classList.remove('gh-intro-on', 'gh-intro-out')
+        window.dispatchEvent(new Event('gh:intro-done'))
       }
     }
 

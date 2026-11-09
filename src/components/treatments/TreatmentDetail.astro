@@ -4,6 +4,7 @@ import Button from '../ui/Button.astro'
 import BeforeAfter from '../shared/BeforeAfter.astro'
 import FaqWhatsapp from '../shared/FaqWhatsapp.astro'
 import VideoToggle from './VideoToggle.astro'
+import VideoSound from './VideoSound.astro'
 import StepsTimeline from './StepsTimeline.astro'
 import PaymentMethods from './PaymentMethods.astro'
 import RelatedTreatments from './RelatedTreatments.astro'
@@ -171,7 +172,12 @@ const book = whatsappHref(lang, name)
             {t('Lo realiza')} {t(tx.by)}
           </span>
         </figcaption>
-        {!still && <VideoToggle lang={lang} controls={videoId} class="absolute top-4 right-4" />}
+        {!still && (
+          <div class="absolute top-4 right-4 flex gap-2.5">
+            <VideoSound lang={lang} controls={videoId} />
+            <VideoToggle lang={lang} controls={videoId} />
+          </div>
+        )}
       </figure>
     </div>
   </section>
@@ -242,7 +248,7 @@ const book = whatsappHref(lang, name)
         {t('Reservar cita')}
       </Button>
     </div>
-    <PaymentMethods lang={lang} class="self-end" data-reveal="solo" data-delay="650" />
+    <PaymentMethods lang={lang} class="self-center" data-reveal="solo" data-delay="650" />
   </section>
 </div>
 

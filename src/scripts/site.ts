@@ -539,6 +539,23 @@ document.querySelectorAll<HTMLButtonElement>('[data-video-toggle]').forEach((btn
   sync()
 })
 
+// Botones de sonido: el vídeo arranca en silencio y solo suena si se pide
+document.querySelectorAll<HTMLButtonElement>('[data-video-sound]').forEach((btn) => {
+  const v = document.getElementById(btn.getAttribute('aria-controls') ?? '')
+  if (!(v instanceof HTMLVideoElement)) return
+  const sync = () => btn.setAttribute('aria-pressed', String(!v.muted))
+  btn.addEventListener('click', () => {
+    v.muted = !v.muted
+    if (!v.muted && v.paused) {
+      if (!v.src && v.dataset.src) v.src = v.dataset.src
+      delete v.dataset.userPaused
+      v.play().catch(() => {})
+    }
+  })
+  v.addEventListener('volumechange', sync)
+  sync()
+})
+
 // Recalcular posiciones cuando terminan de cargar fuentes e imágenes
 window.addEventListener('load', () => ScrollTrigger.refresh())
 void document.fonts.ready.then(() => ScrollTrigger.refresh())
