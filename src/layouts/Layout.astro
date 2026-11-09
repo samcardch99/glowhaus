@@ -36,8 +36,10 @@ const {
   noindex = false,
 } = Astro.props
 const t = useT(lang)
-// El dominio temporal de Hostinger no debe indexarse
-const staging = Astro.site?.hostname.endsWith('hostingersite.com') ?? false
+// El dominio temporal de Hostinger no debe indexarse, ni ningún otro mientras
+// la construcción lleve NOINDEX=1 (dominio aún no confirmado como definitivo)
+const staging =
+  process.env.NOINDEX === '1' || (Astro.site?.hostname.endsWith('hostingersite.com') ?? false)
 
 const canonical = new URL(Astro.url.pathname, Astro.site)
 const alternate = new URL(altPath, Astro.site)
