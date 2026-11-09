@@ -22,7 +22,8 @@ const { lang, treatment: tx } = Astro.props
 const t = useT(lang)
 const name = t(tx.title)
 // Foto fija de la ficha si la hay; si no, el vídeo; si no, la foto de la categoría
-const still = tx.detailImg ?? (tx.video ? undefined : tx.img)
+// Como en el diseño: vídeo dentro de la ficha salvo en inyectables, rellenos y complementos
+const still = tx.video && tx.detailVideo ? undefined : (tx.detailImg ?? (tx.video ? undefined : tx.img))
 const stillPos = tx.detailImg ? (tx.detailPos ?? 'center 45%') : (tx.imgPos ?? 'center')
 const videoId = `tx-video-${tx.slug.es}`
 const book = whatsappHref(lang, name)
@@ -333,13 +334,12 @@ const book = whatsappHref(lang, name)
   if (page && !prefersReducedMotion()) {
     const q = <T extends Element = HTMLElement>(sel: string) =>
       Array.from(page.querySelectorAll<T>(sel))
-    const from = { opacity: 0, y: 36, filter: 'blur(6px)' }
+    const from = { opacity: 0, y: 18 }
     const to = {
       opacity: 1,
       y: 0,
-      filter: 'blur(0px)',
       ease: 'glow',
-      clearProps: 'transform,filter',
+      clearProps: 'transform',
     }
 
     const tl = gsap.timeline({ delay: 0.05 })
@@ -347,28 +347,27 @@ const book = whatsappHref(lang, name)
     if (bg)
       tl.fromTo(
         bg,
-        { scale: 1.18, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 1.8, ease: 'glow', clearProps: 'transform' },
+        { scale: 1.04, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 1.2, ease: 'glow', clearProps: 'transform' },
         0,
       )
     const parts = q('[data-hero-part]')
     // Botón y migas, etiqueta; el resto tras el titular
-    tl.fromTo(parts.slice(0, 3), from, { ...to, duration: 0.9, stagger: 0.12 }, 0.1)
-    tl.fromTo(parts.slice(3), from, { ...to, duration: 0.9, stagger: 0.14 }, 0.75)
-    tl.fromTo(q('[data-hero-fact]'), from, { ...to, duration: 0.8, stagger: 0.1 }, 0.9)
+    tl.fromTo(parts.slice(0, 3), from, { ...to, duration: 0.7, stagger: 0.08 }, 0.1)
+    tl.fromTo(parts.slice(3), from, { ...to, duration: 0.7, stagger: 0.08 }, 0.45)
+    tl.fromTo(q('[data-hero-fact]'), from, { ...to, duration: 0.7, stagger: 0.06 }, 0.6)
     tl.fromTo(
       q('[data-hero-chip]'),
-      { opacity: 0, y: 14, scale: 0.94 },
+      { opacity: 0, y: 10 },
       {
         opacity: 1,
         y: 0,
-        scale: 1,
-        duration: 0.6,
+        duration: 0.5,
         ease: 'glow',
         stagger: 0.05,
         clearProps: 'transform',
       },
-      1.15,
+      0.8,
     )
     const media = page.querySelector('[data-hero-media]')
     const inner = page.querySelector('[data-hero-media-inner]')

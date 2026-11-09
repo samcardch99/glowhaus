@@ -48,6 +48,8 @@ export interface Treatment {
   /** Imagen fija de la ficha cuando no hay vídeo o se prefiere una foto */
   detailImg?: ImageMetadata
   detailPos?: string
+  /** En la ficha se ve el vídeo aunque haya foto interior (la foto queda para el fondo y redes) */
+  detailVideo?: boolean
   items: PriceRow[]
   what: string
   sessions: string
@@ -488,6 +490,7 @@ export const treatments: Treatment[] = [
     video: '/media/tx-intimo.mp4',
     detailImg: intimoInterna,
     detailPos: 'center 45%',
+    detailVideo: true,
     items: [
       P('IntimaLase · tensado vaginal', '$800'),
       P('IncontiLase · incontinencia urinaria', '$800'),

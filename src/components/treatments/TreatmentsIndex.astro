@@ -1,10 +1,9 @@
 ---
 import { Image } from 'astro:assets'
 import Button from '../ui/Button.astro'
-import VideoToggle from './VideoToggle.astro'
 import { treatments, countLabel } from '../../data/treatments'
 import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
-import { catNumber, fromLabel, itemCols, needsConsult, posterFor } from './helpers'
+import { catNumber, fromLabel, itemCols, needsConsult } from './helpers'
 
 // Página «Tratamientos»: cabecera oscura, 11 categorías apiladas a pantalla
 // completa (o vista de lista) y conmutador flotante «Desplazar / Lista».
@@ -56,7 +55,6 @@ const MOBILE_MAX = 12
     {treatments.map((c, i) => {
       const n = c.items.length
       const shown = n > MOBILE_MAX ? c.items.slice(0, MOBILE_MAX - 1) : c.items
-      const vid = `tx-slide-video-${i}`
       return (
         <>
           <article
@@ -66,31 +64,15 @@ const MOBILE_MAX = 12
             aria-labelledby={`tx-slide-${i}`}
             class="bg-ink text-cream sticky top-0 h-[calc(100vh+28px)] origin-top overflow-hidden will-change-[transform,filter] max-[759px]:h-auto max-[759px]:min-h-[calc(100svh+28px)]"
           >
-            {c.video ? (
-              <video
-                id={vid}
-                data-autoplay
-                data-src={c.video}
-                poster={posterFor(c.video)}
-                muted
-                loop
-                playsinline
-                preload="none"
-                aria-hidden="true"
-                data-slide-media
-                class="absolute inset-0 size-full object-cover"
-              />
-            ) : (
-              <Image
-                src={c.img}
-                alt=""
-                widths={[640, 1024, 1600, 2200]}
-                sizes="100vw"
-                data-slide-media
-                class="absolute inset-0 size-full object-cover"
-                style={c.imgPos ? `object-position:${c.imgPos}` : undefined}
-              />
-            )}
+            <Image
+              src={c.img}
+              alt=""
+              widths={[640, 1024, 1600, 2200]}
+              sizes="100vw"
+              data-slide-media
+              class="absolute inset-0 size-full object-cover"
+              style={c.imgPos ? `object-position:${c.imgPos}` : undefined}
+            />
             <div
               aria-hidden="true"
               class="absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.55)_0%,rgb(24_18_14/0.25)_35%,rgb(24_18_14/0.88)_100%)]"
@@ -178,13 +160,6 @@ const MOBILE_MAX = 12
                 </div>
               </div>
             </div>
-            {c.video && (
-              <VideoToggle
-                lang={lang}
-                controls={vid}
-                class="absolute right-[clamp(16px,1.8vw,28px)] bottom-[52px] z-10"
-              />
-            )}
           </article>
           <div aria-hidden="true" class="pointer-events-none h-[60vh]" />
         </>
@@ -344,20 +319,19 @@ const MOBILE_MAX = 12
         if (media)
           tl.fromTo(
             media,
-            { scale: 1.06 },
-            { scale: 1, duration: 1.6, ease: 'glow', clearProps: 'transform' },
+            { scale: 1.02 },
+            { scale: 1, duration: 1.2, ease: 'glow', clearProps: 'transform' },
             0,
           )
         tl.fromTo(
           parts,
-          { opacity: 0, y: 56, scale: 0.96 },
+          { opacity: 0, y: 20 },
           {
             opacity: 1,
             y: 0,
-            scale: 1,
-            duration: 0.8,
+            duration: 0.7,
             ease: 'glow',
-            stagger: 0.22,
+            stagger: 0.1,
             clearProps: 'transform',
           },
           0.1,

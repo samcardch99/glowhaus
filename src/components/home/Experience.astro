@@ -126,18 +126,18 @@ const t = useT(lang)
           .fromTo(
             split.lines,
             { yPercent: 110 },
-            { yPercent: 0, duration: 1, ease: 'power4.out', stagger: 0.08 },
+            { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.05 },
           )
           .fromTo(
             panel,
-            { opacity: 0, y: 56, scale: 0.96 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'glow' },
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.7, ease: 'glow' },
             0.26,
           )
           .fromTo(
             rows,
-            { opacity: 0, y: 18 },
-            { opacity: 1, y: 0, duration: 0.7, ease: 'glow', stagger: 0.12 },
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'glow', stagger: 0.08 },
             0.45,
           )
         tl.progress(0)
