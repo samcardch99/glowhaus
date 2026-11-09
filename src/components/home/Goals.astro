@@ -75,7 +75,7 @@ const t = useT(lang)
           sizes="(min-width: 1100px) 560px, 100vw"
           class:list={[
             'absolute inset-0 size-full object-cover transition-[opacity,transform] duration-[900ms,1600ms] ease-(--ease-glow)',
-            i === 0 ? 'scale-100 opacity-100' : 'scale-[1.08] opacity-0',
+            i === 0 ? 'scale-100 opacity-100' : 'scale-[1.03] opacity-0',
           ]}
         />
       ))}
@@ -142,7 +142,7 @@ const t = useT(lang)
         im.classList.toggle('opacity-100', on)
         im.classList.toggle('scale-100', on)
         im.classList.toggle('opacity-0', !on)
-        im.classList.toggle('scale-[1.08]', !on)
+        im.classList.toggle('scale-[1.03]', !on)
       })
       // Solo se anuncia lo que elige la persona, no la rotación automática
       if (user) panel?.setAttribute('aria-live', 'polite')
@@ -152,11 +152,10 @@ const t = useT(lang)
       if (cards && !reduce)
         gsap.fromTo(
           cards,
-          { opacity: 0, y: 28, scale: 0.97 },
+          { opacity: 0, y: 12 },
           {
             opacity: 1,
             y: 0,
-            scale: 1,
             duration: 0.7,
             ease: 'glow',
             stagger: 0.1,

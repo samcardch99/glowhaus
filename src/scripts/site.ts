@@ -92,7 +92,7 @@ function openMenu() {
     )
     .from(
       menu.querySelectorAll('[data-menu-item]'),
-      { y: reduce ? 0 : 40, opacity: 0, duration: 0.8, stagger: 0.06, ease: 'glow' },
+      { y: reduce ? 0 : 16, opacity: 0, duration: 0.6, stagger: 0.04, ease: 'glow' },
       0.25,
     )
 }
@@ -148,28 +148,20 @@ document.addEventListener('click', (e) => {
 })
 
 // ---------- Apariciones por grupos ----------
-// [data-reveal] sube 56px con una leve escala al entrar, en grupo con sus
-// hermanos (220ms entre uno y otro). data-delay suma ms; data-reveal="solo"
-// aparece por su cuenta; data-mark añade un destello dorado arriba.
+// [data-reveal] se funde subiendo 20px al entrar, en grupo con sus hermanos
+// (100ms entre uno y otro). data-delay suma ms; data-reveal="solo" aparece por
+// su cuenta. Movimiento contenido a propósito: el diseño original era más
+// enfático y la clínica lo pidió más sobrio.
 const revealEls = gsap.utils.toArray<HTMLElement>('[data-reveal]')
 
 function playReveal(group: HTMLElement[]) {
   group.forEach((el, k) => {
-    const delay = k * 0.22 + Number(el.dataset.delay ?? 0) / 1000
+    const delay = k * 0.1 + Number(el.dataset.delay ?? 0) / 1000
     gsap.fromTo(
       el,
-      { opacity: 0, y: 56, scale: 0.96 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.8, delay, ease: 'glow', clearProps: 'transform' },
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.7, delay, ease: 'glow', clearProps: 'transform' },
     )
-    if (el.dataset.mark !== undefined)
-      gsap.to(el, {
-        keyframes: [
-          { boxShadow: 'inset 0 3px 0 rgba(168,132,79,1)', duration: 0.7 },
-          { boxShadow: 'inset 0 2px 0 rgba(168,132,79,0)', duration: 0.7 },
-        ],
-        delay: 0.5 + k * 0.45,
-        ease: 'sine.inOut',
-      })
   })
 }
 
@@ -200,30 +192,29 @@ if (reduce) {
   })
 }
 
-// ---------- Titulares letra a letra ----------
-// [data-words]: las letras aparecen en cascada (data-wstep ms entre letras,
-// data-wdelay ms de espera). Los lectores de pantalla leen el texto entero.
+// ---------- Titulares palabra a palabra ----------
+// [data-words]: las palabras se funden en cascada suave (data-wdelay ms de
+// espera). Los lectores de pantalla leen el texto entero.
 async function splitWords() {
   const els = gsap.utils.toArray<HTMLElement>('[data-words]')
   if (!els.length || reduce) return
   await document.fonts.ready
   await introDone
   els.forEach((el) => {
-    const split = SplitText.create(el, { type: 'words,chars', aria: 'auto' })
-    const step = Number(el.dataset.wstep ?? 32) / 1000
-    gsap.set(split.chars, { opacity: 0, yPercent: 40 })
+    const split = SplitText.create(el, { type: 'words', aria: 'auto' })
+    gsap.set(split.words, { opacity: 0, yPercent: 15 })
     el.style.opacity = '1'
     ScrollTrigger.create({
       trigger: el,
       start: 'top 85%',
       once: true,
       onEnter: () =>
-        gsap.to(split.chars, {
+        gsap.to(split.words, {
           opacity: 1,
           yPercent: 0,
-          duration: 0.55,
+          duration: 0.7,
           ease: 'glow',
-          stagger: step,
+          stagger: 0.05,
           delay: Number(el.dataset.wdelay ?? 0) / 1000,
         }),
     })
@@ -233,8 +224,8 @@ void splitWords()
 
 // ---------- Tarjetas apiladas ----------
 // [data-stack-wrap] > [data-stack] (sticky, a pantalla completa): la de abajo
-// tapa a la de arriba, que se reduce, se desenfoca, se oscurece y redondea sus
-// esquinas. [data-cover] hace lo mismo con una sola sección sticky y la
+// tapa a la de arriba, que se reduce un poco, se oscurece y redondea sus
+// esquinas (sin desenfoque). [data-cover] hace lo mismo con una sola sección sticky y la
 // siguiente. En escritorio, la rueda salta de una tarjeta a la siguiente.
 function stackPair(card: HTMLElement, next: HTMLElement, target: Element = card) {
   ScrollTrigger.create({
@@ -243,8 +234,8 @@ function stackPair(card: HTMLElement, next: HTMLElement, target: Element = card)
     end: 'top top',
     onUpdate: ({ progress: p }) => {
       gsap.set(target, {
-        scale: 1 - 0.06 * p,
-        filter: p > 0.001 ? `blur(${(p * 4).toFixed(2)}px) brightness(${1 - 0.35 * p})` : 'none',
+        scale: 1 - 0.03 * p,
+        filter: p > 0.001 ? `brightness(${1 - 0.25 * p})` : 'none',
         borderRadius: Math.round(p * 18),
       })
       next.style.boxShadow = p > 0.03 && p < 0.99 ? '0 -24px 48px rgba(0,0,0,.45)' : ''
@@ -374,14 +365,13 @@ if (!reduce) {
   gsap.utils.toArray<HTMLElement>('[data-wipe]').forEach((el) => {
     gsap.fromTo(
       el,
-      { clipPath: 'inset(0 100% 0 0)', opacity: 0.2, filter: 'blur(4px)' },
+      { clipPath: 'inset(0 100% 0 0)', opacity: 0.4 },
       {
         clipPath: 'inset(0 0% 0 0)',
         opacity: 1,
-        filter: 'blur(0px)',
-        duration: 1.4,
+        duration: 1,
         ease: 'wipe',
-        clearProps: 'clipPath,filter',
+        clearProps: 'clipPath',
         scrollTrigger: { trigger: el, start: 'top 80%', once: true },
       },
     )
@@ -390,15 +380,14 @@ if (!reduce) {
     gsap.to(el, {
       keyframes: [
         {
-          color: '#F6E2B8',
-          textShadow: '0 0 18px rgba(232,196,130,.95), 0 0 36px rgba(232,196,130,.55)',
+          textShadow: '0 0 14px rgba(232,196,130,.45)',
           duration: 0.8,
         },
         { textShadow: '0 0 0px rgba(232,196,130,0)', duration: 1 },
       ],
       delay: 0.9,
       ease: 'sine.inOut',
-      clearProps: 'color,textShadow',
+      clearProps: 'textShadow',
       scrollTrigger: { trigger: el, start: 'top 80%', once: true },
     })
   })
@@ -407,12 +396,12 @@ if (!reduce) {
 // ---------- Texto que se escribe ----------
 // Un contenedor con filas [data-typerow] (cada una con [data-dot] y [data-type])
 // se escribe fila a fila: el punto aparece con un rebote y después el texto,
-// 22ms por letra. Un [data-type] suelto se escribe solo.
+// 12ms por letra. Un [data-type] suelto se escribe solo.
 function typeInto(el: HTMLElement, full: string, at: number) {
   const obj = { n: 0 }
   gsap.to(obj, {
     n: full.length,
-    duration: full.length * 0.022,
+    duration: full.length * 0.012,
     delay: at,
     ease: 'none',
     onUpdate: () => {
@@ -449,14 +438,14 @@ if (!reduce) {
           if (dot)
             gsap.to(dot, {
               keyframes: [
-                { opacity: 1, scale: 1.35, duration: 0.25 },
-                { scale: 1, duration: 0.17 },
+                { opacity: 1, scale: 1.1, duration: 0.2 },
+                { scale: 1, duration: 0.15 },
               ],
               delay: t,
               ease: 'power2.out',
             })
           typeInto(tx, full, t + 0.2)
-          t += 0.2 + full.length * 0.022 + 0.18
+          t += 0.15 + full.length * 0.012 + 0.1
         })
       },
     })

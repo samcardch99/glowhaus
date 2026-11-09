@@ -249,11 +249,10 @@ const items = treatments.map((c, i) => ({
       mm.add('(max-width: 1099.98px)', () => {
         const tw = gsap.fromTo(
           btns,
-          { y: 56, opacity: 0, scale: 0.94 },
+          { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            scale: 1,
             ease: 'none',
             stagger: 0.06,
             scrollTrigger: { trigger: grid, start: 'top 98%', end: 'top 40%', scrub: 0.6 },

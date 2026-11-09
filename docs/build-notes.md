@@ -55,24 +55,23 @@ Convenciones del código de la web. Léelas antes de tocar una página.
 
 ## Sistema de movimiento (`src/scripts/site.ts` y `src/scripts/gsap.ts`)
 
-Replica la lógica de animación del diseño v3, que se puede leer extraída en
+Parte de la lógica de animación del diseño v3, **atenuada a petición de la clínica** (menos recorrido, sin escalas ni desenfoques, titulares por palabras y pie estático). El original se puede leer extraído en
 `/private/tmp/claude-501/-Users-sam-Documents-laira/fa562ac9-3ef6-40d0-a75c-4018ce24d885/scratchpad/design-logic.js`.
 **No reimplementes en un componente lo que ya hace un atributo global.**
 
 | Atributo | Qué hace (parámetros del diseño) |
 | --- | --- |
 | `data-theme="dark\|light\|overlay"` | En cada sección. La cabecera toma el color de fondo opaco de lo que tiene debajo y cambia su texto a claro u oscuro. Se esconde al bajar y vuelve al subir |
-| `data-reveal` | Aparece en **grupo con sus hermanos** (mismo padre): sube 56 px, escala .96 → 1, 0,8 s, curva `glow` (.2,.7,.2,1), 220 ms entre hermanos. Se dispara cuando el primero del grupo llega al 82 % de la pantalla |
+| `data-reveal` | Aparece en **grupo con sus hermanos** (mismo padre): se funde subiendo 20 px, 0,7 s, curva `glow` (.2,.7,.2,1), 100 ms entre hermanos. Se dispara cuando el primero del grupo llega al 82 % de la pantalla |
 | `data-reveal="solo"` | Igual que `data-reveal`, pero aparece por su cuenta |
 | `data-delay="ms"` | Retraso extra para `data-reveal` |
-| `data-mark` | Destello dorado en el borde superior tras aparecer (tarjetas) |
-| `data-words` (con `data-wstep="ms"` y `data-wdelay="ms"`) | Titular que aparece letra a letra. Úsalo en los h1/h2 grandes, nunca junto con `data-reveal` en el mismo elemento |
-| `data-stack-wrap` > `data-stack` | Tarjetas sticky a pantalla completa. La de abajo tapa a la de arriba, que pasa a escala 1−.06p, desenfoque 4p, brillo 1−.35p y radio 18p; la que entra lleva sombra. En escritorio, cada golpe de rueda salta a la tarjeta siguiente (560–620 ms, easeInOutCubic) |
+| `data-words` (con `data-wdelay="ms"`) | Titular que aparece palabra a palabra (sube 15 %, 50 ms entre palabras). Úsalo en los h1/h2 grandes, nunca junto con `data-reveal` en el mismo elemento |
+| `data-stack-wrap` > `data-stack` | Tarjetas sticky a pantalla completa. La de abajo tapa a la de arriba, que pasa a escala 1−.03p, brillo 1−.25p y radio 18p, sin desenfoque; la que entra lleva sombra. En escritorio, cada golpe de rueda salta a la tarjeta siguiente (560–620 ms, easeInOutCubic) |
 | `data-cover` (opcional: `data-cover-target`) | Una sección sticky que reacciona igual cuando la tapa su hermana siguiente |
 | `data-count="650"` | Cuenta desde 0 en 1,3 s, conservando el prefijo y el sufijo |
-| `data-wipe` | El texto se descubre de izquierda a derecha con desenfoque (1,4 s) |
-| `data-glow` | Destello dorado del texto una vez, tras 0,9 s |
-| Contenedor con `data-typerow` (cada fila con `data-dot` + `data-type`) | Se escribe fila a fila: el punto aparece con un rebote y luego el texto, a 22 ms por letra. Un `data-type` suelto también funciona |
+| `data-wipe` | El texto se descubre de izquierda a derecha (1 s) |
+| `data-glow` | Halo dorado suave del texto una vez, tras 0,9 s |
+| Contenedor con `data-typerow` (cada fila con `data-dot` + `data-type`) | Se escribe fila a fila: el punto aparece con un rebote y luego el texto, a 12 ms por letra. Un `data-type` suelto también funciona |
 | `video[data-autoplay][data-src]` | Carga diferida, play y pause según la visibilidad |
 | `data-video-toggle` + `aria-controls` | Botón de pausa de un vídeo |
 
@@ -88,6 +87,7 @@ Más piezas:
 
 Reglas:
 
+- **Sobriedad:** las apariciones suben 12–24 px como mucho, sin escala ni desenfoque; las fotos se asientan desde 1.03 como máximo; los zooms al pasar el ratón no pasan de 1.02. El pie de página no se anima.
 - **Hover** solo en escritorio (en Tailwind 4, `hover:` ya va dentro de `@media (hover:hover)`).
 - **Rotación automática** (carruseles, metas, equipo, pagos): se pausa al interactuar 6–7 s, con la pestaña oculta o fuera de pantalla, y no corre con movimiento reducido.
 - Todo debe verse completo **sin JS** y con **movimiento reducido**.

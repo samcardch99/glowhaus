@@ -183,11 +183,10 @@ const stats = [
           })
           gsap.set(h1, { opacity: 1 })
           return gsap.from(self.words, {
-            yPercent: 115,
-            rotate: 2.5,
-            duration: 1.15,
-            ease: 'power4.out',
-            stagger: { each: 0.045, from: 'start' },
+            yPercent: 100,
+            duration: 0.9,
+            ease: 'power3.out',
+            stagger: { each: 0.03, from: 'start' },
             delay: 0.05,
           })
         },
@@ -197,12 +196,11 @@ const stats = [
     items.forEach((el) => {
       gsap.fromTo(
         el,
-        { opacity: 0, y: 56, scale: 0.96 },
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.8,
+          duration: 0.7,
           delay: 0.15 + Number(el.dataset.delay ?? 0) / 1000,
           ease: 'glow',
           clearProps: 'transform',
@@ -238,8 +236,8 @@ const stats = [
     const next = copy?.closest('section')?.nextElementSibling
     if (copy && next)
       gsap.to(copy, {
-        yPercent: -14,
-        opacity: 0.25,
+        yPercent: -6,
+        opacity: 0.5,
         ease: 'none',
         scrollTrigger: { trigger: next, start: 'top bottom', end: 'top top', scrub: true },
       })

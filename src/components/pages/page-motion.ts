@@ -9,7 +9,7 @@ const reduce = prefersReducedMotion()
 
 /**
  * Foto que se descubre de abajo arriba (clip-path) mientras la imagen se asienta
- * (escala 1.08 → 1). `frame` es el contenedor con esquinas redondeadas.
+ * (escala 1.03 → 1). `frame` es el contenedor con esquinas redondeadas.
  */
 export function revealImage(frame: HTMLElement, img: HTMLElement | null, start = 'top 85%') {
   if (reduce) return
@@ -18,7 +18,7 @@ export function revealImage(frame: HTMLElement, img: HTMLElement | null, start =
   const hidden = 'inset(100% 0% 0% 0% round 14px)'
   const shown = 'inset(0% 0% 0% 0% round 14px)'
   gsap.set(frame, { clipPath: hidden })
-  if (img) gsap.set(img, { scale: 1.08 })
+  if (img) gsap.set(img, { scale: 1.03 })
   void introDone.then(() => {
     const tl = gsap.timeline({
       scrollTrigger: { trigger: frame, start, once: true },
@@ -26,9 +26,9 @@ export function revealImage(frame: HTMLElement, img: HTMLElement | null, start =
     tl.fromTo(
       frame,
       { clipPath: hidden },
-      { clipPath: shown, duration: 1.3, ease: 'wipe', clearProps: 'clipPath' },
+      { clipPath: shown, duration: 1, ease: 'wipe', clearProps: 'clipPath' },
     )
-    if (img) tl.fromTo(img, { scale: 1.08 }, { scale: 1, duration: 1.8, ease: 'glow' }, 0)
+    if (img) tl.fromTo(img, { scale: 1.03 }, { scale: 1, duration: 1.2, ease: 'glow' }, 0)
   })
 }
 

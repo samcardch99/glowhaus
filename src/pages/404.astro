@@ -87,10 +87,9 @@ import { pathFor } from '../i18n'
   const digits = document.querySelectorAll<HTMLElement>('[data-404] .nf-digit')
   if (digits.length && !prefersReducedMotion()) {
     gsap.from(digits, {
-      yPercent: 60,
+      yPercent: 30,
       opacity: 0,
-      filter: 'blur(10px)',
-      duration: 1.2,
+      duration: 0.9,
       stagger: 0.12,
       ease: 'glow',
       clearProps: 'filter',
