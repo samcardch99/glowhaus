@@ -340,6 +340,12 @@ export const testimonials = [
     tag: 'Fotona',
     title: 'Su experiencia',
   },
+  {
+    src: '/media/testimonio-4.mp4',
+    poster: '/media/testimonio-4.jpg',
+    tag: 'Complementos',
+    title: 'Su visita',
+  },
 ]
 
 // ---------- Preguntas frecuentes ----------

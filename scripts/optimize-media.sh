@@ -28,6 +28,7 @@ JOBS=(
   "testimonio-1|testimonios/t1.mp4|0|0|1|720"
   "testimonio-2|testimonios/t2.mp4|0|0|1|720"
   "testimonio-3|testimonios/t3.mp4|0|0|1|720"
+  "testimonio-4|tx/complementos.mp4|0|0|1|720"
 )
 
 for job in "${JOBS[@]}"; do
