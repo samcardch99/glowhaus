@@ -23,7 +23,8 @@ const t = useT(lang)
 const name = t(tx.title)
 // Foto fija de la ficha si la hay; si no, el vídeo; si no, la foto de la categoría
 // Como en el diseño: vídeo dentro de la ficha salvo en inyectables, rellenos y complementos
-const still = tx.video && tx.detailVideo ? undefined : (tx.detailImg ?? (tx.video ? undefined : tx.img))
+const still =
+  tx.video && tx.detailVideo ? undefined : (tx.detailImg ?? (tx.video ? undefined : tx.img))
 const stillPos = tx.detailImg ? (tx.detailPos ?? 'center 45%') : (tx.imgPos ?? 'center')
 const videoId = `tx-video-${tx.slug.es}`
 const book = whatsappHref(lang, name)
@@ -43,38 +44,45 @@ const book = whatsappHref(lang, name)
     <div class="absolute inset-0 bg-[rgb(234_224_209/0.72)]"></div>
   </div>
 
-  <section
-    data-theme="light"
-    class="px-gutter flex flex-col gap-9 pt-[clamp(120px,15vh,150px)] pb-[88px]"
-  >
-    <Button href={pathFor(lang, 'treatments')} tone="dark" back class="self-start" data-hero-part>
-      {t('Atrás')}
-    </Button>
-    <nav aria-label={t('Migas de pan')} data-hero-part>
-      <ol class="text-taupe m-0 flex list-none flex-wrap gap-2 p-0 text-[14.5px] font-medium">
-        <li>
-          <a href={pathFor(lang, 'home')} class="hover:text-ink underline-offset-4 hover:underline">
-            {t('Inicio')}
-          </a>
-        </li>
-        <li aria-hidden="true">/</li>
-        <li>
-          <a
-            href={pathFor(lang, 'treatments')}
-            class="hover:text-ink underline-offset-4 hover:underline"
-          >
-            {t('Tratamientos')}
-          </a>
-        </li>
-        <li aria-hidden="true">/</li>
-        <li aria-current="page" class="text-ink">
-          {t(tx.name)}
-        </li>
-      </ol>
-    </nav>
-
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] items-start gap-14">
+  <section data-theme="light" class="px-gutter flex flex-col pt-[clamp(120px,15vh,150px)] pb-12">
+    <div class="grid grid-cols-1 items-start gap-14 min-[1040px]:grid-cols-2">
       <div class="flex flex-col gap-[30px]">
+        <div class="flex flex-col gap-9">
+          <Button
+            href={pathFor(lang, 'treatments')}
+            tone="dark"
+            back
+            class="self-start"
+            data-hero-part
+          >
+            {t('Atrás')}
+          </Button>
+          <nav aria-label={t('Migas de pan')} data-hero-part>
+            <ol class="text-taupe m-0 flex list-none flex-wrap gap-2 p-0 text-[14.5px] font-medium">
+              <li>
+                <a
+                  href={pathFor(lang, 'home')}
+                  class="hover:text-ink underline-offset-4 hover:underline"
+                >
+                  {t('Inicio')}
+                </a>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li>
+                <a
+                  href={pathFor(lang, 'treatments')}
+                  class="hover:text-ink underline-offset-4 hover:underline"
+                >
+                  {t('Tratamientos')}
+                </a>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li aria-current="page" class="text-ink">
+                {t(tx.name)}
+              </li>
+            </ol>
+          </nav>
+        </div>
         <div class="flex flex-col gap-3.5">
           <span class="eyebrow text-gold-dark" data-hero-part>
             {t(tx.tag)}
@@ -123,7 +131,7 @@ const book = whatsappHref(lang, name)
 
       <figure
         data-hero-media
-        class="relative m-0 aspect-[4/5] overflow-hidden rounded-[14px] max-[759px]:aspect-[4/4.4]"
+        class="tx-hero-media relative m-0 aspect-[4/5] overflow-hidden rounded-[14px] max-[759px]:aspect-[4/4.4]"
       >
         <div class="bg-sand size-full overflow-hidden" data-hero-media-inner>
           {still ? (
@@ -277,6 +285,24 @@ const book = whatsappHref(lang, name)
 <RelatedTreatments lang={lang} treatment={tx} />
 
 <style>
+  /* El vídeo o la foto de la ficha cabe entero en la pantalla: el ancho sale del
+     alto disponible (pantalla − margen superior de la sección − 32px) */
+  .tx-hero-media {
+    --tx-room: calc(100svh - clamp(120px, 15vh, 150px) - 32px);
+    width: min(100%, calc(var(--tx-room) * 0.8));
+    justify-self: center;
+  }
+  @media (min-width: 1040px) {
+    .tx-hero-media {
+      justify-self: end;
+    }
+  }
+  @media (max-width: 759px) {
+    .tx-hero-media {
+      width: min(100%, calc(var(--tx-room) / 1.1));
+    }
+  }
+
   /* Estado inicial de la entrada (solo con JS y sin movimiento reducido) */
   :global(.js) [data-hero-part],
   :global(.js) [data-hero-fact],
@@ -386,8 +412,8 @@ const book = whatsappHref(lang, name)
     if (inner)
       tl.fromTo(
         inner,
-        { scale: 1.14 },
-        { scale: 1, duration: 1.6, ease: 'glow', clearProps: 'transform' },
+        { scale: 1.04 },
+        { scale: 1, duration: 1.2, ease: 'glow', clearProps: 'transform' },
         0.25,
       )
     tl.fromTo(
