@@ -45,6 +45,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
 const alternate = new URL(altPath, Astro.site)
 const esUrl = lang === 'es' ? canonical : alternate
 const enUrl = lang === 'en' ? canonical : alternate
+// Rutas (sin dominio) de esta página en cada idioma, para el redireccionamiento
+// por idioma del navegador: el sitio se sirve en más de un dominio
+const langPaths = { es: esUrl.pathname, en: enUrl.pathname }
 const og = await getImage({ src: ogImage, width: 1200, height: 630, format: 'jpg', fit: 'cover' })
 const ogUrl = new URL(og.src, Astro.site)
 
@@ -88,10 +91,63 @@ const fullTitle = title.includes('GlowHaus') ? title : `${title} · GlowHaus Aes
 ---
 
 <!doctype html>
-<html lang={lang} class="no-js">
+<html lang={lang} translate="no" class="no-js">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Tenemos nuestra propia versión en inglés: que el navegador no traduzca encima -->
+    <meta name="google" content="notranslate" />
+    <script is:inline define:vars={{ ghLang: lang, ghPaths: langPaths }}>
+      // Idioma: la elección manual (ES/EN) se recuerda; si no la hay, en la versión en
+      // español se manda a la inglesa a quien tiene el navegador en inglés.
+      ;(function () {
+        var KEY = 'gh-lang'
+        var store = null
+        try {
+          store = window.localStorage
+        } catch (e) {}
+        function get() {
+          try {
+            return store && store.getItem(KEY)
+          } catch (e) {
+            return null
+          }
+        }
+        // Cualquier enlace con hreflang (selector de la cabecera, menú y pie) fija la elección
+        document.addEventListener(
+          'click',
+          function (ev) {
+            var a = ev.target && ev.target.closest && ev.target.closest('a[hreflang]')
+            if (!a) return
+            var l = a.getAttribute('hreflang')
+            if (l !== 'es' && l !== 'en') return
+            try {
+              store && store.setItem(KEY, l)
+            } catch (e) {}
+          },
+          true
+        )
+        if (/bot|crawl|spider|slurp|lighthouse|headless|preview/i.test(navigator.userAgent)) return
+        var want = get()
+        if (want !== 'es' && want !== 'en') {
+          want = null
+          var langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']
+          for (var i = 0; i < langs.length; i++) {
+            var p = String(langs[i]).toLowerCase().slice(0, 2)
+            if (p === 'es' || p === 'en') {
+              want = p
+              break
+            }
+          }
+          // Sin elección manual solo se redirige de español a inglés, nunca al revés
+          if (want !== 'en') want = null
+        }
+        if (!want || want === ghLang) return
+        var target = ghPaths[want]
+        if (!target || target === location.pathname) return
+        location.replace(target + location.search + location.hash)
+      })()
+    </script>
     <script is:inline>
       document.documentElement.classList.replace('no-js', 'js')
       // Si el JS de animación no llega a cargar, se muestra todo igualmente
