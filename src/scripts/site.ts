@@ -502,16 +502,42 @@ if (!reduce) {
 }
 
 // ---------- Vídeos: cargan cerca de la pantalla y se pausan fuera de ella ----------
+// Se reproducen solos en todos los dispositivos, también con «reducir movimiento» activado
+// (decisión del cliente): van en silencio, en bucle y con botón de pausa donde lo hay.
+// Si el navegador niega el arranque (modo de bajo consumo del iPhone, ahorro de datos…),
+// se reintenta con el primer gesto de la persona.
 const videos = document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]')
+const inView = new Set<HTMLVideoElement>()
+const GESTURES = ['pointerdown', 'touchend', 'keydown', 'click'] as const
+let waitingGesture = false
+const onGesture = () => {
+  waitingGesture = false
+  GESTURES.forEach((e) => window.removeEventListener(e, onGesture, true))
+  inView.forEach((v) => {
+    if (v.paused) playVideo(v)
+  })
+}
+function playVideo(v: HTMLVideoElement) {
+  if (v.dataset.userPaused) return
+  if (!v.src && v.dataset.src) v.src = v.dataset.src
+  v.muted = true
+  v.play().catch((err: unknown) => {
+    // AbortError (cambió la fuente o se pausó) no es un bloqueo: solo se espera gesto si lo niega
+    if (!(err instanceof DOMException) || err.name !== 'NotAllowedError' || waitingGesture) return
+    waitingGesture = true
+    GESTURES.forEach((e) => window.addEventListener(e, onGesture, { capture: true, passive: true }))
+  })
+}
 const io = new IntersectionObserver(
   (entries) => {
     entries.forEach(({ target, isIntersecting }) => {
       const v = target as HTMLVideoElement
       if (isIntersecting) {
-        if (!v.src && v.dataset.src) v.src = v.dataset.src
-        if (!reduce && !v.dataset.userPaused) v.play().catch(() => {})
-      } else if (!v.paused) {
-        v.pause()
+        inView.add(v)
+        playVideo(v)
+      } else {
+        inView.delete(v)
+        if (!v.paused) v.pause()
       }
     })
   },

@@ -182,7 +182,9 @@ const t = useT(lang)
     let centers: number[] = []
     let act = -1
     let inView = false
-    let userPaused = reduce
+    // Se reproducen solos también con «reducir movimiento» (decisión del cliente)
+    let userPaused = false
+    let retryOnGesture = false
     let sound = false
 
     vids.forEach((v) => {
@@ -210,14 +212,24 @@ const t = useT(lang)
         const on = i === act && inView && !userPaused
         if (on) {
           v.muted = !sound
-          v.play().catch(() => {
+          v.play().catch((err: unknown) => {
             // Sin gesto previo el navegador puede negar el sonido: se sigue en silencio
             if (!v.muted) {
               v.muted = true
               sound = false
               paintSound()
               v.play().catch(() => {})
+              return
             }
+            // En silencio y aun así bloqueado (bajo consumo): se reintenta con el primer gesto
+            if (!(err instanceof DOMException) || err.name !== 'NotAllowedError') return
+            if (retryOnGesture) return
+            retryOnGesture = true
+            const again = () => {
+              retryOnGesture = false
+              sync()
+            }
+            window.addEventListener('pointerdown', again, { once: true, capture: true })
           })
         } else if (!v.paused) v.pause()
       })
