@@ -12,9 +12,9 @@ export const site = {
   email: 'hola@aestheticsglowhaus.com',
   instagram: 'https://www.instagram.com/aestheticsglowhaus/',
   instagramHandle: '@aestheticsglowhaus',
-  // Pendiente de que la clínica pase los enlaces reales
+  // Pendiente de que la clínica pase el enlace real
   facebook: 'https://www.facebook.com/',
-  tiktok: 'https://www.tiktok.com/',
+  tiktok: 'https://www.tiktok.com/@thehausofglow',
   googleReviews: 'https://www.google.com/maps/search/GlowHaus+Aesthetics+11890+SW+8th+St+Miami',
   mapsLink: 'https://maps.google.com/?q=GlowHaus+Aesthetics+11890+SW+8th+St+Miami',
   mapsEmbed:
