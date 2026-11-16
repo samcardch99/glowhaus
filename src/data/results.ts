@@ -26,11 +26,8 @@ const pair = (before: string, after: string, credit = false): BAPair => ({
 })
 const pairs = (k: string, ns: number[]): BAPair[] => ns.map((n) => pair(`${k}-${n}a`, `${k}-${n}d`))
 
-const fotona4d: BAPair[] = [
-  pair('f4d-1a', 'f4d-1d', true),
-  pair('f4d-2a-up', 'f4d-2d', true),
-  pair('f4d-3a', 'f4d-3d', true),
-]
+// Fotona 4D: cuatro casos de fotona.com, en alta resolución (16-11)
+const fotona4d: BAPair[] = [1, 2, 3, 4].map((n) => pair(`f4d-${n}a`, `f4d-${n}d`, true))
 
 export const baSets: BASet[] = [
   { tab: 'Botox', pairs: pairs('botox', [1, 2, 3, 4, 5, 6]) },
