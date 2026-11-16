@@ -9,7 +9,6 @@ import StepsTimeline from './StepsTimeline.astro'
 import PaymentMethods from './PaymentMethods.astro'
 import RelatedTreatments from './RelatedTreatments.astro'
 import type { Treatment } from '../../data/treatments'
-import { site } from '../../data/site'
 import { pathFor, useT, type Lang } from '../../i18n'
 import { baSetsFor, posterFor } from './helpers'
 
@@ -28,7 +27,6 @@ const still =
   tx.video && tx.detailVideo ? undefined : (tx.detailImg ?? (tx.video ? undefined : tx.img))
 const stillPos = tx.detailImg ? (tx.detailPos ?? 'center 45%') : (tx.imgPos ?? 'center')
 const videoId = `tx-video-${tx.slug.es}`
-const book = site.booking
 const baSets = baSetsFor(tx)
 ---
 
@@ -80,7 +78,7 @@ const baSets = baSetsFor(tx)
               </li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" class="text-ink">
-                {t(tx.name)}
+                {name}
               </li>
             </ol>
           </nav>
@@ -238,16 +236,6 @@ const baSets = baSetsFor(tx)
       <p data-reveal="solo" data-delay="550" class="text-body-sm text-gold-dark m-0">
         {t('Precios sujetos a cambios. El plan final se confirma en tu valoración.')}
       </p>
-      <Button
-        href={book}
-        external
-        tone="dark"
-        class="tx-sheen relative mt-2 self-start overflow-hidden"
-        data-reveal="solo"
-        data-delay="650"
-      >
-        {t('Reservar cita')}
-      </Button>
     </div>
     <PaymentMethods lang={lang} class="self-center" data-reveal="solo" data-delay="650" />
   </section>
@@ -331,27 +319,6 @@ const baSets = baSetsFor(tx)
     }
     :global(.js) [data-hero-media] {
       clip-path: none;
-    }
-  }
-
-  /* «Reservar cita»: destello dorado al pasar el ratón (escritorio) */
-  :global(.tx-sheen)::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    background: linear-gradient(
-      100deg,
-      transparent 30%,
-      rgb(232 196 130 / 0.55) 50%,
-      transparent 70%
-    );
-    transform: translateX(-120%);
-    pointer-events: none;
-  }
-  @media (hover: hover) and (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
-    :global(.tx-sheen):hover::after {
-      transform: translateX(120%);
-      transition: transform 0.9s var(--ease-swift);
     }
   }
 </style>

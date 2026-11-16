@@ -1,6 +1,5 @@
 ---
 import { Image } from 'astro:assets'
-import Button from '../ui/Button.astro'
 import bodyFull from '../../assets/body-full-t.png'
 import bodyFace from '../../assets/body-face-t.png'
 import { treatments } from '../../data/treatments'
@@ -64,7 +63,7 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
             data-featured={order[k] === START ? '' : undefined}
             aria-pressed={order[k] === START ? 'true' : 'false'}
             aria-controls="body-figure"
-            class="body-slot text-cream flex flex-col items-start gap-0 rounded-lg border border-[rgb(250_248_245/0.16)] bg-[rgb(24_18_14/0.74)] min-w-0 px-4 pt-3.5 pb-4 text-left max-sm:px-3"
+            class="body-slot text-cream flex flex-col items-start gap-0 rounded-lg border border-[rgb(250_248_245/0.16)] bg-[rgb(24_18_14/0.42)] backdrop-blur-[16px] backdrop-saturate-[1.1] min-w-0 px-4 pt-3.5 pb-4 text-left max-sm:px-3"
           >
             <span class="max-w-full text-[clamp(16px,1.9vw,20px)] leading-[1.15] font-semibold hyphens-auto min-[1100px]:text-[clamp(20px,1.7vw,23.5px)]">
               {t(c.name)}
@@ -80,14 +79,32 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
         ))}
     </div>
     <div>
-      <Button
+      <a
         href={treatmentPath(lang, treatments[START]!.slug[lang])}
-        tone="dark"
         data-body-link
-        class="!whitespace-normal text-left"
+        class="text-brown hover:bg-gold hover:border-gold hover:text-cream inline-flex items-center gap-3.5 rounded-[10px] border border-[#3B2F26] px-[18px] py-3 text-left text-[clamp(17px,calc(12px+0.8vw),18px)] font-medium no-underline transition-colors duration-300"
       >
-        {t('Ver tratamiento')}: <span data-body-name>{t(treatments[START]!.name)}</span>
-      </Button>
+        <span class="flex flex-wrap gap-1.5">
+          <span>{t('Ver tratamiento')}:</span>
+          <span data-body-name class="font-semibold">
+            {t(treatments[START]!.name)}
+          </span>
+        </span>
+        <svg
+          viewBox="0 0 20 20"
+          width="1.45em"
+          height="1.45em"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="square"
+          aria-hidden="true"
+          class="flex-none"
+        >
+          <path d="M5 15 15 5"></path>
+          <path d="M5 5h10v10"></path>
+        </svg>
+      </a>
     </div>
   </div>
 
@@ -209,7 +226,7 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
   /* Mientras vuelan: todos iguales y sin transiciones que muevan los huecos */
   [data-flying] .body-slot,
   [data-flying] .body-slot:hover {
-    background-color: rgb(24 18 14 / 0.74);
+    background-color: rgb(24 18 14 / 0.42);
     transition: none;
   }
   [data-flying] .slot-desc {

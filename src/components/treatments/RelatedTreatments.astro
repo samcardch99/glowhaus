@@ -5,8 +5,8 @@ import { treatments } from '../../data/treatments'
 import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
 import { catNumber, fromLabel } from './helpers'
 
-// «Otros tratamientos»: cinta continua como en el diseño (gh-marquee, 120 s),
-// con el resto de categorías empezando por la siguiente. Se detiene con el
+// «Otros tratamientos»: cinta continua como en el diseño (gh-marquee, 120 s):
+// las 3 categorías siguientes, repetidas 4 veces. Se detiene con el
 // ratón encima o con el foco dentro; con movimiento reducido es una rejilla
 // fija con las 3 siguientes.
 interface Props {
@@ -16,9 +16,8 @@ interface Props {
 const { lang, treatment } = Astro.props
 const t = useT(lang)
 const i0 = treatments.indexOf(treatment)
-const others = treatments
-  .map((_, o) => (i0 + 1 + o) % treatments.length)
-  .filter((k) => k !== i0)
+const others = [1, 2, 3]
+  .map((o) => (i0 + o) % treatments.length)
   .map((index) => ({ r: treatments[index]!, index }))
 const STATIC = 3
 ---
@@ -40,7 +39,7 @@ const STATIC = 3
   </div>
   <div data-reveal="solo" data-delay="250" class="rel-viewport overflow-hidden py-2.5">
     <div data-rel-track class="rel-track flex w-max">
-      {[0, 1].map((copy) =>
+      {[0, 1, 2, 3].map((copy) =>
         others.map(({ r, index }, k) => (
           <a
             href={treatmentPath(lang, r.slug[lang])}

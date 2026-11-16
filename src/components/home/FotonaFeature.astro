@@ -1,13 +1,12 @@
 ---
 import { Image } from 'astro:assets'
 import Button from '../ui/Button.astro'
-import PauseButton from './PauseButton.astro'
 import isotipo from '../../assets/glowhaus-isotipo-crema.jpg'
 import { treatments } from '../../data/treatments'
 import { treatmentPath, useT, type Lang } from '../../i18n'
 
-// Fotona 4D, la tecnología insignia: vídeo enmarcado sobre su copia difuminada
-// (una imagen fija, que pesa menos que un segundo vídeo) y precios con contador.
+// Fotona 4D, la tecnología insignia: vídeo enmarcado sobre el mismo vídeo
+// difuminado de fondo (como el diseño) y precios con contador.
 interface Props {
   lang: Lang
 }
@@ -20,20 +19,24 @@ const fotona = treatments[0]!
   data-theme="dark"
   class="bg-brown text-cream relative z-[4] flex min-h-[calc(100vh+120px)] items-center overflow-hidden"
 >
-  <img
-    src="/media/fotona-reel.jpg"
-    alt=""
+  <video
+    data-autoplay
+    data-src="/media/fotona-reel.mp4"
+    poster="/media/fotona-reel.jpg"
+    muted
+    loop
+    playsinline
+    preload="none"
     aria-hidden="true"
-    loading="lazy"
-    decoding="async"
+    tabindex="-1"
     class="pointer-events-none absolute inset-0 size-full scale-[1.2] object-cover blur-[38px] saturate-[1.1]"
-  />
+  ></video>
   <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.55),rgb(24_18_14/0.4)_50%,rgb(24_18_14/0.6))]"></div>
 
   <div class="px-gutter relative grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] items-center gap-[clamp(32px,5vw,80px)] pt-[clamp(80px,11vh,110px)] pb-[clamp(48px,7vh,96px)]">
     <div
       data-fotona-frame
-      class="bg-brown-2 relative aspect-[3/4] h-[min(82vh,820px)] max-w-full justify-self-center overflow-hidden rounded-[14px] max-md:aspect-[4/5] max-md:h-auto max-md:w-full"
+      class="bg-brown-2 relative aspect-[4/4.2] h-[calc(100vh-2*clamp(48px,7vh,96px)-30px)] min-h-[380px] max-w-full justify-self-center overflow-hidden rounded-[14px] max-[759px]:aspect-[4/5] max-[759px]:h-auto max-[759px]:min-h-0 max-[759px]:w-full"
     >
       <video
         id="fotona-video"
@@ -48,7 +51,7 @@ const fotona = treatments[0]!
         class="block size-full object-cover"
         data-fotona-video
       ></video>
-      <div class="glass-chip pointer-events-none absolute bottom-3 left-3 flex max-w-[calc(100%-80px)] items-center gap-2.5 rounded-xl py-2 pr-3.5 pl-2">
+      <div class="glass-chip pointer-events-none absolute bottom-3 left-3 flex max-w-[calc(100%-24px)] items-center gap-2.5 rounded-xl py-2 pr-3.5 pl-2">
         <Image
           src={isotipo}
           alt=""
@@ -64,7 +67,6 @@ const fotona = treatments[0]!
           </span>
         </div>
       </div>
-      <PauseButton lang={lang} controls="fotona-video" class="absolute right-3 bottom-3" />
     </div>
 
     <div class="flex flex-col gap-[22px]">

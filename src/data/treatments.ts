@@ -102,7 +102,7 @@ export const treatments: Treatment[] = [
         'Desde el interior de la boca, estimula el colágeno y da soporte a las mejillas y los surcos.',
       ],
       ['FRAC3', 'Trabaja imperfecciones, manchas y textura en capas profundas de la piel.'],
-      ['PIANO', 'Calor profundo y uniforme que tensa el óvalo del rostro y la piel del cuello.'],
+      ['PIANO', 'Calienta de forma uniforme la dermis para tensar el rostro y el contorno.'],
       ['SupErficial', 'Un pulido suave de la superficie que deja la piel más lisa y luminosa.'],
     ]),
     faqs: F([
@@ -346,7 +346,7 @@ export const treatments: Treatment[] = [
     ],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
-      ['Valoración', 'Observamos tus gestos y definimos las zonas y las unidades necesarias.'],
+      ['Valoración', 'Alain observa tus gestos y define las zonas y las unidades necesarias.'],
       ['Marcado', 'Marcamos los puntos de aplicación para un resultado equilibrado.'],
       ['Aplicación', 'Microinyecciones rápidas con aguja muy fina, en pocos minutos.'],
       ['Revisión', 'A las dos semanas revisamos el resultado y ajustamos si hace falta.'],

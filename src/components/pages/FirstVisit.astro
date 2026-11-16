@@ -202,7 +202,22 @@ const dot = 'border-gold size-[9px] flex-none rounded-full border-[1.5px] bg-[rg
           data-active={i === 0 ? '' : undefined}
           class="pay-card relative flex cursor-pointer flex-col gap-5 overflow-hidden rounded-[14px] border p-[clamp(22px,2.2vw,32px)] backdrop-blur-[14px]"
         >
-          <h3 class="m-0 text-[clamp(22px,2vw,26px)] leading-[1.2] font-semibold">{t(p.title)}</h3>
+          <h3 class="m-0 text-[clamp(22px,2vw,26px)] leading-[1.2] font-semibold">
+            {p.link ? (
+              <a
+                href={p.link.href}
+                target="_blank"
+                rel="noopener"
+                aria-label={`${t(p.title)}: ${t(p.link.label)}`}
+                class="inline-flex items-center gap-2.5 text-inherit no-underline after:absolute after:inset-0 after:content-['']"
+              >
+                {t(p.title)}
+                <Arrow />
+              </a>
+            ) : (
+              t(p.title)
+            )}
+          </h3>
           <p class="pay-sub m-0 text-[17.5px] leading-[1.6] text-pretty">{t(p.text)}</p>
           <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
             {p.tags.map((tag) => (
@@ -224,23 +239,14 @@ const dot = 'border-gold size-[9px] flex-none rounded-full border-[1.5px] bg-[rg
             </div>
           )}
           {p.link && (
-            <a
-              href={p.link.href}
-              target="_blank"
-              rel="noopener"
-              class="text-cream hover:text-gold-light mt-auto inline-flex flex-wrap items-center gap-3 self-start pt-1 text-[17px] font-semibold underline underline-offset-4 transition-colors"
-            >
+            <div class="-mt-1 flex flex-wrap gap-2">
               <Image
                 src={p.link.logo}
                 alt={p.link.alt}
                 height={40}
                 class="block h-5 w-auto rounded-[3px] bg-white px-2 py-[3px] [box-sizing:content-box]"
               />
-              <span class="inline-flex items-center gap-2">
-                {t(p.link.label)}
-                <Arrow />
-              </span>
-            </a>
+            </div>
           )}
         </li>
       ))}

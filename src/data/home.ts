@@ -257,7 +257,7 @@ export const team: {
     role: 'FNP-BC',
     tag: '',
     cred: 'FNP-BC · Family Nurse Practitioner',
-    bio: 'Nurse Practitioner con certificación en medicina familiar (FNP-BC). Antes de cada tratamiento revisa con calma la piel y el historial de la paciente, y se encarga de los tratamientos con láser Fotona.',
+    bio: 'Nurse Practitioner certificada. Valora a cada paciente y realiza tratamientos con láser Fotona.',
   },
 ]
 
@@ -357,7 +357,7 @@ export const homeFaqs: Faq[] = [
   },
   {
     q: '¿Quién realiza los tratamientos?',
-    a: 'Un equipo licenciado bajo la dirección de Alain Castellat, APRN. Cada tratamiento lo realiza tu proveedor de salud del equipo.',
+    a: 'Un equipo licenciado bajo la dirección de Alain Castellat, APRN. En cada página de tratamiento verás quién lo realiza.',
   },
   {
     q: '¿Los precios de la web son los finales?',
@@ -369,7 +369,7 @@ export const homeFaqs: Faq[] = [
   },
   {
     q: '¿Cómo reservo?',
-    a: 'Pulsa «Reservar cita» y elige tratamiento y horario en nuestra agenda en línea. Si tienes dudas, escríbenos por WhatsApp o llámanos al +1 (786) 918-2997.',
+    a: 'Con el botón “Reservar cita”, que te lleva a nuestra agenda en línea. También puedes escribirnos por WhatsApp o llamarnos al (786) 918-2997.',
   },
   {
     q: '¿Dónde están?',
