@@ -64,9 +64,9 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
             data-featured={order[k] === START ? '' : undefined}
             aria-pressed={order[k] === START ? 'true' : 'false'}
             aria-controls="body-figure"
-            class="body-slot text-cream flex flex-col items-start gap-0 rounded-lg border border-[rgb(250_248_245/0.16)] bg-[rgb(24_18_14/0.74)] px-4 pt-3.5 pb-4 text-left"
+            class="body-slot text-cream flex flex-col items-start gap-0 rounded-lg border border-[rgb(250_248_245/0.16)] bg-[rgb(24_18_14/0.74)] min-w-0 px-4 pt-3.5 pb-4 text-left max-sm:px-3"
           >
-            <span class="text-[clamp(16px,1.9vw,20px)] leading-[1.15] font-semibold min-[1100px]:text-[clamp(20px,1.7vw,23.5px)]">
+            <span class="max-w-full text-[clamp(16px,1.9vw,20px)] leading-[1.15] font-semibold hyphens-auto min-[1100px]:text-[clamp(20px,1.7vw,23.5px)]">
               {t(c.name)}
             </span>
             <span class="slot-desc grid max-sm:hidden">
