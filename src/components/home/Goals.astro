@@ -54,6 +54,7 @@ const t = useT(lang)
             data-goal={i}
             aria-pressed={i === 0 ? 'true' : 'false'}
             aria-controls="goal-panel"
+            data-btn-m
             class="aria-pressed:bg-gold aria-pressed:border-gold aria-pressed:text-cream hover:bg-gold hover:border-gold hover:text-cream text-ink flex w-auto items-center rounded-[14px] whitespace-nowrap border border-[rgb(24_18_14/0.55)] bg-[rgb(24_18_14/0.06)] px-3.5 py-3 text-left sm:px-[18px] text-[clamp(15px,1.2vw,17px)] font-semibold tracking-[0.03em] backdrop-blur-[10px] transition-colors duration-300 max-sm:rounded-lg"
           >
             <span class="sm:truncate">{t(g.label)}</span>
@@ -106,7 +107,7 @@ const t = useT(lang)
                   </span>
                   <a
                     href={treatmentPath(lang, treatments[s.tx]!.slug[lang])}
-                    class="btn-glass !gap-2.5 !px-4 !py-2.5"
+                    class="btn-glass min-[760px]:!gap-2.5 min-[760px]:!px-4 min-[760px]:!py-2.5"
                     aria-label={`${t('Ver y reservar')}: ${t(s.name)}`}
                   >
                     <span>{t('Ver y reservar')}</span>

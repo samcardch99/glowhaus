@@ -252,3 +252,25 @@
     transform: translateX(-50%);
   }
 }
+
+/* Móvil, como el diseño: títulos de sección a 24 px y botones compactos */
+@media (width < 760px) {
+  section h2:not([data-small-title]) {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+  }
+  .btn-glass,
+  .btn-glass-dark,
+  [data-btn-m] {
+    padding: 8px 12px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em !important;
+    min-width: 0 !important;
+    gap: 10px !important;
+  }
+  :is(.btn-glass, .btn-glass-dark, [data-btn-m]) svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}

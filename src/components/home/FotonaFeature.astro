@@ -91,11 +91,11 @@ const fotona = treatments[0]!
           { k: 'RECUPERACIÓN', v: 'Mínima' },
         ].map((r) => (
           <div class="contents">
-            <dt class="text-tan text-[clamp(11px,calc(8px+0.7vw),13.5px)] font-medium tracking-[0.1em]">
+            <dt class="text-tan leading-[normal] text-[clamp(11px,calc(8px+0.7vw),13.5px)] font-medium tracking-[0.1em]">
               {t(r.k)}
             </dt>
             <dd
-              class="m-0 text-[clamp(19px,calc(14px+1vw),24px)] font-semibold tabular-nums"
+              class="m-0 text-[clamp(19px,calc(14px+1vw),24px)] leading-[normal] font-semibold tabular-nums"
               data-count={r.n}
             >
               {r.n ? r.v : t(r.v)}
