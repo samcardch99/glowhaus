@@ -22,5 +22,10 @@ export default defineConfig({
       i18n: { defaultLocale: 'es', locales: { es: 'es-US', en: 'en-US' } },
     }),
   ],
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    // Safari anterior a la 18 necesita -webkit-backdrop-filter: con estos objetivos el
+    // compilador de CSS escribe las dos variantes del desenfoque de cristal
+    build: { cssTarget: ['chrome111', 'edge111', 'firefox128', 'safari16.4', 'ios16.4'] },
+  },
 })

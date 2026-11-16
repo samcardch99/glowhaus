@@ -65,6 +65,10 @@
   text-wrap: balance;
 }
 
+/* El desenfoque se escribe solo como backdrop-filter: el compilador añade la variante de Safari
+   (cssTarget en astro.config). Con las dos a mano, el minificador dejaba solo la de Safari y el
+   efecto desaparecía en Chrome. */
+
 /* Botón de cristal: sobre fondo oscuro */
 @utility btn-glass {
   display: inline-flex;
@@ -76,7 +80,6 @@
   border: 1px solid rgb(250 248 245 / 0.55);
   color: var(--color-cream);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border-radius: 14px;
   padding: 13px 20px;
   font: 400 var(--text-body) / 1.2 var(--font-sans);
@@ -107,7 +110,6 @@
   border: 1px solid rgb(24 18 14 / 0.55);
   color: var(--color-ink);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border-radius: 14px;
   padding: 13px 20px;
   font: 400 var(--text-body) / 1.2 var(--font-sans);
@@ -131,7 +133,6 @@
 @utility glass-panel {
   background: rgb(24 18 14 / 0.5);
   backdrop-filter: blur(18px) saturate(1.1);
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
   border: 1px solid rgb(250 248 245 / 0.55);
   border-radius: 14px;
 }
@@ -139,7 +140,6 @@
 @utility glass-chip {
   background: rgb(24 18 14 / 0.42);
   backdrop-filter: blur(16px) saturate(1.1);
-  -webkit-backdrop-filter: blur(16px) saturate(1.1);
   border: 1px solid rgb(250 248 245 / 0.16);
 }
 
