@@ -49,10 +49,10 @@ const t = useT(lang)
         <Image
           src={s.img}
           alt=""
-          widths={[640, 1080, 1600, 2160]}
-          sizes="100vw"
-          style={`object-position:${s.pos}`}
-          class="absolute inset-0 size-full object-cover"
+          widths={[640, 1080, 1600, 2160, 2452]}
+          sizes="(max-aspect-ratio: 16/9) 180vh, 100vw"
+          style={`--pos:${s.pos};--pos-m:${s.posM};--pos-t:${s.posT}`}
+          class="step-photo absolute inset-0 size-full object-cover"
         />
         <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.6)_0%,rgb(24_18_14/0.2)_38%,rgb(24_18_14/0.85)_100%)]" />
         <div class="px-gutter relative flex h-full flex-col justify-between gap-[clamp(32px,6vh,64px)] pt-[clamp(120px,16vh,150px)] pb-[clamp(80px,9vh,104px)]">
@@ -87,6 +87,20 @@ const t = useT(lang)
 </div>
 
 <style>
+  /* Fotos horizontales: en pantallas verticales se ve solo una franja, con su propio encuadre */
+  :global(.step-photo) {
+    object-position: var(--pos);
+  }
+  @media (orientation: portrait) {
+    :global(.step-photo) {
+      object-position: var(--pos-m);
+    }
+  }
+  @media (orientation: portrait) and (width >= 760px) {
+    :global(.step-photo) {
+      object-position: var(--pos-t);
+    }
+  }
   :global(.js) [data-card-title],
   :global(.js) [data-card-panel] {
     opacity: 0;

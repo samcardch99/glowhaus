@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets'
-import sala from '../../assets/clinica-sala.jpg'
+import sala from '../../assets/primera-visita.jpg'
 import BackButton from './BackButton.astro'
 import Arrow from '../ui/Arrow.astro'
 import visa from '../../assets/pay/visa.png'
@@ -135,10 +135,10 @@ const dot = 'border-gold size-[9px] flex-none rounded-full border-[1.5px] bg-[rg
     <Image
       src={sala}
       alt={t('Sala de tratamiento de la clínica GlowHaus')}
-      widths={[480, 768]}
-      sizes="100vw"
+      widths={[640, 1080, 1600, 2160, 2736]}
+      sizes="(max-width: 639px) 230vw, 100vw"
       data-visit-img
-      class="size-full object-cover object-[50%_60%]"
+      class="size-full object-cover object-[64%_60%] sm:object-[50%_60%]"
     />
   </div>
 </section>

@@ -12,9 +12,9 @@ import alain from '../assets/team/alain.jpg'
 import daniela from '../assets/team/p2.jpg'
 import bella from '../assets/reviews/bella.png'
 import odelia from '../assets/reviews/odelia.png'
-import step1 from '../assets/steps/01.jpg'
-import step2 from '../assets/steps/02c.jpg'
-import step3 from '../assets/steps/03.jpg'
+import step1 from '../assets/steps/01-h.jpg'
+import step2 from '../assets/steps/02-h.jpg'
+import step3 from '../assets/steps/03-h.jpg'
 
 // Contenido propio de la página de inicio. Texto en español: el inglés sale del
 // diccionario (src/i18n). Las reseñas se publican tal cual las escribió cada paciente.
@@ -203,7 +203,10 @@ export const steps: {
   title: string
   text: string
   img: ImageMetadata
+  /** Encuadre de la foto (horizontal) en pantallas apaisadas, en móvil vertical y en tableta vertical */
   pos: string
+  posM: string
+  posT: string
 }[] = [
   {
     num: '01',
@@ -211,7 +214,9 @@ export const steps: {
     title: 'Tu hora es solo tuya',
     text: 'La experiencia empieza antes de llegar. Tu cita queda reservada para ti, sin agendas llenas ni turnos encimados.',
     img: step1,
-    pos: 'center 38%',
+    pos: '50% 55%',
+    posM: '17% 50%',
+    posT: '40% 50%',
   },
   {
     num: '02',
@@ -219,7 +224,9 @@ export const steps: {
     title: 'Nunca eres uno más',
     text: 'Sin ruido ni salas de espera llenas. Entras a un espacio en calma, con tu privacidad cuidada.',
     img: step2,
-    pos: 'center 45%',
+    pos: '50% 35%',
+    posM: '31% 50%',
+    posT: '26% 50%',
   },
   {
     num: '03',
@@ -227,7 +234,9 @@ export const steps: {
     title: 'Hecho bien, no rápido',
     text: 'No se trata de hacer más tratamientos, sino de hacerlos bien. Te consentimos y avanzamos a tu ritmo.',
     img: step3,
-    pos: 'center 68%',
+    pos: '50% 40%',
+    posM: '56% 50%',
+    posT: '53% 50%',
   },
 ]
 
