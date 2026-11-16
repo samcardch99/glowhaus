@@ -8,15 +8,19 @@ import { useT, type Lang } from '../../i18n'
 // flechas. Comportamiento del diseño: tras 3 s sin tocarlo, el tirador vuelve
 // suave al centro; si ya estaba ahí, pasa al siguiente caso fundiendo el
 // anterior (800 ms). Se detiene fuera de pantalla, con el foco dentro, con la
-// pestaña oculta y con movimiento reducido. Pensado para fondo oscuro.
+// pestaña oculta y con movimiento reducido. `tone` adapta pestañas y paginación
+// al fondo: oscuro (inicio) o claro (fichas de tratamiento).
 interface Props {
   lang: Lang
   sets: BASet[]
   id?: string
   /** A dos columnas, la fila de pestañas no se recorta: sobresale por la derecha */
   tabsOverflow?: boolean
+  /** Fondo sobre el que va el comparador */
+  tone?: 'dark' | 'light'
 }
-const { lang, sets, id = 'ba', tabsOverflow = false } = Astro.props
+const { lang, sets, id = 'ba', tabsOverflow = false, tone = 'dark' } = Astro.props
+const light = tone === 'light'
 const t = useT(lang)
 ---
 
@@ -39,7 +43,12 @@ const t = useT(lang)
           aria-selected={i === 0 ? 'true' : 'false'}
           aria-controls={`${id}-set-${i}`}
           tabindex={i === 0 ? undefined : -1}
-          class="aria-selected:bg-gold aria-selected:border-gold hover:border-gold text-cream rounded-[clamp(8px,calc(2px+1vw),14px)] border border-[rgb(250_248_245/0.35)] bg-[rgb(250_248_245/0.06)] px-[clamp(12px,calc(5px+1.3vw),18px)] py-[clamp(8px,calc(4px+0.6vw),10px)] text-[clamp(13.5px,calc(11px+0.6vw),16px)] font-semibold tracking-[0.03em] whitespace-nowrap backdrop-blur-[10px] transition-colors duration-300"
+          class:list={[
+            'aria-selected:bg-gold aria-selected:border-gold hover:border-gold rounded-[clamp(8px,calc(2px+1vw),14px)] border px-[clamp(12px,calc(5px+1.3vw),18px)] py-[clamp(8px,calc(4px+0.6vw),10px)] text-[clamp(13.5px,calc(11px+0.6vw),16px)] font-semibold tracking-[0.03em] whitespace-nowrap backdrop-blur-[10px] transition-colors duration-300',
+            light
+              ? 'text-ink aria-selected:text-cream border-[rgb(24_18_14/0.35)] bg-[rgb(24_18_14/0.06)]'
+              : 'text-cream border-[rgb(250_248_245/0.35)] bg-[rgb(250_248_245/0.06)]',
+          ]}
         >
           {t(s.tab)}
         </button>
@@ -117,7 +126,14 @@ const t = useT(lang)
         </div>
         {s.pairs.length > 1 && (
           <div class="flex justify-center">
-            <div class="flex items-center gap-[18px] rounded-[14px] border border-[rgb(250_248_245/0.55)] bg-[rgb(250_248_245/0.14)] px-5 py-3.5 backdrop-blur-[10px]">
+            <div
+              class:list={[
+                'flex items-center gap-[18px] rounded-[14px] border px-5 py-3.5 backdrop-blur-[10px]',
+                light
+                  ? 'border-[rgb(24_18_14/0.14)] bg-[rgb(24_18_14/0.045)]'
+                  : 'border-[rgb(250_248_245/0.55)] bg-[rgb(250_248_245/0.14)]',
+              ]}
+            >
               <div class="flex items-center gap-2">
                 {s.pairs.map((_, pi) => (
                   <button
@@ -125,12 +141,20 @@ const t = useT(lang)
                     data-ba-dot={pi}
                     aria-label={`${t('Caso')} ${pi + 1} / ${s.pairs.length}`}
                     aria-current={pi === 0 ? 'true' : undefined}
-                    class="aria-[current]:bg-gold hover:bg-gold-light relative h-[11px] w-[11px] rounded-full bg-[rgb(250_248_245/0.35)] transition-[width,background-color] duration-300 before:absolute before:-inset-2 before:content-[''] aria-[current]:w-[34px]"
+                    class:list={[
+                      "aria-[current]:bg-gold relative h-[11px] w-[11px] rounded-full transition-[width,background-color] duration-300 before:absolute before:-inset-2 before:content-[''] aria-[current]:w-[34px]",
+                      light
+                        ? 'hover:bg-gold bg-[rgb(59_47_38/0.28)]'
+                        : 'hover:bg-gold-light bg-[rgb(250_248_245/0.35)]',
+                    ]}
                   />
                 ))}
               </div>
               <span
-                class="text-beige text-[clamp(16px,1.4vw,20px)] font-medium tracking-[0.08em] tabular-nums"
+                class:list={[
+                  'text-[clamp(16px,1.4vw,20px)] font-medium tracking-[0.08em] tabular-nums',
+                  light ? 'text-brown' : 'text-beige',
+                ]}
                 data-ba-count
               >
                 1/{s.pairs.length}
