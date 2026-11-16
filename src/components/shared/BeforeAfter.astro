@@ -13,8 +13,10 @@ interface Props {
   lang: Lang
   sets: BASet[]
   id?: string
+  /** A dos columnas, la fila de pestañas no se recorta: sobresale por la derecha */
+  tabsOverflow?: boolean
 }
-const { lang, sets, id = 'ba' } = Astro.props
+const { lang, sets, id = 'ba', tabsOverflow = false } = Astro.props
 const t = useT(lang)
 ---
 
@@ -23,7 +25,10 @@ const t = useT(lang)
     <div
       role="tablist"
       aria-label={t('Antes y después, por tratamiento')}
-      class="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-1"
+      class:list={[
+        'no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-1',
+        tabsOverflow && 'min-[980px]:w-max min-[980px]:overflow-visible',
+      ]}
     >
       {sets.map((s, i) => (
         <button

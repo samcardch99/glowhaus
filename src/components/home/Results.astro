@@ -5,6 +5,9 @@ import { baSets } from '../../data/results'
 import { useT, type Lang } from '../../i18n'
 
 // «Antes y después, por tratamiento» (el menú enlaza a /#resultados).
+// A dos columnas (≥980 px) el comparador va a la izquierda y el texto a la derecha, para
+// que la fila de pestañas pueda sobresalir hacia el texto y se lean todas (hasta «Fotona 4D»).
+// En una columna el título sigue arriba.
 interface Props {
   lang: Lang
 }
@@ -27,7 +30,7 @@ const bg = baSets[0]!.pairs[0]!.after
   />
   <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(24_18_14/0.78),rgb(24_18_14/0.62)_50%,rgb(24_18_14/0.8))]"></div>
 
-  <div class="relative flex flex-col gap-6">
+  <div class="relative flex flex-col gap-6 min-[980px]:order-2">
     <h2 data-reveal class="font-display m-0 text-[clamp(28px,4vw,52px)] leading-[1.08]">
       {t('Antes y después, por tratamiento')}
     </h2>
@@ -39,7 +42,11 @@ const bg = baSets[0]!.pairs[0]!.after
       {t('Desliza para comparar. Pacientes reales de GlowHaus, publicados con su autorización.')}
     </p>
   </div>
-  <div data-reveal data-delay="300" class="relative mx-auto w-full max-w-[640px] min-w-0">
-    <BeforeAfter lang={lang} sets={baSets} id="ba-home" />
+  <div
+    data-reveal
+    data-delay="300"
+    class="relative z-[1] mx-auto w-full max-w-[640px] min-w-0 min-[980px]:order-1"
+  >
+    <BeforeAfter lang={lang} sets={baSets} id="ba-home" tabsOverflow />
   </div>
 </section>
