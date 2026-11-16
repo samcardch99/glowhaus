@@ -25,16 +25,20 @@ export function itemCols(n: number) {
   return [mobile, desktop, maxW].join(' ')
 }
 
-/** Fotos de antes y después más relevantes para cada ficha */
+/** Fotos de antes y después de cada ficha (las del inicio que pertenecen a ese
+ * tratamiento). Las fichas sin fotos propias no muestran la sección. */
 const BA_BY_SLUG: Record<string, string[]> = {
-  'fotona-4d': ['Fotona', 'LipLase'],
+  'fotona-4d': ['Fotona 4D', 'LipLase'],
+  'renovacion-piel-fotona': ['Fotona – Acné activo'],
   inyectables: ['Botox'],
   'rellenos-dermicos': ['Relleno de labios'],
 }
 export function baSetsFor(t: Treatment): BASet[] {
   const tabs = BA_BY_SLUG[t.slug.es]
-  if (!tabs) return baSets
-  return tabs.map((tab) => baSets.find((s) => s.tab === tab)).filter((s): s is BASet => !!s)
+  if (!tabs) return []
+  const found = tabs.map((tab) => baSets.find((s) => s.tab === tab)).filter((s): s is BASet => !!s)
+  // En la ficha, todos los casos van seguidos en un solo comparador, sin pestañas
+  return [{ tab: t.name, pairs: found.flatMap((s) => s.pairs) }]
 }
 
 /** Importes de un texto de precio: «$1,999» → 1999; «$299 / mes» → 299 */

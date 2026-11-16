@@ -3,7 +3,13 @@ import { Image } from 'astro:assets'
 import sala from '../../assets/clinica-sala.jpg'
 import BackButton from './BackButton.astro'
 import Arrow from '../ui/Arrow.astro'
-import { site, whatsappHref } from '../../data/site'
+import visa from '../../assets/pay/visa.png'
+import mastercard from '../../assets/pay/mastercard.png'
+import amex from '../../assets/pay/amex.png'
+import discover from '../../assets/pay/discover.png'
+import cherryLogo from '../../assets/pay/cherry-trim.png'
+import careCreditLogo from '../../assets/pay/carecredit-trim.png'
+import { site } from '../../data/site'
 import { useT, type Lang } from '../../i18n'
 
 // Página «Tu primera visita»: pasos, formas de pago y qué conviene saber.
@@ -40,15 +46,25 @@ const steps = [
   },
 ]
 
-// Cherry: el enlace real cuando la clínica lo pase; mientras, preguntar por WhatsApp
-const cherryHref = site.cherry || whatsappHref(lang, t('pago en cuotas con Cherry'))
-const cherryLabel = site.cherry ? t('Solicitar con Cherry') : t('Pregunta por Cherry')
+const cardLogos = [
+  { src: visa, alt: 'Visa' },
+  { src: mastercard, alt: 'Mastercard' },
+  { src: amex, alt: 'American Express' },
+  { src: discover, alt: 'Discover' },
+]
 
-const payments = [
+const payments: {
+  title: string
+  text: string
+  tags: string[]
+  cards?: boolean
+  link?: { href: string; label: string; logo: ImageMetadata; alt: string }
+}[] = [
   {
     title: 'Por sesión',
     text: 'Pagas cada cita al terminar, con tarjeta o efectivo.',
     tags: ['Tarjeta', 'Efectivo'],
+    cards: true,
   },
   {
     title: 'Por paquete',
@@ -59,16 +75,35 @@ const payments = [
     title: 'En cuotas con Cherry',
     text: 'Divide tu paquete en pagos mensuales. La solicitud se hace desde el celular.',
     tags: ['Pagos mensuales', 'Desde el celular'],
-    link: { href: cherryHref, label: cherryLabel },
+    link: { href: site.cherry, label: 'Solicitar con Cherry', logo: cherryLogo, alt: 'Cherry' },
+  },
+  {
+    title: 'Financiamiento con CareCredit',
+    text: 'Tarjeta de crédito para tratamientos de salud y estética. Se solicita en línea.',
+    tags: ['Tarjeta de salud', 'Solicitud en línea'],
+    link: {
+      href: site.careCredit,
+      label: 'Solicitar CareCredit',
+      logo: careCreditLogo,
+      alt: 'CareCredit',
+    },
   },
 ]
 
+// Textos de la clínica (corrección del 14-11)
 const tips = [
-  'Llega 10 minutos antes para completar tu ficha.',
-  'Trae la lista de medicamentos o tratamientos que uses.',
-  'Si vienes por láser, evita el sol directo la semana anterior.',
-  'Estacionamiento disponible frente a la clínica.',
+  'Durante al menos 2 semanas antes del tratamiento, evita tomar el sol y las camas de bronceado. Usa a diario protector solar de amplio espectro FPS 30 o más. Si te quemas con el sol o estás bronceada recientemente, contáctanos antes de venir: puede que tengamos que reprogramar tu cita.',
+  'Pregúntanos cuándo suspender el retinol, la tretinoína, los ácidos exfoliantes, los exfoliantes físicos y los productos para el acné en la zona a tratar. Consúltanos antes de reservar un peeling químico, depilación con cera, microneedling, inyectables u otro tratamiento láser en la misma zona.',
+  'Mantén una rutina de cuidado suave. Usa un limpiador y una crema hidratante delicados, y evita los productos que te irriten la piel.',
 ]
+const callIf = [
+  'Tienes un herpes labial activo o has tenido herpes labial alguna vez, aunque el último brote haya sido hace años. Tu proveedor de salud puede recetarte un antiviral para empezar antes del tratamiento.',
+  'Tienes un sarpullido, una herida abierta, una infección o irritación en la zona que vamos a tratar.',
+  'Estás embarazada, podrías estarlo o estás dando el pecho.',
+  'Tomas o has tomado hace poco isotretinoína (Accutane), empezaste un medicamento nuevo como antibióticos fotosensibilizantes, tomas anticoagulantes o has tenido una reacción a la crema anestésica. Consulta con el médico que te lo recetó antes de dejar cualquier medicamento.',
+  'Has tenido cicatrices elevadas o queloides, o tu piel suele mancharse después de una irritación o un procedimiento.',
+]
+const dot = 'border-gold size-[9px] flex-none rounded-full border-[1.5px] bg-[rgb(168_132_79/0.25)]'
 ---
 
 <section
@@ -153,11 +188,11 @@ const tips = [
       data-words
       class="font-display m-0 mb-8 text-[clamp(30px,3.4vw,44px)] leading-[1.1] text-balance"
     >
-      {t('Tres formas de pago')}
+      {t('Cuatro formas de pago')}
     </h2>
     <ul
       data-pay
-      class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] gap-[22px] p-0"
+      class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,max(260px,calc((100%-66px)/4))),1fr))] gap-[22px] p-0"
     >
       {payments.map((p, i) => (
         <li
@@ -176,15 +211,35 @@ const tips = [
               </li>
             ))}
           </ul>
+          {p.cards && (
+            <div class="-mt-1 flex flex-wrap gap-2">
+              {cardLogos.map((c) => (
+                <Image
+                  src={c.src}
+                  alt={c.alt}
+                  height={52}
+                  class="block h-[26px] w-auto rounded-[3px]"
+                />
+              ))}
+            </div>
+          )}
           {p.link && (
             <a
               href={p.link.href}
               target="_blank"
               rel="noopener"
-              class="text-cream hover:text-gold-light mt-auto inline-flex items-center gap-2 self-start pt-1 text-[17px] font-semibold underline underline-offset-4 transition-colors"
+              class="text-cream hover:text-gold-light mt-auto inline-flex flex-wrap items-center gap-3 self-start pt-1 text-[17px] font-semibold underline underline-offset-4 transition-colors"
             >
-              <span>{p.link.label}</span>
-              <Arrow />
+              <Image
+                src={p.link.logo}
+                alt={p.link.alt}
+                height={40}
+                class="block h-5 w-auto rounded-[3px] bg-white px-2 py-[3px] [box-sizing:content-box]"
+              />
+              <span class="inline-flex items-center gap-2">
+                {t(p.link.label)}
+                <Arrow />
+              </span>
             </a>
           )}
         </li>
@@ -194,7 +249,7 @@ const tips = [
 
   <section
     data-theme="light"
-    class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-14 px-gutter"
+    class="grid grid-cols-1 gap-x-14 gap-y-12 px-gutter lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]"
   >
     <div class="flex flex-col gap-[18px]">
       <span data-reveal class="eyebrow text-gold-dark">
@@ -208,20 +263,38 @@ const tips = [
       </h2>
     </div>
     <ul class="border-ink text-body-sm text-brown m-0 flex list-none flex-col border-t p-0">
-      {tips.map((tip) => (
-        <li data-typerow class="border-beige flex items-baseline gap-3.5 border-b py-[18px]">
-          <span
-            data-dot
-            aria-hidden="true"
-            class="border-gold size-[9px] flex-none rounded-full border-[1.5px] bg-[rgb(168_132_79/0.25)]"
-          ></span>
-          <!-- El texto completo reserva el alto (sin saltos al escribirse) y es el que se lee -->
-          <span class="grid min-w-0 flex-1">
-            <span class="col-start-1 row-start-1 opacity-0">{t(tip)}</span>
-            <span data-type aria-hidden="true" class="col-start-1 row-start-1">
-              {t(tip)}
-            </span>
-          </span>
+      {tips.map((tip, i) => (
+        <li
+          data-reveal="solo"
+          data-delay={String(120 + i * 110)}
+          class="border-beige flex items-baseline gap-3.5 border-b py-[18px]"
+        >
+          <span aria-hidden="true" class={dot}></span>
+          <span>{t(tip)}</span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex flex-col gap-[18px] pt-6 lg:col-span-2">
+      <span data-reveal class="eyebrow text-gold-dark">
+        {t('ANTES DE TU VISITA')}
+      </span>
+      <h2
+        data-words
+        class="font-display m-0 max-w-[519px] text-[clamp(30px,3.4vw,44px)] leading-[1.1] text-balance"
+      >
+        {t('Llámanos o escríbenos si')}
+      </h2>
+    </div>
+    <ul class="border-ink text-body-sm text-brown m-0 -mt-6 grid list-none grid-cols-1 gap-x-10 border-t p-0 md:grid-cols-2 lg:col-span-2 lg:grid-cols-3">
+      {callIf.map((item, i) => (
+        <li
+          data-reveal="solo"
+          data-delay={String(120 + (i % 3) * 110)}
+          class="border-beige flex items-baseline gap-3.5 border-b py-[18px]"
+        >
+          <span aria-hidden="true" class={dot}></span>
+          <span>{t(item)}</span>
         </li>
       ))}
     </ul>
@@ -285,6 +358,13 @@ const tips = [
   .pay-tag {
     border-color: var(--pay-bd);
   }
+  /* Al pasar el ratón: marrón (el turno automático va en dorado) */
+  .pay-card[data-hover] {
+    --pay-bd: rgb(250 248 245 / 0.35);
+    background: var(--color-brown);
+  }
+  .pay-card[data-hover] .pay-sub,
+  .pay-card[data-hover] .pay-tag,
   .pay-card[data-active] .pay-sub,
   .pay-card[data-active] .pay-tag {
     color: var(--color-cream);
@@ -383,6 +463,15 @@ const tips = [
       }
       c.addEventListener('click', pick)
       c.addEventListener('focusin', pick)
+      c.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'mouse') return
+        pausedAt = Date.now()
+        c.setAttribute('data-hover', '')
+      })
+      c.addEventListener('pointerleave', () => {
+        pausedAt = Date.now()
+        c.removeAttribute('data-hover')
+      })
     })
     new IntersectionObserver(([e]) => {
       onScreen = !!e?.isIntersecting

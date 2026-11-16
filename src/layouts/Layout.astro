@@ -64,7 +64,7 @@ const business = {
   email: site.email,
   priceRange: '$$',
   currenciesAccepted: 'USD',
-  paymentAccepted: 'Cash, Credit Card, Cherry financing',
+  paymentAccepted: 'Cash, Credit Card, Cherry financing, CareCredit',
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address.street,
@@ -78,7 +78,7 @@ const business = {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
       opens: '09:00',
-      closes: '18:00',
+      closes: '17:00',
     },
   ],
   sameAs: [site.instagram],
@@ -125,13 +125,16 @@ const fullTitle = title.includes('GlowHaus') ? title : `${title} · GlowHaus Aes
               store && store.setItem(KEY, l)
             } catch (e) {}
           },
-          true
+          true,
         )
         if (/bot|crawl|spider|slurp|lighthouse|headless|preview/i.test(navigator.userAgent)) return
         var want = get()
         if (want !== 'es' && want !== 'en') {
           want = null
-          var langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']
+          var langs =
+            navigator.languages && navigator.languages.length
+              ? navigator.languages
+              : [navigator.language || '']
           for (var i = 0; i < langs.length; i++) {
             var p = String(langs[i]).toLowerCase().slice(0, 2)
             if (p === 'es' || p === 'en') {

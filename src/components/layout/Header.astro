@@ -254,6 +254,12 @@ const items = menuItems.map((m, i) => ({
   #gh-header[data-theme='overlay']:not([data-scrolled])::after {
     opacity: 0;
   }
+  #gh-header[data-clear] {
+    background-color: transparent;
+  }
+  #gh-header[data-clear]::after {
+    opacity: 0;
+  }
   #gh-header[data-theme='overlay'] .hdr-logo,
   #gh-header[data-theme='dark'] .hdr-logo {
     filter: none;

@@ -59,21 +59,21 @@ Parte de la lógica de animación del diseño v3, **atenuada a petición de la c
 `/private/tmp/claude-501/-Users-sam-Documents-laira/fa562ac9-3ef6-40d0-a75c-4018ce24d885/scratchpad/design-logic.js`.
 **No reimplementes en un componente lo que ya hace un atributo global.**
 
-| Atributo | Qué hace (parámetros del diseño) |
-| --- | --- |
-| `data-theme="dark\|light\|overlay"` | En cada sección. La cabecera toma el color de fondo opaco de lo que tiene debajo y cambia su texto a claro u oscuro. Se esconde al bajar y vuelve al subir |
-| `data-reveal` | Aparece en **grupo con sus hermanos** (mismo padre): se funde subiendo 20 px, 0,7 s, curva `glow` (.2,.7,.2,1), 100 ms entre hermanos. Se dispara cuando el primero del grupo llega al 82 % de la pantalla |
-| `data-reveal="solo"` | Igual que `data-reveal`, pero aparece por su cuenta |
-| `data-delay="ms"` | Retraso extra para `data-reveal` |
-| `data-words` (con `data-wdelay="ms"`) | Titular que aparece palabra a palabra (sube 15 %, 50 ms entre palabras). Úsalo en los h1/h2 grandes, nunca junto con `data-reveal` en el mismo elemento |
-| `data-stack-wrap` > `data-stack` | Tarjetas sticky a pantalla completa. La de abajo tapa a la de arriba, que pasa a escala 1−.03p, brillo 1−.25p y radio 18p, sin desenfoque; la que entra lleva sombra. En escritorio, cada golpe de rueda salta a la tarjeta siguiente (560–620 ms, easeInOutCubic) |
-| `data-cover` (opcional: `data-cover-target`) | Una sección sticky que reacciona igual cuando la tapa su hermana siguiente |
-| `data-count="650"` | Cuenta desde 0 en 1,3 s, conservando el prefijo y el sufijo |
-| `data-wipe` | El texto se descubre de izquierda a derecha (1 s) |
-| `data-glow` | Halo dorado suave del texto una vez, tras 0,9 s |
-| Contenedor con `data-typerow` (cada fila con `data-dot` + `data-type`) | Se escribe fila a fila: el punto aparece con un rebote y luego el texto, a 12 ms por letra. Un `data-type` suelto también funciona |
-| `video[data-autoplay][data-src]` | Carga diferida, play y pause según la visibilidad |
-| `data-video-toggle` + `aria-controls` | Botón de pausa de un vídeo |
+| Atributo                                                               | Qué hace (parámetros del diseño)                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data-theme="dark\|light\|overlay"`                                    | En cada sección. La cabecera toma el color de fondo opaco de lo que tiene debajo y cambia su texto a claro u oscuro. Se esconde al bajar y vuelve al subir                                                                                                         |
+| `data-reveal`                                                          | Aparece en **grupo con sus hermanos** (mismo padre): se funde subiendo 20 px, 0,7 s, curva `glow` (.2,.7,.2,1), 100 ms entre hermanos. Se dispara cuando el primero del grupo llega al 82 % de la pantalla                                                         |
+| `data-reveal="solo"`                                                   | Igual que `data-reveal`, pero aparece por su cuenta                                                                                                                                                                                                                |
+| `data-delay="ms"`                                                      | Retraso extra para `data-reveal`                                                                                                                                                                                                                                   |
+| `data-words` (con `data-wdelay="ms"`)                                  | Titular que aparece palabra a palabra (sube 15 %, 50 ms entre palabras). Úsalo en los h1/h2 grandes, nunca junto con `data-reveal` en el mismo elemento                                                                                                            |
+| `data-stack-wrap` > `data-stack`                                       | Tarjetas sticky a pantalla completa. La de abajo tapa a la de arriba, que pasa a escala 1−.03p, brillo 1−.25p y radio 18p, sin desenfoque; la que entra lleva sombra. En escritorio, cada golpe de rueda salta a la tarjeta siguiente (560–620 ms, easeInOutCubic) |
+| `data-cover` (opcional: `data-cover-target`)                           | Una sección sticky que reacciona igual cuando la tapa su hermana siguiente                                                                                                                                                                                         |
+| `data-count="650"`                                                     | Cuenta desde 0 en 1,3 s, conservando el prefijo y el sufijo                                                                                                                                                                                                        |
+| `data-wipe`                                                            | El texto se descubre de izquierda a derecha (1 s)                                                                                                                                                                                                                  |
+| `data-glow`                                                            | Halo dorado suave del texto una vez, tras 0,9 s                                                                                                                                                                                                                    |
+| Contenedor con `data-typerow` (cada fila con `data-dot` + `data-type`) | Se escribe fila a fila: el punto aparece con un rebote y luego el texto, a 12 ms por letra. Un `data-type` suelto también funciona                                                                                                                                 |
+| `video[data-autoplay][data-src]`                                       | Carga diferida, play y pause según la visibilidad                                                                                                                                                                                                                  |
+| `data-video-toggle` + `aria-controls`                                  | Botón de pausa de un vídeo                                                                                                                                                                                                                                         |
 
 Más piezas:
 
@@ -97,8 +97,8 @@ Reglas:
 - **Imágenes:** se importan desde `src/assets/...` y se pintan con `<Image>` o `<Picture>` de `astro:assets`, con `widths` y `sizes`. `loading="eager"` solo en la imagen principal de la primera pantalla.
 - **Vídeos:** en `public/media/` hay un `.mp4` y un póster `.jpg` de cada uno:
   - `hero-reel`, `fotona-reel` y `fotona-4d`;
-  - `tx-renovacion`, `tx-body`, `tx-inyectables`, `tx-rellenos`, `tx-skincare`, `tx-intimo` y `tx-complementos`;
-  - `testimonio-1`, `testimonio-2` y `testimonio-3`, con sonido: sin `autoplay`, con controles o con reproducción al pulsar.
+  - `tx-renovacion`, `tx-body`, `tx-depilacion`, `tx-inyectables`, `tx-rellenos`, `tx-skincare`, `tx-intimo` y `tx-vip`;
+  - `testimonio-1`, `testimonio-3`, `testimonio-4` y `testimonio-5`, con sonido: sin `autoplay`, con controles o con reproducción al pulsar.
 
 ## Reservas y contacto
 

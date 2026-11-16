@@ -232,8 +232,8 @@ export const steps: {
 ]
 
 // ---------- Equipo ----------
-// El diseño tiene una tercera persona («Nombre», esteticista) sin datos todavía:
-// se añade aquí cuando la clínica pase su nombre y su formación.
+// Dos personas: las fotos van al centro y la información se despliega hacia
+// cada lado (Team.astro). Sin etiqueta sobre el nombre (tag vacío).
 
 export const team: {
   name: string
@@ -247,7 +247,7 @@ export const team: {
     name: 'Alain Castellat',
     img: alain,
     role: 'APRN, FNP-C',
-    tag: 'DIRECCIÓN MÉDICA',
+    tag: '',
     cred: 'APRN, FNP-C · Enfermero de práctica avanzada',
     bio: 'Médico de formación, enfermero registrado y Nurse Practitioner en Florida. Fundó GlowHaus para ofrecer una estética sin prisas, una persona a la vez.',
   },
@@ -255,9 +255,9 @@ export const team: {
     name: 'Daniela Vela',
     img: daniela,
     role: 'FNP-BC',
-    tag: 'LÁSER',
+    tag: '',
     cred: 'FNP-BC · Family Nurse Practitioner',
-    bio: 'Nurse Practitioner certificada. Valora a cada paciente y realiza tratamientos con láser Fotona.',
+    bio: 'Nurse Practitioner con certificación en medicina familiar (FNP-BC). Antes de cada tratamiento revisa con calma la piel y el historial de la paciente, y se encarga de los tratamientos con láser Fotona.',
   },
 ]
 
@@ -329,12 +329,6 @@ export const testimonials = [
     title: 'Su recuperación',
   },
   {
-    src: '/media/testimonio-2.mp4',
-    poster: '/media/testimonio-2.jpg',
-    tag: 'Inyectables',
-    title: 'Su primera vez',
-  },
-  {
     src: '/media/testimonio-3.mp4',
     poster: '/media/testimonio-3.jpg',
     tag: 'Fotona',
@@ -343,8 +337,14 @@ export const testimonials = [
   {
     src: '/media/testimonio-4.mp4',
     poster: '/media/testimonio-4.jpg',
-    tag: 'Complementos',
+    tag: 'Cuidado de la piel',
     title: 'Su visita',
+  },
+  {
+    src: '/media/testimonio-5.mp4',
+    poster: '/media/testimonio-5.jpg',
+    tag: 'Cuidado de la piel',
+    title: 'Su facial',
   },
 ]
 
@@ -357,7 +357,7 @@ export const homeFaqs: Faq[] = [
   },
   {
     q: '¿Quién realiza los tratamientos?',
-    a: 'Un equipo licenciado bajo la dirección de Alain Castellat, APRN. En cada página de tratamiento verás quién lo realiza.',
+    a: 'Un equipo licenciado bajo la dirección de Alain Castellat, APRN. Cada tratamiento lo realiza tu proveedor de salud del equipo.',
   },
   {
     q: '¿Los precios de la web son los finales?',
@@ -373,7 +373,7 @@ export const homeFaqs: Faq[] = [
   },
   {
     q: '¿Dónde están?',
-    a: 'En 11890 SW 8th St, Miami, FL. Atendemos de lunes a viernes, de 9:00 a. m. a 6:00 p. m.',
+    a: 'En 11890 SW 8th St, Miami, FL. Atendemos de lunes a viernes, de 9:00 a. m. a 5:00 p. m.',
   },
 ]
 
@@ -461,9 +461,14 @@ const ZONES: { face: boolean; z: string[] }[] = [
   { face: false, z: ['intima'] },
   { face: true, z: ['frente', 'ojeras', 'mejillas', 'labios', 'cuello'] },
   { face: false, z: ['abdomen', 'flancos'] },
-  { face: false, z: ['cara', 'escote', 'muslos'] },
 ]
-export const bodyMap = ZONES.map(({ face, z }) => ({
+/** Rejuvenecimiento íntimo: la figura se acerca (×1,7) a la zona y el punto
+ * queda en el centro, como en el diseño */
+const INTIMATE = 7
+export const bodyMap = ZONES.map(({ face, z }, i) => ({
   face,
-  dots: z.flatMap((k) => (face ? FACE : BODY)[k] ?? []),
+  zoom: i === INTIMATE,
+  dots: i === INTIMATE ? ([[50, 50]] as P[]) : z.flatMap((k) => (face ? FACE : BODY)[k] ?? []),
 }))
+/** Índice de la categoría destacada, que va primera y llega seleccionada */
+export const bodyFeatured = INTIMATE

@@ -78,6 +78,11 @@ const t = useT(lang)
                   class="absolute inset-0 size-full object-cover"
                 />
               </div>
+              {p.credit && (
+                <span class="text-cream pointer-events-none absolute right-3 bottom-3 z-[5] rounded-md bg-[rgb(24_18_14/0.55)] px-2.5 py-[5px] text-[13px] font-medium backdrop-blur-[8px]">
+                  {t('Foto: fotona.com')}
+                </span>
+              )}
               <span class="text-cream pointer-events-none absolute top-[18px] left-5 text-[14.5px] font-semibold tracking-[0.18em] [text-shadow:0_1px_6px_rgb(24_18_14/0.55)]">
                 {t('ANTES')}
               </span>

@@ -23,12 +23,13 @@ const { lang, treatment: tx } = Astro.props
 const t = useT(lang)
 const name = t(tx.title)
 // Foto fija de la ficha si la hay; si no, el vídeo; si no, la foto de la categoría
-// Como en el diseño: vídeo dentro de la ficha salvo en inyectables, rellenos y complementos
+// Como en el diseño: vídeo dentro de la ficha si lo hay
 const still =
   tx.video && tx.detailVideo ? undefined : (tx.detailImg ?? (tx.video ? undefined : tx.img))
 const stillPos = tx.detailImg ? (tx.detailPos ?? 'center 45%') : (tx.imgPos ?? 'center')
 const videoId = `tx-video-${tx.slug.es}`
 const book = whatsappHref(lang, name)
+const baSets = baSetsFor(tx)
 ---
 
 <div class="relative isolate overflow-clip" data-tx-page>
@@ -91,7 +92,7 @@ const book = whatsappHref(lang, name)
           <h1
             data-words
             data-wdelay="380"
-            class="font-display m-0 text-[clamp(44px,6vw,84px)] leading-none text-balance"
+            class="font-display m-0 text-[clamp(34px,3.6vw,56px)] leading-[1.05] break-words text-balance"
           >
             {name}
           </h1>
@@ -169,7 +170,7 @@ const book = whatsappHref(lang, name)
             {name}
           </span>
           <span class="text-sand-2 text-[clamp(14.5px,1.1vw,16px)] leading-[1.35]">
-            {t('Lo realiza')} {t(tx.by)}
+            {t('Con tu proveedor de salud')}
           </span>
         </figcaption>
         {!still && (
@@ -252,7 +253,7 @@ const book = whatsappHref(lang, name)
   </section>
 </div>
 
-{tx.showResults && (
+{baSets.length > 0 && (
   <section
     data-theme="dark"
     class="bg-ink text-cream px-gutter grid grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] items-center gap-14 py-[clamp(64px,10vh,112px)]"
@@ -273,7 +274,7 @@ const book = whatsappHref(lang, name)
       </p>
     </div>
     <div class="w-full max-w-[720px] justify-self-center lg:order-1">
-      <BeforeAfter lang={lang} sets={baSetsFor(tx)} id={`ba-${tx.slug.es}`} />
+      <BeforeAfter lang={lang} sets={baSets} id={`ba-${tx.slug.es}`} />
     </div>
   </section>
 )}
@@ -295,7 +296,7 @@ const book = whatsappHref(lang, name)
      alto disponible (pantalla − margen superior de la sección − 32px) */
   .tx-hero-media {
     --tx-room: calc(100svh - clamp(120px, 15vh, 150px) - 32px);
-    width: min(100%, calc(var(--tx-room) * 0.8));
+    width: min(82%, calc(var(--tx-room) * 0.8));
     justify-self: center;
   }
   @media (min-width: 1040px) {

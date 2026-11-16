@@ -28,8 +28,9 @@ export const site = {
     lng: -80.3828,
   },
   rating: { value: 5, count: 6 },
-  // Enlace de solicitud de Cherry: pendiente de la clínica
-  cherry: '' as string,
+  // Solicitud de pago en cuotas (enlaces de la clínica)
+  cherry: 'https://pay.withcherry.com/glowhaus-aesthetics',
+  careCredit: 'https://www.carecredit.com/go/HZQ526/',
 } as const
 
 /** Enlace de WhatsApp con un mensaje inicial en el idioma de la página */

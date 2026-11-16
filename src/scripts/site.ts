@@ -50,6 +50,8 @@ function updateHeader() {
     .filter((el) => !header.contains(el))
   const host = below.find((el) => el.closest('[data-theme]'))?.closest<HTMLElement>('[data-theme]')
   if (!host) return
+  // Sobre las tarjetas apiladas de «Tu experiencia», cabecera sin fondo ni difuminado
+  header.toggleAttribute('data-clear', host.hasAttribute('data-hdr-clear'))
   const theme = host.dataset.theme ?? 'light'
   if (header.dataset.theme !== theme) header.dataset.theme = theme
   // El color es el de la sección (no el de una foto o tarjeta que pase por debajo)

@@ -46,7 +46,7 @@ const t = useT(lang)
         data-delay="400"
         role="group"
         aria-label={t('¿Qué desearías mejorar?')}
-        class="mt-1.5 grid w-[calc(clamp(30px,3.6vw,48px)*12.7)] max-w-full grid-cols-2 gap-2.5 sm:grid-cols-3"
+        class="mt-1.5 flex w-[calc(clamp(30px,3.6vw,48px)*12.7)] max-w-full flex-wrap gap-2.5"
       >
         {goals.map((g, i) => (
           <button
@@ -54,7 +54,7 @@ const t = useT(lang)
             data-goal={i}
             aria-pressed={i === 0 ? 'true' : 'false'}
             aria-controls="goal-panel"
-            class="aria-pressed:bg-gold aria-pressed:border-gold aria-pressed:text-cream hover:bg-gold hover:border-gold hover:text-cream text-ink flex min-w-0 items-center rounded-[14px] border border-[rgb(24_18_14/0.55)] bg-[rgb(24_18_14/0.06)] px-3.5 py-3 text-left sm:px-[18px] text-[clamp(15px,1.2vw,17px)] font-semibold tracking-[0.03em] backdrop-blur-[10px] transition-colors duration-300 max-sm:rounded-lg"
+            class="aria-pressed:bg-gold aria-pressed:border-gold aria-pressed:text-cream hover:bg-gold hover:border-gold hover:text-cream text-ink flex w-auto items-center rounded-[14px] whitespace-nowrap border border-[rgb(24_18_14/0.55)] bg-[rgb(24_18_14/0.06)] px-3.5 py-3 text-left sm:px-[18px] text-[clamp(15px,1.2vw,17px)] font-semibold tracking-[0.03em] backdrop-blur-[10px] transition-colors duration-300 max-sm:rounded-lg"
           >
             <span class="sm:truncate">{t(g.label)}</span>
           </button>

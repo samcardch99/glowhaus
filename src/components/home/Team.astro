@@ -3,8 +3,9 @@ import { Image } from 'astro:assets'
 import { team } from '../../data/home'
 import { useT, type Lang } from '../../i18n'
 
-// «Las manos detrás de cada tratamiento». En escritorio, cada foto abre su
-// ficha a la derecha (una a la vez, anchura en .7 s con la curva glow) y las
+// «Las manos detrás de cada tratamiento». Son dos personas: en escritorio las
+// dos fotos van juntas en el centro y cada ficha se despliega hacia su lado
+// (la de la izquierda hacia la izquierda), una a la vez, en .7 s con la curva glow; las
 // fichas se turnan solas cada 3,8 s mientras la sección se ve (≥1100 px; 6 s de
 // pausa tras pasar el ratón o pulsar). En móvil la ficha va siempre debajo y
 // foto y ficha entran juntas.
@@ -32,20 +33,25 @@ const t = useT(lang)
       </h2>
     </div>
 
-    <ul role="list" class="m-0 flex list-none flex-col gap-10 p-0 lg:flex-row lg:gap-5">
+    <ul role="list" class="m-0 flex list-none flex-col gap-10 p-0 lg:grid lg:grid-cols-2 lg:gap-5">
       {team.map((p, i) => (
         <li
           data-reveal="solo"
           data-team-item={i}
           data-open={i === 0 ? '' : undefined}
-          class="team-item flex flex-col gap-5 lg:flex-row lg:gap-0"
+          class:list={[
+            'team-item flex flex-col gap-5 lg:gap-0',
+            i === 0
+              ? 'lg:flex-row-reverse lg:justify-self-end'
+              : 'lg:flex-row lg:justify-self-start',
+          ]}
         >
           <button
             type="button"
             data-team-btn={i}
             aria-expanded={i === 0 ? 'true' : 'false'}
             aria-controls={`team-info-${i}`}
-            class="team-photo bg-sand relative h-[min(72vh,620px)] w-full flex-none overflow-hidden rounded-[14px] text-left outline outline-offset-4 outline-transparent transition-[outline-color] duration-400 max-lg:pointer-events-none sm:w-[clamp(240px,22vw,340px)]"
+            class="team-photo bg-sand relative h-[min(72vh,620px)] w-full flex-none overflow-hidden rounded-[14px] text-left max-lg:pointer-events-none sm:w-[clamp(240px,22vw,340px)]"
           >
             <Image
               src={p.img}
@@ -63,7 +69,7 @@ const t = useT(lang)
           </button>
           <div id={`team-info-${i}`} class="team-info overflow-hidden">
             <div class="flex h-full w-full flex-col justify-end gap-3.5 rounded-[14px] border border-[rgb(250_248_245/0.16)] bg-[rgb(250_248_245/0.06)] p-[clamp(24px,2.6vw,40px)] backdrop-blur-[14px] lg:w-[clamp(260px,26vw,380px)]">
-              <span class="label-caps text-tan">{t(p.tag)}</span>
+              {p.tag && <span class="label-caps text-tan">{t(p.tag)}</span>}
               <h3 class="m-0 text-[clamp(26px,2.4vw,36px)] leading-[1.1] font-semibold">
                 {p.name}
               </h3>
@@ -82,19 +88,20 @@ const t = useT(lang)
     .team-info {
       height: min(72vh, 620px);
       width: clamp(260px, 26vw, 380px);
-      margin-left: 20px;
+      margin-inline: 20px 0;
       transition:
         width 0.7s var(--ease-glow),
         margin 0.7s var(--ease-glow),
         opacity 0.5s 0.15s;
     }
+    /* La ficha de la primera persona se abre hacia la izquierda */
+    .team-item:first-child .team-info {
+      margin-inline: 0 20px;
+    }
     :global(.js) .team-item:not([data-open]) .team-info {
       width: 0;
-      margin-left: 0;
+      margin-inline: 0;
       opacity: 0;
-    }
-    .team-item[data-open] .team-photo {
-      outline-color: var(--color-gold);
     }
   }
 </style>

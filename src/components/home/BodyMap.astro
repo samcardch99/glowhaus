@@ -4,11 +4,14 @@ import Button from '../ui/Button.astro'
 import bodyFull from '../../assets/body-full-t.png'
 import bodyFace from '../../assets/body-face-t.png'
 import { treatments } from '../../data/treatments'
-import { bodyMap } from '../../data/home'
+import { bodyMap, bodyFeatured } from '../../data/home'
 import { treatmentPath, useT, type Lang } from '../../i18n'
 
-// «Dónde actúa cada tratamiento»: once botones y un maniquí con puntos dorados.
-// Las categorías de rostro amplían la cara. Sin JS se ve la categoría inicial.
+// «Dónde actúa cada tratamiento»: diez botones (solo el nombre; el activo
+// despliega su descripción) y un maniquí de cuerpo entero con puntos dorados.
+// Rejuvenecimiento íntimo va primero, llega seleccionado y se marca en marrón;
+// al elegirlo, la figura se acerca a la zona. Las categorías de rostro amplían
+// la cara. Debajo, «Ver tratamiento: X». Sin JS se ve la categoría inicial.
 // En escritorio (≥1100 px), al entrar la sección los paneles de texto del
 // carrusel de arriba vuelan hasta su hueco (ligado al scroll y reversible) y
 // al posarse se convierten en los botones reales. En pantallas menores los
@@ -18,13 +21,17 @@ interface Props {
 }
 const { lang } = Astro.props
 const t = useT(lang)
-const START = 1
+const START = bodyFeatured
 const startFace = bodyMap[START]!.face
+const startZoom = bodyMap[START]!.zoom
 const items = treatments.map((c, i) => ({
   href: treatmentPath(lang, c.slug[lang]),
   name: t(c.name),
   face: bodyMap[i]?.face ?? false,
+  zoom: bodyMap[i]?.zoom ?? false,
 }))
+// La destacada primero; el índice real va en data-body-btn
+const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
 ---
 
 <section
@@ -41,33 +48,36 @@ const items = treatments.map((c, i) => ({
     {t('Dónde actúa cada tratamiento')}
   </h2>
 
-  <div class="order-3 flex flex-col gap-5 lg:order-none lg:col-start-1 lg:row-span-2 lg:row-start-1">
+  <div class="order-3 flex flex-col gap-5 lg:order-none lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-center">
     <div
       data-body-grid
       role="group"
       aria-label={t('Categorías de tratamientos')}
       class="grid grid-cols-2 items-start gap-2.5 sm:gap-3"
     >
-      {treatments.map((c, i) => (
-        <button
-          type="button"
-          data-body-btn={i}
-          aria-pressed={i === START ? 'true' : 'false'}
-          aria-controls="body-figure"
-          class="body-slot text-cream flex flex-col items-start gap-0 rounded-lg border border-[rgb(250_248_245/0.16)] bg-[rgb(24_18_14/0.74)] px-4 pt-3.5 pb-4 text-left"
-        >
-          <span class="text-[clamp(16px,1.9vw,20px)] leading-[1.15] font-semibold min-[1100px]:text-[clamp(20px,1.7vw,23.5px)]">
-            {t(c.name)}
-          </span>
-          <span class="slot-desc grid max-sm:hidden">
-            <span class="overflow-hidden">
-              <span class="text-cream-2 block pt-2 text-[17px] leading-[1.55] text-pretty">
-                {t(c.short)}
+      {order
+        .map((i) => treatments[i]!)
+        .map((c, k) => (
+          <button
+            type="button"
+            data-body-btn={order[k]}
+            data-featured={order[k] === START ? '' : undefined}
+            aria-pressed={order[k] === START ? 'true' : 'false'}
+            aria-controls="body-figure"
+            class="body-slot text-cream flex flex-col items-start gap-0 rounded-lg border border-[rgb(250_248_245/0.16)] bg-[rgb(24_18_14/0.74)] px-4 pt-3.5 pb-4 text-left"
+          >
+            <span class="text-[clamp(16px,1.9vw,20px)] leading-[1.15] font-semibold min-[1100px]:text-[clamp(20px,1.7vw,23.5px)]">
+              {t(c.name)}
+            </span>
+            <span class="slot-desc grid max-sm:hidden">
+              <span class="overflow-hidden">
+                <span class="text-cream-2 block pt-2 text-[17px] leading-[1.55] text-pretty">
+                  {t(c.short)}
+                </span>
               </span>
             </span>
-          </span>
-        </button>
-      ))}
+          </button>
+        ))}
     </div>
     <div>
       <Button
@@ -86,6 +96,7 @@ const items = treatments.map((c, i) => ({
     data-reveal
     data-delay="200"
     data-face={startFace ? '' : undefined}
+    data-zoom={startZoom ? '' : undefined}
     class="body-fig relative order-2 aspect-[2/3] h-[min(52vh,520px)] w-auto max-w-full justify-self-center overflow-hidden lg:order-none lg:col-start-2 lg:h-[min(78vh,780px)] lg:w-auto lg:max-w-full"
   >
     <div class="body-stage absolute inset-0">
@@ -135,6 +146,9 @@ const items = treatments.map((c, i) => ({
   [data-face] .body-stage {
     transform: translate(-0.3%, 23.2%) scale(5.1);
   }
+  [data-zoom] .body-stage {
+    transform: translate(0.2%, -21.56%) scale(1.7);
+  }
   [data-face] .body-full {
     opacity: 0;
     transition-delay: 0.6s;
@@ -163,6 +177,18 @@ const items = treatments.map((c, i) => ({
   }
   .body-slot[aria-pressed='true'] {
     background-color: var(--color-gold-dark);
+  }
+  /* La categoría destacada: siempre marrón; seleccionada, con filo dorado */
+  .body-slot[data-featured],
+  .body-slot[data-featured]:hover {
+    background-color: var(--color-brown);
+    box-shadow: inset 0 0 0 1.5px transparent;
+    transition:
+      background-color 0.45s ease,
+      box-shadow 0.45s ease;
+  }
+  .body-slot[data-featured][aria-pressed='true'] {
+    box-shadow: inset 0 0 0 1.5px var(--color-gold);
   }
   .slot-desc {
     grid-template-rows: 0fr;
@@ -209,27 +235,33 @@ const items = treatments.map((c, i) => ({
       href: string
       name: string
       face: boolean
+      zoom: boolean
     }[]
 
     // ---------- Selección y vista previa ----------
-    let picked = btns.findIndex((b) => b.getAttribute('aria-pressed') === 'true')
+    // i = índice de la categoría (data-body-btn), no la posición del botón
+    const idx = (b: HTMLElement) => Number(b.dataset.bodyBtn)
+    const pressed = btns.find((b) => b.getAttribute('aria-pressed') === 'true')
+    let picked = pressed ? idx(pressed) : 0
     let shown = picked
     const showFigure = (i: number) => {
       if (i === shown) return
       shown = i
-      groups.forEach((g, k) => (g.hidden = k !== i))
+      groups.forEach((g) => (g.hidden = Number(g.dataset.bodyDots) !== i))
       fig?.toggleAttribute('data-face', data[i]?.face ?? false)
+      fig?.toggleAttribute('data-zoom', data[i]?.zoom ?? false)
     }
     const pick = (i: number) => {
       picked = i
-      btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)))
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(idx(x) === i)))
       showFigure(i)
       const d = data[i]
       if (!d) return
       if (link) link.href = d.href
       if (name) name.textContent = d.name
     }
-    btns.forEach((b, i) => {
+    btns.forEach((b) => {
+      const i = idx(b)
       b.addEventListener('click', () => pick(i))
       // Escritorio: pasar el ratón enseña sus zonas sin cambiar la selección
       b.addEventListener('pointerenter', (e) => {
@@ -319,8 +351,8 @@ const items = treatments.map((c, i) => ({
       const sr = sec.getBoundingClientRect()
       secTop = sr.top + window.scrollY
       const mid = window.innerWidth / 2
-      const geo = btns.map((btn, i) => {
-        const caps = capsFor(i)
+      const geo = btns.map((btn) => {
+        const caps = capsFor(Number(btn.dataset.bodyBtn))
         let cap = caps[0]!
         let rect = cap.getBoundingClientRect()
         let bd = Infinity

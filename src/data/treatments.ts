@@ -1,19 +1,17 @@
 import type { ImageMetadata } from 'astro'
-import p0 from '../assets/photos/p0.jpg'
-import p1 from '../assets/photos/p1.jpg'
-import p2 from '../assets/photos/p2.jpg'
-import p3 from '../assets/photos/p3.jpg'
-import p4 from '../assets/photos/p4.jpg'
-import p5 from '../assets/photos/p5.jpg'
-import p7 from '../assets/photos/p7.jpg'
-import p8 from '../assets/photos/p8.jpg'
-import p9 from '../assets/photos/p9.jpg'
+import fotonaRostroH from '../assets/photos/fotona-rostro-h.jpg'
+import renovacionH from '../assets/photos/renovacion-h.jpg'
+import fotonaBodyH from '../assets/photos/fotona-body-h.jpg'
+import depilacionH from '../assets/photos/depilacion-h.jpg'
+import inyectablesH from '../assets/photos/inyectables-h.jpg'
+import rellenosH from '../assets/photos/rellenos-h.jpg'
+import cuidadoPielH from '../assets/photos/cuidado-piel-h.jpg'
+import intimoH from '../assets/photos/intimo-h.jpg'
+import vipH from '../assets/photos/vip-h.jpg'
 import bienestar from '../assets/photos/bienestar.jpg'
 import intimoInterna from '../assets/photos/intimo-interna.jpg'
-import inyectablesImg from '../assets/tx/inyectables.jpg'
-import rellenosImg from '../assets/tx/rellenos.jpg'
 
-// Las 11 categorías de tratamientos. Texto en español: el inglés sale del
+// Las 10 categorías de tratamientos. Texto en español: el inglés sale del
 // diccionario (src/i18n). Precios en dólares tal como los publica la clínica.
 
 export interface PriceRow {
@@ -60,8 +58,6 @@ export interface Treatment {
   stepsTitle: string
   steps: Step[]
   faqs: Faq[]
-  /** Se muestran fotos de antes y después en la ficha */
-  showResults: boolean
 }
 
 const A = 'Alain Castellat, APRN, FNP-C'
@@ -79,7 +75,7 @@ export const treatments: Treatment[] = [
     from: '$300',
     short: 'Láser que tensa, renueva y da luminosidad al rostro sin agujas.',
     desc: 'Lifting no quirúrgico con láser Fotona para rostro, cuello, ojos y labios. Precio por sesión; paquetes de 4 sesiones con descuento.',
-    img: p3,
+    img: fotonaRostroH,
     video: '/media/fotona-4d.mp4',
     items: [
       P('Fotona 4D · lifting no quirúrgico', '$650'),
@@ -87,7 +83,7 @@ export const treatments: Treatment[] = [
       P('Fotona SmoothEye', '$350'),
       P('Fotona LipLace', '$300'),
     ],
-    what: 'Un tratamiento láser que tensa y renueva la piel del rostro por dentro y por fuera. Combina cuatro modos de la tecnología Fotona en una sola sesión, sin agujas y sin cirugía.',
+    what: 'Cuatro pasos, una sesión. Fotona 4D combina cuatro modos de un mismo láser en un solo tratamiento. Unos actúan con calor profundo y estimulan la producción de colágeno para tensar; otros trabajan la superficie para afinar la textura y unificar el tono. Al tratar la piel por dentro de la boca y por fuera, el efecto lifting se consigue sin agujas, sin cortes y sin tiempo de recuperación, y sigue mejorando a medida que el colágeno se renueva.',
     sessions: '2 a 4',
     duration: '60 min',
     recovery: 'Mínima',
@@ -131,7 +127,6 @@ export const treatments: Treatment[] = [
         'Sí, por ejemplo con neurotoxina o rellenos. Lo planificamos contigo para espaciar las citas de forma segura.',
       ],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'renovacion-piel-fotona', en: 'fotona-skin-renewal' },
@@ -141,7 +136,7 @@ export const treatments: Treatment[] = [
     from: '$200',
     short: 'Peelings láser, cicatrices de acné, manchas y lesiones.',
     desc: 'Resurfacing láser para textura, cicatrices, acné, manchas y lesiones vasculares. Paquetes de 3 sesiones. Lesiones con valoración previa.',
-    img: p1,
+    img: renovacionH,
     video: '/media/tx-renovacion.mp4',
     items: [
       P('GlowHaus Glass Skin Peel', '$300'),
@@ -158,7 +153,7 @@ export const treatments: Treatment[] = [
       P('Várices · áreas pequeñas (30 min)', '$600'),
       P('Várices · áreas grandes (30 min)', '$900'),
     ],
-    what: 'Peelings y resurfacing con láser Fotona para mejorar la textura, las cicatrices de acné, las manchas y las lesiones de la piel. Cada protocolo se ajusta a tu tipo de piel.',
+    what: 'El láser retira capas muy finas de piel dañada de forma controlada y activa la regeneración de la piel nueva. La profundidad se regula según el problema: un paso superficial devuelve luminosidad y suaviza poros, mientras que uno más profundo trabaja cicatrices de acné, manchas y lesiones. Al no usar químicos, el resultado es preciso y predecible.',
     sessions: '1 a 3',
     duration: '30–60 min',
     recovery: '1 a 5 días',
@@ -203,7 +198,6 @@ export const treatments: Treatment[] = [
         'Parten desde $250 y el precio final depende del tamaño y la cantidad. Lo confirmamos en tu valoración.',
       ],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'fotona-body', en: 'fotona-body' },
@@ -213,7 +207,7 @@ export const treatments: Treatment[] = [
     from: '$450',
     short: 'Tensado de la piel y TightSculpting para el cuerpo.',
     desc: 'Tensado corporal y TightSculpting con láser Fotona. Precio por sesión; paquetes de 4 sesiones con descuento.',
-    img: p2,
+    img: fotonaBodyH,
     video: '/media/tx-body.mp4',
     items: [
       P('Tensado de cuello', '$550'),
@@ -225,7 +219,7 @@ export const treatments: Treatment[] = [
       P('TightSculpting · flancos', '$450'),
       P('TightSculpting · brazos y muslos', '$650'),
     ],
-    what: 'Tensado de la piel y TightSculpting con láser Fotona para cuello, abdomen, brazos, piernas y glúteos. Mejora la firmeza y el contorno sin cirugía.',
+    what: 'El láser Fotona emite calor que llega a las capas profundas de la piel y al tejido graso sin dañar la superficie. Ese calor contrae y estimula el colágeno, lo que mejora la firmeza, y en TightSculpting también reduce la grasa localizada de forma no invasiva. Se usa en cuello, abdomen, brazos, piernas y glúteos, sin cirugía ni recuperación.',
     sessions: '4',
     duration: '30–60 min',
     recovery: 'Ninguna',
@@ -264,7 +258,6 @@ export const treatments: Treatment[] = [
       ],
       ['¿Puedo hacer ejercicio después?', 'Sí, puedes seguir con tu rutina el mismo día.'],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'depilacion-laser', en: 'laser-hair-removal' },
@@ -274,8 +267,9 @@ export const treatments: Treatment[] = [
     from: '$120',
     short: 'Elimina el vello de forma duradera en rostro y cuerpo.',
     desc: 'Depilación con láser Fotona para rostro y cuerpo. Precio por sesión; paquetes de 8 sesiones.',
-    img: p1,
-    imgPos: 'center 30%',
+    img: depilacionH,
+    imgPos: 'center 35%',
+    video: '/media/tx-depilacion.mp4',
     items: [
       P('Labio superior', '$120'),
       P('Axilas', '$175'),
@@ -288,7 +282,7 @@ export const treatments: Treatment[] = [
       P('Pecho y abdomen bajo', '$450'),
       P('Espalda completa', '$500'),
     ],
-    what: 'Depilación con láser Fotona para rostro y cuerpo. Reduce el vello de forma duradera sesión a sesión y es apta para distintos tonos de piel.',
+    what: 'La luz del láser es absorbida por el pigmento del vello y viaja hasta el folículo, donde el calor lo inactiva sin dañar la piel que lo rodea. Solo funciona sobre el vello que está en fase de crecimiento, por eso hacen falta varias sesiones para alcanzarlo todo. El láser Fotona se ajusta a cada tono de piel, lo que permite tratar con seguridad pieles claras y morenas.',
     sessions: '8',
     duration: '15–60 min',
     recovery: 'Ninguna',
@@ -315,7 +309,6 @@ export const treatments: Treatment[] = [
         'Evita el sol directo unos días antes y después de cada sesión y usa protector solar.',
       ],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'inyectables', en: 'injectables' },
@@ -325,9 +318,8 @@ export const treatments: Treatment[] = [
     from: '$80',
     short: 'Suaviza líneas de expresión con resultados naturales.',
     desc: 'Neurotoxina para líneas de expresión y tratamientos puntuales del rostro.',
-    img: p9,
+    img: inyectablesH,
     video: '/media/tx-inyectables.mp4',
-    detailImg: inyectablesImg,
     items: [
       P('Neurotoxina · frente, entrecejo, patas de gallo', '$225 / área'),
       P('Nose lift', '$150'),
@@ -340,7 +332,7 @@ export const treatments: Treatment[] = [
       P('Masetero', '$700'),
       P('Hiperhidrosis (axilas)', '$1,000'),
     ],
-    what: 'Neurotoxina para suavizar las líneas de expresión de la frente, el entrecejo y las patas de gallo, y para tratamientos puntuales como lip flip, masetero o sudoración excesiva.',
+    what: 'La neurotoxina relaja de forma temporal los músculos que forman las arrugas de expresión al gesticular. Se aplica en dosis pequeñas y precisas, de modo que el músculo se mueve menos pero no deja de moverse: la frente, el entrecejo y las patas de gallo se suavizan y la expresión se mantiene natural. El efecto aparece en pocos días y dura entre tres y cuatro meses.',
     sessions: '1',
     duration: '15–30 min',
     recovery: 'Ninguna',
@@ -354,7 +346,7 @@ export const treatments: Treatment[] = [
     ],
     stepsTitle: 'Cómo es una sesión',
     steps: S([
-      ['Valoración', 'Alain observa tus gestos y define las zonas y las unidades necesarias.'],
+      ['Valoración', 'Observamos tus gestos y definimos las zonas y las unidades necesarias.'],
       ['Marcado', 'Marcamos los puntos de aplicación para un resultado equilibrado.'],
       ['Aplicación', 'Microinyecciones rápidas con aguja muy fina, en pocos minutos.'],
       ['Revisión', 'A las dos semanas revisamos el resultado y ajustamos si hace falta.'],
@@ -370,7 +362,6 @@ export const treatments: Treatment[] = [
         'Buscamos un resultado natural: suavizar las líneas sin perder la expresión.',
       ],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'rellenos-dermicos', en: 'dermal-fillers' },
@@ -380,9 +371,8 @@ export const treatments: Treatment[] = [
     from: '$700',
     short: 'Devuelve volumen y define labios, mejillas y contorno.',
     desc: 'Volumen y definición con ácido hialurónico y bioestimuladores. Precio por jeringa de 1 ml.',
-    img: p7,
+    img: rellenosH,
     video: '/media/tx-rellenos.mp4',
-    detailImg: rellenosImg,
     items: [
       P('Labios', '$700'),
       P('Mejillas', '$700'),
@@ -390,7 +380,7 @@ export const treatments: Treatment[] = [
       P('Skin booster (SkinVive, Redensity)', '$700'),
       P('Radiesse', '$950'),
     ],
-    what: 'Rellenos con ácido hialurónico y Radiesse para devolver volumen y definir labios, mejillas y surcos. También skin boosters para hidratar la piel en profundidad.',
+    what: 'El ácido hialurónico es una sustancia que la piel ya produce y que retiene agua. Aplicado en gel, devuelve el volumen perdido y define contornos en labios, mejillas y surcos; con el tiempo el cuerpo lo reabsorbe de forma natural. Radiesse, en cambio, actúa como bioestimulador: además de dar soporte, impulsa la producción de colágeno propio.',
     sessions: '1',
     duration: '30–45 min',
     recovery: '1 a 3 días',
@@ -414,7 +404,6 @@ export const treatments: Treatment[] = [
         'Depende de la zona y de lo que buscas. El precio es por jeringa de 1 ml y lo definimos contigo.',
       ],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'cuidado-medico-piel', en: 'medical-skin-care' },
@@ -424,10 +413,13 @@ export const treatments: Treatment[] = [
     from: '$90',
     short: 'Faciales médicos y HydraFacial para textura, manchas y acné.',
     desc: 'HydraFacial, faciales médicos, microneedling, MesojectGun y peelings. Precio por sesión; paquetes de 4 sesiones con descuento.',
-    img: p4,
+    img: cuidadoPielH,
     video: '/media/tx-skincare.mp4',
     items: [
       P('HydraFacial Signature', '$170'),
+      P('Terapia de luz LED · complemento', '$20'),
+      P('Cuello y escote · complemento', '$50'),
+      P('Globos fríos · complemento', '$10'),
       P('HydraFacial Deluxe', '$230'),
       P('HydraFacial Platinum', '$280'),
       P('GlowHaus Signature Experience', '$130'),
@@ -446,7 +438,7 @@ export const treatments: Treatment[] = [
       P('Peeling químico', '$125'),
       P('Exosomes Dermapen', '$475'),
     ],
-    what: 'HydraFacial, faciales médicos, microneedling, MesojectGun y peelings para limpiar, hidratar y mejorar la textura, las manchas y el acné.',
+    what: 'Son protocolos médicos que trabajan la piel por pasos: limpieza profunda, exfoliación y principios activos que penetran mejor en una piel preparada. El HydraFacial usa succión suave para extraer impurezas mientras hidrata; el microneedling y MesojectGun crean microcanales que estimulan colágeno y permiten que los sueros lleguen más profundo. Mejoran la textura, el acné y las manchas sin tiempo de recuperación.',
     sessions: '1 a 4',
     duration: '30–90 min',
     recovery: 'Ninguna a 2 días',
@@ -476,7 +468,6 @@ export const treatments: Treatment[] = [
         'Lo definimos en tu valoración según tu piel y lo que quieres mejorar.',
       ],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'rejuvenecimiento-intimo', en: 'intimate-rejuvenation' },
@@ -486,7 +477,7 @@ export const treatments: Treatment[] = [
     from: '$800',
     short: 'Láser Fotona para la salud y el bienestar íntimo.',
     desc: 'Tratamientos láser Fotona de salud íntima. Precio por sesión; paquetes de 3 sesiones por $2,100.',
-    img: p5,
+    img: intimoH,
     video: '/media/tx-intimo.mp4',
     detailImg: intimoInterna,
     detailPos: 'center 45%',
@@ -496,7 +487,7 @@ export const treatments: Treatment[] = [
       P('IncontiLase · incontinencia urinaria', '$800'),
       P('RenovaLase · resequedad / menopausia', '$800'),
     ],
-    what: 'Tratamientos láser Fotona para el tensado vaginal, la incontinencia urinaria leve y la resequedad asociada a la menopausia. Sin cirugía y en un espacio privado.',
+    what: 'El láser Fotona aplica calor suave sobre la mucosa vaginal, sin cortes ni anestesia. Ese calor estimula la producción de colágeno y mejora la circulación, lo que devuelve firmeza, elasticidad e hidratación a la zona. Se usa para la laxitud vaginal, la incontinencia urinaria leve y la resequedad asociada a la menopausia o al posparto.',
     sessions: '3',
     duration: '20–30 min',
     recovery: 'Mínima',
@@ -526,7 +517,6 @@ export const treatments: Treatment[] = [
         'Muchas pacientes notan cambios desde la primera sesión, y mejoran con las siguientes.',
       ],
     ]),
-    showResults: false,
   },
   {
     slug: { es: 'paquetes-vip', en: 'vip-packages' },
@@ -536,7 +526,8 @@ export const treatments: Treatment[] = [
     from: '$299 / mes',
     short: 'Combinaciones de Fotona y HydraFacial con precio especial.',
     desc: 'Paquetes que combinan Fotona 4D, SmoothEye, LipLace y HydraFacial Platinum, y una membresía mensual.',
-    img: p8,
+    img: vipH,
+    video: '/media/tx-vip.mp4',
     items: [
       P('Gold Glow', '$1,999'),
       P('GlowHaus 4D Transformation', '$1,999'),
@@ -544,7 +535,7 @@ export const treatments: Treatment[] = [
       P('Executive Refresh', '$1,199'),
       P('Membresía Total Face Rejuvenation', '$299 / mes'),
     ],
-    what: 'Paquetes que combinan Fotona 4D, SmoothEye, LipLace y HydraFacial Platinum con un precio especial, y una membresía mensual para mantener tus resultados.',
+    what: 'Los paquetes reúnen tratamientos que se potencian entre sí. Fotona 4D tensa y renueva el rostro, SmoothEye trabaja la zona de los ojos, LipLace da volumen e hidratación a los labios sin agujas y HydraFacial Platinum prepara y limpia la piel para que responda mejor al láser. Combinados en un mismo plan, el resultado es más completo que con cada tratamiento por separado.',
     sessions: 'Según paquete',
     duration: 'Varias citas',
     recovery: 'Mínima',
@@ -573,7 +564,6 @@ export const treatments: Treatment[] = [
       ],
       ['¿Puedo cambiar un tratamiento del paquete?', 'Lo podemos ajustar en tu valoración.'],
     ]),
-    showResults: true,
   },
   {
     slug: { es: 'bienestar', en: 'wellness' },
@@ -584,8 +574,12 @@ export const treatments: Treatment[] = [
     short: 'Programa médico de pérdida de peso.',
     desc: 'Programa médico de pérdida de peso con seguimiento. Requiere consulta.',
     img: bienestar,
-    items: [P('Pérdida de peso médica', 'Consultar')],
-    what: 'Programa médico de pérdida de peso con seguimiento de Alain Castellat, APRN. El plan se define en una consulta según tu historial y tus objetivos.',
+    items: [
+      P('Pérdida de peso médica', 'Consultar'),
+      P('Drenaje linfático', '$80'),
+      P('Terapia IV', 'Consultar'),
+    ],
+    what: 'Es un programa de pérdida de peso con supervisión médica. Combina orientación sobre alimentación y hábitos con tratamiento farmacológico cuando está indicado, y se adapta a tu historial de salud. El objetivo es bajar de peso de forma segura y sostenida, cuidando también la piel y la firmeza durante el proceso.',
     sessions: 'Mensual',
     duration: '30 min',
     recovery: 'Ninguna',
@@ -603,43 +597,6 @@ export const treatments: Treatment[] = [
       ['¿Necesito análisis?', 'En algunos casos sí. Te lo indicamos en la consulta.'],
       ['¿Cada cuánto son las citas?', 'Normalmente una vez al mes.'],
     ]),
-    showResults: true,
-  },
-  {
-    slug: { es: 'complementos', en: 'add-ons' },
-    name: 'Complementos',
-    title: 'Complementos',
-    tag: 'PARA SUMAR A TU TRATAMIENTO',
-    from: '$10',
-    short: 'Luz LED, drenaje y más para potenciar tu tratamiento.',
-    desc: 'Para sumar a tu facial o tratamiento. Precio por sesión.',
-    img: p0,
-    video: '/media/tx-complementos.mp4',
-    detailImg: p0,
-    items: [
-      P('Terapia de luz LED', '$20'),
-      P('Drenaje linfático', '$80'),
-      P('Cuello y escote', '$50'),
-      P('Globos fríos', '$10'),
-    ],
-    what: 'Pequeños extras para sumar a tu facial o tratamiento: terapia de luz LED, drenaje linfático, cuello y escote, y globos fríos.',
-    sessions: 'Por sesión',
-    duration: '10–30 min',
-    recovery: 'Ninguna',
-    by: E,
-    forWho: ['Desinflamar', 'Calmar la piel', 'Potenciar un facial', 'Cuello y escote'],
-    stepsTitle: 'Cómo se suman',
-    steps: S([
-      ['Elige tu tratamiento', 'Reserva tu facial o tratamiento principal.'],
-      ['Añade el complemento', 'Pídelo al reservar o el mismo día en la clínica.'],
-      ['Lo aplicamos', 'Se hace en la misma cita, antes o después del tratamiento.'],
-      ['Sales lista', 'Sin tiempo de recuperación.'],
-    ]),
-    faqs: F([
-      ['¿Puedo reservar solo un complemento?', 'Están pensados para sumarse a otro tratamiento.'],
-      ['¿Qué hace la luz LED?', 'Ayuda a calmar la piel y a potenciar los resultados del facial.'],
-    ]),
-    showResults: true,
   },
 ]
 
