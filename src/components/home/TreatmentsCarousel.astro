@@ -73,12 +73,18 @@ const copies = [0, 1, 2] as const
               draggable="false"
               class="group text-cream bg-brown relative block aspect-[4/5.4] overflow-hidden rounded-[20px] focus-visible:outline-offset-4"
             >
+              {/* Las fotos son horizontales y la tarjeta vertical: se recortan al formato de la
+                  tarjeta al generar los archivos; si no, el navegador elige uno demasiado pequeño
+                  (calcula por el ancho) y la foto se ve borrosa. */}
               <Image
                 src={c.cardImg ?? c.img}
                 alt=""
                 draggable="false"
-                widths={[320, 480, 720]}
-                sizes="(min-width: 1100px) 350px, 280px"
+                width={720}
+                height={972}
+                fit="cover"
+                widths={[360, 540, 720, 1080]}
+                sizes="(min-width: 1400px) 350px, (min-width: 1100px) 25vw, 270px"
                 style={`object-position:${c.cardImg ? (c.cardPos ?? 'center') : (c.imgPos ?? 'center')}`}
                 class="absolute inset-0 size-full object-cover transition-transform duration-800 ease-(--ease-glow) group-hover:scale-[1.02]"
               />
