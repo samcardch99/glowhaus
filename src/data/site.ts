@@ -9,7 +9,7 @@ export const site = {
   whatsapp: '17869182997',
   // Agenda en línea (Vagaro), el mismo enlace que la clínica tiene en Instagram
   booking: 'https://bit.ly/GlowHaus',
-  email: 'hola@aestheticsglowhaus.com',
+  email: 'hello@aestheticsglowhaus.com',
   instagram: 'https://www.instagram.com/aestheticsglowhaus/',
   instagramHandle: '@aestheticsglowhaus',
   facebook: 'https://www.facebook.com/profile.php?id=61588214351367',
