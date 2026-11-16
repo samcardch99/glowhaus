@@ -16,7 +16,8 @@ import { treatmentPath, useT, type Lang } from '../../i18n'
 // al posarse se convierten en los botones reales. En tableta los botones suben
 // escalonados con el scroll.
 // En teléfono (<760 px), como en el diseño responsive: la figura va arriba y los
-// botones forman una fila de tarjetas tipo carrusel, en su orden natural y en bucle.
+// botones forman una fila de tarjetas tipo carrusel en bucle, con Rejuvenecimiento
+// íntimo la primera y elegida al llegar (petición del cliente).
 // La tarjeta centrada es la elegida (dorada) y marca sus zonas en la figura; se
 // avanza con las flechas o deslizando con el dedo.
 interface Props {
@@ -65,7 +66,7 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
           <button
             type="button"
             data-body-btn={order[k]}
-            style={`--o:${order[k]}`}
+            style={`--o:${k}`}
             data-featured={order[k] === START ? '' : undefined}
             aria-pressed={order[k] === START ? 'true' : 'false'}
             aria-controls="body-figure"
@@ -503,7 +504,7 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
   }
 
   // ---------- Fila de tarjetas del teléfono ----------
-  // Las tarjetas van en su orden natural y en bucle: dos copias a cada extremo
+  // Las tarjetas van en el orden del DOM (la destacada, primera) y en bucle: dos copias a cada extremo
   // (como los «fantasmas» del diseño). La tarjeta centrada es la elegida. Al
   // pararse sobre una copia, la fila salta sin animación a la tarjeta real.
   function rowSlider(
@@ -516,8 +517,9 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
   ) {
     const reduce = prefersReducedMotion()
     const num = (b: HTMLElement) => Number(b.dataset.bodyBtn ?? b.dataset.ghostOf)
-    const real = [...btns].sort((a, b) => num(a) - num(b))
+    const real = btns
     const n = real.length
+    const byNum = (i: number) => real.find((b) => num(b) === i)
     const ghost = (src: HTMLButtonElement, order: number) => {
       const c = src.cloneNode(true) as HTMLButtonElement
       c.dataset.ghostOf = src.dataset.bodyBtn
@@ -555,7 +557,7 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
     const settle = () => {
       let el = nearest()
       if (el.dataset.ghostOf !== undefined) {
-        el = real[num(el)]!
+        el = byNum(num(el))!
         center(el, false)
       }
       if (num(el) !== getPicked()) pick(num(el))
@@ -576,15 +578,14 @@ const order = [START, ...treatments.map((_, i) => i).filter((i) => i !== START)]
     }
     const onArrow = (e: Event) => step(Number((e.currentTarget as HTMLElement).dataset.bodyStep))
     const onGhost = (e: Event) => tap(e.currentTarget as HTMLElement)
-    const recenter = () => center(real[getPicked()] ?? real[0]!, false)
+    const recenter = () => center(byNum(getPicked()) ?? real[0]!, false)
 
     grid.addEventListener('scroll', onScroll, { passive: true })
     arrows.forEach((a) => a.addEventListener('click', onArrow))
     ghosts.forEach((g) => g.addEventListener('click', onGhost))
     window.addEventListener('resize', recenter)
 
-    // En teléfono la fila empieza por la primera categoría, como en el diseño
-    pick(0)
+    // La fila empieza centrada en la tarjeta elegida (al cargar, la destacada)
     recenter()
     void document.fonts.ready.then(recenter)
 
