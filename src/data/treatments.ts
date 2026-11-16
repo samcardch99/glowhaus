@@ -8,7 +8,7 @@ import rellenosH from '../assets/photos/rellenos-h.jpg'
 import cuidadoPielH from '../assets/photos/cuidado-piel-h.jpg'
 import intimoH from '../assets/photos/intimo-h.jpg'
 import vipH from '../assets/photos/vip-h.jpg'
-import bienestar from '../assets/photos/bienestar.jpg'
+import bienestar from '../assets/photos/bienestar-alejada.jpg'
 import bienestarTarjeta from '../assets/photos/bienestar-tarjeta.jpg'
 import intimoInterna from '../assets/photos/intimo-interna.jpg'
 
@@ -578,6 +578,8 @@ export const treatments: Treatment[] = [
     short: 'Programa médico de pérdida de peso.',
     desc: 'Programa médico de pérdida de peso con seguimiento. Requiere consulta.',
     img: bienestar,
+    // Foto vertical: en las pantallas apaisadas de «Tratamientos» se ve la franja del torso
+    imgPos: 'center 28%',
     cardImg: bienestarTarjeta,
     items: [
       P('Pérdida de peso médica', 'Consultar'),
