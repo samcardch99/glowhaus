@@ -7,6 +7,8 @@ export const site = {
   phone: '+1 (786) 918-2997',
   phoneHref: 'tel:+17869182997',
   whatsapp: '17869182997',
+  // Agenda en línea (Vagaro), el mismo enlace que la clínica tiene en Instagram
+  booking: 'https://bit.ly/GlowHaus',
   email: 'hola@aestheticsglowhaus.com',
   instagram: 'https://www.instagram.com/aestheticsglowhaus/',
   instagramHandle: '@aestheticsglowhaus',

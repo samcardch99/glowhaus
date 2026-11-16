@@ -160,12 +160,12 @@ export function detailMeta(lang: Lang, t: Treatment) {
   if (lang === 'en') {
     return {
       title: `${name} in Miami · Prices | GlowHaus Aesthetics`,
-      description: `${tt(t.short)} ${price}. Per-session prices, FAQs and WhatsApp booking at GlowHaus Aesthetics, Miami.`,
+      description: `${tt(t.short)} ${price}. Per-session prices, FAQs and online booking at GlowHaus Aesthetics, Miami.`,
     }
   }
   return {
     title: `${name} en Miami · Precios | GlowHaus Aesthetics`,
-    description: `${t.short} ${price}. Precios por sesión, preguntas frecuentes y reserva por WhatsApp en GlowHaus Aesthetics, Miami.`,
+    description: `${t.short} ${price}. Precios por sesión, preguntas frecuentes y reserva en línea en GlowHaus Aesthetics, Miami.`,
   }
 }
 

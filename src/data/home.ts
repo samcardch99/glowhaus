@@ -369,7 +369,7 @@ export const homeFaqs: Faq[] = [
   },
   {
     q: '¿Cómo reservo?',
-    a: 'Escríbenos por WhatsApp o llámanos al +1 (786) 918-2997 y te damos cita. No tenemos agenda en línea: así confirmamos contigo el tratamiento y el horario.',
+    a: 'Pulsa «Reservar cita» y elige tratamiento y horario en nuestra agenda en línea. Si tienes dudas, escríbenos por WhatsApp o llámanos al +1 (786) 918-2997.',
   },
   {
     q: '¿Dónde están?',

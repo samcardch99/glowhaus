@@ -2,7 +2,7 @@
 import Button from '../ui/Button.astro'
 import Arrow from '../ui/Arrow.astro'
 import PauseButton from './PauseButton.astro'
-import { site, whatsappHref } from '../../data/site'
+import { site } from '../../data/site'
 import { pathFor, useT, type Lang } from '../../i18n'
 
 // Primera pantalla: reel vertical enmarcado a la derecha sobre una copia
@@ -89,7 +89,7 @@ const stats = [
           )}
         </p>
         <div data-hero-in data-delay="320">
-          <Button href={whatsappHref(lang)} external>
+          <Button href={site.booking} external>
             {t('Reservar cita')}
           </Button>
         </div>

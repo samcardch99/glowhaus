@@ -9,7 +9,7 @@ import StepsTimeline from './StepsTimeline.astro'
 import PaymentMethods from './PaymentMethods.astro'
 import RelatedTreatments from './RelatedTreatments.astro'
 import type { Treatment } from '../../data/treatments'
-import { whatsappHref } from '../../data/site'
+import { site } from '../../data/site'
 import { pathFor, useT, type Lang } from '../../i18n'
 import { baSetsFor, posterFor } from './helpers'
 
@@ -28,7 +28,7 @@ const still =
   tx.video && tx.detailVideo ? undefined : (tx.detailImg ?? (tx.video ? undefined : tx.img))
 const stillPos = tx.detailImg ? (tx.detailPos ?? 'center 45%') : (tx.imgPos ?? 'center')
 const videoId = `tx-video-${tx.slug.es}`
-const book = whatsappHref(lang, name)
+const book = site.booking
 const baSets = baSetsFor(tx)
 ---
 

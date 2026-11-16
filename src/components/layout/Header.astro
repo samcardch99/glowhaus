@@ -4,7 +4,7 @@ import wordmark from '../../assets/glowhaus-wordmark.png'
 import logoBlanco from '../../assets/glowhaus-logo-blanco.png'
 import Arrow from '../ui/Arrow.astro'
 import SocialIcon from '../ui/SocialIcon.astro'
-import { menuItems, site, whatsappHref } from '../../data/site'
+import { menuItems, site } from '../../data/site'
 import { treatments } from '../../data/treatments'
 import { pathFor, treatmentPath, useT, type Lang } from '../../i18n'
 
@@ -21,7 +21,7 @@ const t = useT(lang)
 const homeHref = pathFor(lang, 'home')
 const esHref = lang === 'es' ? Astro.url.pathname : altPath
 const enHref = lang === 'en' ? Astro.url.pathname : altPath
-const book = whatsappHref(lang)
+const book = site.booking
 const fotona = treatments[0]!
 
 const items = menuItems.map((m, i) => ({
